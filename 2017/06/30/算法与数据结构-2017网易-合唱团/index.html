@@ -21,25 +21,23 @@
     var CONFIG = {"hostname":"xinxingastro.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":{"disqus":{"text":"Load Disqus","order":-1}},"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="B-Tree（B树）是一种自平衡查找树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，倒在对数时间内完成，B树概括来说是一个一般化的二分搜索树，可以拥有多余2个子节点。与自平衡二叉查找树不同，B树为系统大块数据的读写操作做了优化。B树减少定位记录时所经历的中间过程，从而加快存取速度。B树这种数据结构可以用来描述外部存储。这种数据结构常被引用在数据库和文件系统上。">
+  <meta name="description" content="求间隔子数组的最大乘积。相邻元素的最大间隔为d，子数组长度为k。 相关题目：编程之美2.13: 子数组的最大乘积">
 <meta property="og:type" content="article">
-<meta property="og:title" content="B-Tree总结">
-<meta property="og:url" content="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:title" content="2017网易 合唱团">
+<meta property="og:url" content="https://xinxingastro.github.io/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2017%E7%BD%91%E6%98%93-%E5%90%88%E5%94%B1%E5%9B%A2/index.html">
 <meta property="og:site_name" content="Xing&#39;s Blog">
-<meta property="og:description" content="B-Tree（B树）是一种自平衡查找树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，倒在对数时间内完成，B树概括来说是一个一般化的二分搜索树，可以拥有多余2个子节点。与自平衡二叉查找树不同，B树为系统大块数据的读写操作做了优化。B树减少定位记录时所经历的中间过程，从而加快存取速度。B树这种数据结构可以用来描述外部存储。这种数据结构常被引用在数据库和文件系统上。">
+<meta property="og:description" content="求间隔子数组的最大乘积。相邻元素的最大间隔为d，子数组长度为k。 相关题目：编程之美2.13: 子数组的最大乘积">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/B-Tree.png">
-<meta property="og:image" content="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/Bplustree.png">
-<meta property="article:published_time" content="2017-08-13T16:22:16.000Z">
-<meta property="article:modified_time" content="2017-08-13T16:22:16.000Z">
+<meta property="og:image" content="https://xinxingastro.github.io/images/hechangtuan.png">
+<meta property="article:published_time" content="2017-06-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2017-06-30T16:00:00.000Z">
 <meta property="article:author" content="Xing Xin">
-<meta property="article:tag" content="Tech">
-<meta property="article:tag" content=" Algorithm">
-<meta property="article:tag" content=" Data Structure">
+<meta property="article:tag" content="动态规划">
+<meta property="article:tag" content="数组">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/B-Tree.png">
+<meta name="twitter:image" content="https://xinxingastro.github.io/images/hechangtuan.png">
 
-<link rel="canonical" href="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/">
+<link rel="canonical" href="https://xinxingastro.github.io/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2017%E7%BD%91%E6%98%93-%E5%90%88%E5%94%B1%E5%9B%A2/">
 
 
 <script id="page-configurations">
@@ -52,7 +50,7 @@
   };
 </script>
 
-  <title>B-Tree总结 | Xing's Blog</title>
+  <title>2017网易 合唱团 | Xing's Blog</title>
   
 
 
@@ -204,7 +202,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2017%E7%BD%91%E6%98%93-%E5%90%88%E5%94%B1%E5%9B%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
@@ -217,7 +215,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          B-Tree总结<a href="https://github.com/XinXingAstro/xinxingastro.github.io/edit/source/source/_posts/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/B-Tree%E6%80%BB%E7%BB%93.md" class="post-edit-link" title="编辑" rel="noopener" target="_blank"><i class="fa fa-pencil-alt"></i></a>
+          2017网易 合唱团<a href="https://github.com/XinXingAstro/xinxingastro.github.io/edit/source/source/_posts/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/2017%E7%BD%91%E6%98%93-%E5%90%88%E5%94%B1%E5%9B%A2.md" class="post-edit-link" title="编辑" rel="noopener" target="_blank"><i class="fa fa-pencil-alt"></i></a>
         </h1>
 
         <div class="post-meta">
@@ -227,7 +225,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2017-08-14 00:22:16" itemprop="dateCreated datePublished" datetime="2017-08-14T00:22:16+08:00">2017-08-14</time>
+              <time title="创建时间：2017-07-01 00:00:00" itemprop="dateCreated datePublished" datetime="2017-07-01T00:00:00+08:00">2017-07-01</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -255,8 +253,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/14/算法与数据结构-B-Tree总结/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2017%E7%BD%91%E6%98%93-%E5%90%88%E5%94%B1%E5%9B%A2/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/06/30/算法与数据结构-2017网易-合唱团/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -271,31 +269,32 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>B-Tree（B树）是一种自平衡查找树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，倒在对数时间内完成，B树概括来说是一个一般化的二分搜索树，可以拥有多余2个子节点。与自平衡二叉查找树不同，B树为系统大块数据的读写操作做了优化。B树减少定位记录时所经历的中间过程，从而加快存取速度。B树这种数据结构可以用来描述外部存储。这种数据结构常被引用在数据库和文件系统上。</p>
+        <p>求间隔子数组的最大乘积。相邻元素的最大间隔为d，子数组长度为k。</p>
+<p>相关题目：编程之美2.13: 子数组的最大乘积</p>
 <a id="more"></a>
 
-<hr>
-<h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>文件系统中的文件是以树的形式存储的，查找文件的效率跟树的高度直接相关，为了加快文件查找速度，我们使用M叉查找树，因为一个完全二叉树的高度大约是$log_2N$，而一个完全M叉树的高度大约是$log_MN$。</p>
-<p>建立M叉树的方式跟建立二叉树的方式相同，在二叉树查找树中，需要一个关键字来决定两个分支到底用哪个分支，在M叉查找树中，需要M-1个关键字来决定选取哪个分支。为了保证查找的性能，我们要让这个M叉树保持平衡。实现这种想法使用的数据结构叫B树。</p>
-<p>一个M叉B树具有以下特性：</p>
-<ul>
-<li>数据项存储在树叶上。</li>
-<li>非叶节点存储M-1个关键字以指示搜索的方向，关键字i代表子树i+1中的最小的关键字。</li>
-<li>树的根或者是一片树叶，或者其儿子数载2～M之间。</li>
-<li>除根外，所有非叶节点的儿子数在M/2(向上取整)～M之间。</li>
-<li>所有的树叶都在相同的深度上。</li>
-</ul>
-<p>一个5叉B树如下所示：</p>
-<p><img src="B-Tree.png" alt="B-Tree"></p>
-<p>在B树中，内部（非叶子）节点可以拥有可变数量的子节点（数量范围预先定义好）。当数据被插入或从一个节点中移除，它的子节点数量发生变化。为了维持在预先设定的数量范围内，内部节点可能会被合并或者分离。因为子节点数量有一定的允许范围，所以B树不需要像其他自平衡查找树那样频繁地重新保持平衡，但是由于节点没有被完全填充，可能浪费了一些空间。子节点数量的上界和下界依特定的实现而设置。例如，在一个2-3 B树（通常简称<a href="https://zh.wikipedia.org/wiki/2-3%E6%A0%91">2-3树</a>），每一个内部节点只能有2或3个子节点。</p>
-<p>B树中每一个内部节点会包含一定数量的键值。通常，键值的数量被选定在d和2d之间。在实际中，键值占用了节点中大部分的空间。因数2将保证节点可以被拆分或组合。如果一个内部节点有2d个键值，那么添加一个键值给此节点的过程，将会拆分2d键值为2个d键值的节点，并把中间值节点添加给父节点。每一个拆分的节点需要最小数目的键值。相似地，如果一个内部节点和他的邻居两者都有d个键值，那么将通过它与邻居的合并来删除一个键值。删除此键值将导致此节点拥有d−1个键值（与邻居的合并则加上d个键值，再加上从邻居节点的父节点移来的一个键值）结果为完全填充的2d个键值。</p>
-<p><strong>一个Ｂ树通过约束所有叶子节点在相同深度来保持平衡</strong>。深度在元素添加至树的过程中缓慢增长，而整体深度极少地增长，并导致所有叶子节点与根节点距离加1。</p>
-<p>在存取节点数据所耗时间远超过处理节点数据所耗时间的情况下，Ｂ树在可选的实现中拥有很多优势，因为存取节点的开销被分摊到里层节点的多次操作上。这通常出现在当节点存储在二级存储器如硬盘存储器上。通过最大化内部里层节点的子节点的数量，树的高度减小，存取节点的开销被缩减。另外，重新平衡树的动作也更少出现。子节点的最大数量取决于，每个子节点必需存储的信息量，和完整磁盘块的大小或者二次存储器中类似的容量。虽然2-3 树更易于解释，实际运用中，Ｂ树使用<a href="https://zh.wikipedia.org/w/index.php?title=%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8%E5%99%A8&action=edit&redlink=1">二级存储器</a>，需要要大量数目的子节点来提升效率。</p>
-<p>一个Ｂ树在它内部节点中存储键值，但不需在叶子节点上存储这些键值的记录。大体上的一类包含一些变体，如B+树和Ｂ*树。</p>
-<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>在Ｂ+树中，这些键值的拷贝被存储在内部节点；键值和记录存储在叶子节点；另外，一个叶子节点可以包含一个指针，指向另一个叶子节点以加速顺序存取。</p>
-<p>一个B+树的例子如下图所示：</p>
-<p><img src="Bplustree.png" alt="Bplustree"></p>
-<p>B+ 树通常用于数据库和操作系统的文件系统中。NTFS, ReiserFS, NSS, XFS, JFS, ReFS 和BFS等文件系统都在使用B+树作为元数据索引。B+ 树的特点是能够保持数据稳定有序，其插入与修改拥有较稳定的对数时间复杂度。B+ 树元素自底向上插入。</p>
+<blockquote>
+<p>题目：（网易2017年合唱团）有 n 个学生站成一排，每个学生有一个能力值，牛牛想从这 n 个学生中按照顺序选取 k 名学生，要求相邻两个学生的位置编号的差不超过 d，使得这 k 个学生的能力值的乘积最大，你能返回最大的乘积吗？</p>
+<p>输入：每个输入包含 1 个测试用例。每个测试数据的第一行包含一个整数 n (1 &lt;= n &lt;= 50)，表示学生的个数，接下来的一行，包含 n 个整数，按顺序表示每个学生的能力值 ai（-50 &lt;= ai &lt;= 50）。接下来的一行包含两个整数，k 和 d (1 &lt;= k &lt;= 10, 1 &lt;= d &lt;= 50)。</p>
+<p>输出：输出一行表示最大的乘积</p>
+<p>示例：</p>
+<p>3</p>
+<p>7  4  7</p>
+<p>2  50</p>
+<p>输出：</p>
+<p>49</p>
+</blockquote>
+<h4 id="算法：2D动态规划"><a href="#算法：2D动态规划" class="headerlink" title="算法：2D动态规划"></a>算法：2D动态规划</h4><p>规划过程 ；</p>
+<p><strong>max[k][i] 表示选到第k个数字，并且第k个数字的下标是i，这些数字所能产生的最大累乘积</strong></p>
+<p><strong>min[k][i] 表示选到第k个数字，并且第k个数字的下标是i，这些数字所能产生的最小累乘积</strong></p>
+<p>则<strong>max[k+1][i+1] = max{ max[k][i] * nums[i+1], min[k][i] * nums[i+1] }</strong></p>
+<p>由于选定的两个数的下标之差在(1 ~ d)之间，所以上述的 max[k][i], min[k][i] 中的 i 应为一个变量, 从 max{ (i-d), 0 } 到 (i-1) 进行遍历。之后我们就得到了 k+1 个学生，并且以第 i+1 个学生结尾所能产生的最大乘积，如果 i+1 大于 k+1，我们还要遍历从 k+1 到 i+1 的所有结果中找出最大值。</p>
+<p>同理可得:</p>
+<p><strong>min[k+1][i+1] = min{ max[k][i] * nums[i+1], min[k][i] * nums[i+1] }</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WY_HeChangTuan</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        BufferedReader bufferedReader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(System.in));</span><br><span class="line">        String line = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span>((line = bufferedReader.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> n = Integer.parseInt(line.trim()); <span class="comment">//n表示学生个数</span></span><br><span class="line">            line = bufferedReader.readLine();</span><br><span class="line">            <span class="keyword">int</span>[] nums = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">            String[] s = line.trim().split(<span class="string">" "</span>);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">                nums[i] = Integer.parseInt(s[i]); <span class="comment">// nums[i]表示对应学生的能力值</span></span><br><span class="line">            &#125;</span><br><span class="line">            line = bufferedReader.readLine();</span><br><span class="line">            String[] s1 = line.trim().split(<span class="string">" "</span>);</span><br><span class="line">            <span class="keyword">int</span> k = Integer.parseInt(s1[<span class="number">0</span>]); <span class="comment">//选取k个学生</span></span><br><span class="line">            <span class="keyword">int</span> d = Integer.parseInt(s1[<span class="number">1</span>]); <span class="comment">//编号之差不超过d</span></span><br><span class="line">            <span class="comment">//规划过程开始</span></span><br><span class="line">            <span class="keyword">long</span>[][] max = <span class="keyword">new</span> <span class="keyword">long</span>[k][n];</span><br><span class="line">            <span class="keyword">long</span>[][] min = <span class="keyword">new</span> <span class="keyword">long</span>[k][n];</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">                max[<span class="number">0</span>][i] = nums[i];</span><br><span class="line">                min[<span class="number">0</span>][i] = nums[i];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; k; i++) &#123;</span><br><span class="line">                max[i][i] = max[i-<span class="number">1</span>][i-<span class="number">1</span>] * nums[i];</span><br><span class="line">                min[i][i] = max[i][i];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; k; i++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">2</span>; j &lt; n; j++) &#123;</span><br><span class="line">                    <span class="keyword">for</span>(<span class="keyword">int</span> m = Math.max(<span class="number">0</span>, (j-d)); m &lt;= (j - <span class="number">1</span>); m++) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (m == Math.max(<span class="number">0</span>, (j-d))) &#123;</span><br><span class="line">                            max[i][j] = Math.max(max[i-<span class="number">1</span>][m]*nums[j], min[i-<span class="number">1</span>][m]*nums[j]);</span><br><span class="line">                            min[i][j] = Math.min(max[i-<span class="number">1</span>][m]*nums[j], min[i-<span class="number">1</span>][m]*nums[j]);</span><br><span class="line">                        &#125;</span><br><span class="line">                        max[i][j] = Math.max(Math.max(max[i-<span class="number">1</span>][m]*nums[j], min[i-<span class="number">1</span>][m]*nums[j]), max[i][j]);</span><br><span class="line">                        min[i][j] = Math.min(Math.min(max[i-<span class="number">1</span>][m]*nums[j], min[i-<span class="number">1</span>][m]*nums[j]), min[i][j]);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">long</span> res = Integer.MIN_VALUE;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = k-<span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">                res = Math.max(max[k-<span class="number">1</span>][i], res);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(res);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>动态规划的递归数组如下所示：</p>
+<p><img src="/images/hechangtuan.png" alt="动态规划数组"></p>
 
     </div>
 
@@ -303,9 +302,29 @@
     
     
       
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2017/06/30/算法与数据结构-连续子数组最大累乘积/" rel="bookmark">连续子数组最大累乘积</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2018/05/09/算法与数据结构-二维数组中的查找/" rel="bookmark">二维数组中的查找</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2018/06/20/算法与数据结构-数组中只出现1次的数字/" rel="bookmark">数组中只出现1次的数字</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2018/05/03/算法与数据结构-数组中重复的数字/" rel="bookmark">数组中重复的数字</a></div>
+    </li>
+  </ul>
 
 
       <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag"><i class="fa fa-tag"></i> 动态规划</a>
+              <a href="/tags/%E6%95%B0%E7%BB%84/" rel="tag"><i class="fa fa-tag"></i> 数组</a>
+          </div>
 
         
 
@@ -313,12 +332,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2017/08/12/%E5%85%B6%E4%BB%96-Mac%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AEJDK/" rel="prev" title="Mac安装配置JDK">
-      <i class="fa fa-chevron-left"></i> Mac安装配置JDK
+    <a href="/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E8%BF%9E%E7%BB%AD%E5%AD%90%E6%95%B0%E7%BB%84%E6%9C%80%E5%A4%A7%E7%B4%AF%E4%B9%98%E7%A7%AF/" rel="prev" title="连续子数组最大累乘积">
+      <i class="fa fa-chevron-left"></i> 连续子数组最大累乘积
     </a></div>
       <div class="post-nav-item">
-    <a href="/2017/08/14/Java-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E5%86%99equals%E6%96%B9%E6%B3%95%E5%B0%B1%E5%BF%85%E9%A1%BB%E9%87%8D%E5%86%99hashCode%E6%96%B9%E6%B3%95/" rel="next" title="为什么重写equals方法就必须重写hashCode方法">
-      为什么重写equals方法就必须重写hashCode方法 <i class="fa fa-chevron-right"></i>
+    <a href="/2017/07/22/%E5%85%B6%E4%BB%96-%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/" rel="next" title="科学上网配置指南">
+      科学上网配置指南 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -385,7 +404,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#B树"><span class="nav-number">1.</span> <span class="nav-text">B树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#B-树"><span class="nav-number">1.1.</span> <span class="nav-text">B+树</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#算法：2D动态规划"><span class="nav-number">1.</span> <span class="nav-text">算法：2D动态规划</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -566,9 +585,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/";
-    this.page.identifier = "2017/08/14/算法与数据结构-B-Tree总结/";
-    this.page.title = "B-Tree总结";
+    this.page.url = "https://xinxingastro.github.io/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-2017%E7%BD%91%E6%98%93-%E5%90%88%E5%94%B1%E5%9B%A2/";
+    this.page.identifier = "2017/06/30/算法与数据结构-2017网易-合唱团/";
+    this.page.title = "2017网易 合唱团";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
