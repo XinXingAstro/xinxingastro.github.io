@@ -45,70 +45,6 @@
       </categories>
   </entry>
   <entry>
-    <title>ConcurrentHashMap底层实现原理</title>
-    <url>/2018/04/15/Java-ConcurrentHashMap%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</url>
-    <content><![CDATA[<p>在并发编程中使用HashMap可能导致程序死循环。而使用线程安全的HashTable效率又非常低下，基于以上两个原因，便有了ConcurrentHashMap的登场机会。</p>
-<a id="more"></a>
-
-<hr>
-<h2 id="使用ConcurrentHashMap的原因"><a href="#使用ConcurrentHashMap的原因" class="headerlink" title="使用ConcurrentHashMap的原因"></a>使用ConcurrentHashMap的原因</h2><h3 id="1）线程不安全的HashMap"><a href="#1）线程不安全的HashMap" class="headerlink" title="1）线程不安全的HashMap"></a>1）线程不安全的HashMap</h3><p>多线程往HashMap中put数据会在HashMap中形成环，一旦形成环，在从HashMap中get数据时，由于Entry的next节点永远不为空，就会产生死循环获取Entry。JDK 8已经不会形成环，但是还是存在数据丢失的风险，所以在多线程环境下不建议使用HashMap</p>
-<h3 id="2）效率低下的HashTable"><a href="#2）效率低下的HashTable" class="headerlink" title="2）效率低下的HashTable"></a>2）效率低下的HashTable</h3><p>HashTable容器使用synchronized来保证线程安全，但在线程竞争激烈的情况下HashTable的效率非常低下。因为当一个线程访问HashTable的同步方法，其他线程也访问HashTable的同步方法时，会进入阻塞或轮询状态。如线程1使用put进行元素添加，线程2不但不能使用put方法添加元素，也不能使用get方法来获取元素，所以竞争越激烈效率越低。</p>
-<h3 id="3）ConcurrentHashMap使用锁分段技术有效提高并发访问率"><a href="#3）ConcurrentHashMap使用锁分段技术有效提高并发访问率" class="headerlink" title="3）ConcurrentHashMap使用锁分段技术有效提高并发访问率"></a>3）ConcurrentHashMap使用锁分段技术有效提高并发访问率</h3><p>HashTable效率低下的原因是所有线程都竞争同一把锁。JDK 1.7中ConcurrentHashMap使用<strong>锁分段技术</strong>，将数据分成一段一段地存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一段数据时候，其他段数据也能被其他线程访问。JDK 1.8摒弃了Segment的概念，直接使用volatile Node数组+链表+红黑树的结构来实现，并发控制使用Synchronized和CAS来操作，看起来就像优化过且线程安全的HashMap。</p>
-<p>下面的内容基于JDK1.8中对ConcurrentHashMap的实现。</p>
-<h2 id="ConcurrentHashMap使用的数据结构"><a href="#ConcurrentHashMap使用的数据结构" class="headerlink" title="ConcurrentHashMap使用的数据结构"></a>ConcurrentHashMap使用的数据结构</h2><p>ConcurrentHashMap中使用一个volatile Node类型的数组来存储所有数据，数组定义源码如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The array of bins. Lazily initialized upon first insertion.</span></span><br><span class="line"><span class="comment">     * Size is always a power of two. Accessed directly by iterators.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">volatile</span> Node&lt;K,V&gt;[] table;</span><br></pre></td></tr></table></figure>
-
-<p>table数组在第一次插入数据时才会被初始化，数组的容量总是2的幂，这是因为在计算node的插入位置时，要用以key值计算出的hash码和数组长度-1进行与操作，如果数组长度不是2的幂，长度-1就会出现0位i，详细内容可以参考：<a href="https://xinxingastro.github.io/2018/05/11/Java/HashMap底层实现原理/">HashMap底层实现原理</a>。</p>
-<p>Node类型源码如下所示：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Key-value entry.  This class is never exported out as a</span></span><br><span class="line"><span class="comment">     * user-mutable Map.Entry (i.e., one supporting setValue; see</span></span><br><span class="line"><span class="comment">     * MapEntry below), but can be used for read-only traversals used</span></span><br><span class="line"><span class="comment">     * in bulk tasks.  Subclasses of Node with a negative hash field</span></span><br><span class="line"><span class="comment">     * are special, and contain null keys and values (but are never</span></span><br><span class="line"><span class="comment">     * exported).  Otherwise, keys and vals are never null.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> hash;</span><br><span class="line">    <span class="keyword">final</span> K key;</span><br><span class="line">    <span class="keyword">volatile</span> V val;</span><br><span class="line">    <span class="keyword">volatile</span> Node&lt;K,V&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(<span class="keyword">int</span> hash, K key, V val, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">        <span class="keyword">this</span>.hash = hash;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">        <span class="keyword">this</span>.val = val;</span><br><span class="line">        <span class="keyword">this</span>.next = next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span>       </span>&#123; <span class="keyword">return</span> key; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span>     </span>&#123; <span class="keyword">return</span> val; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span>   </span>&#123; <span class="keyword">return</span> key.hashCode() ^ val.hashCode(); &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span></span>&#123; <span class="keyword">return</span> key + <span class="string">"="</span> + val; &#125;</span><br><span class="line">    <span class="comment">// 这里setValue时会直接抛出异常，所以不允许更新值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        Object k, v, u; Map.Entry&lt;?,?&gt; e;</span><br><span class="line">        <span class="keyword">return</span> ((o <span class="keyword">instanceof</span> Map.Entry) &amp;&amp;</span><br><span class="line">                (k = (e = (Map.Entry&lt;?,?&gt;)o).getKey()) != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                (v = e.getValue()) != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                (k == key || k.equals(key)) &amp;&amp;</span><br><span class="line">                (v == (u = val) || v.equals(u)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Virtualized support for map.get(); overridden in subclasses.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    <span class="function">Node&lt;K,V&gt; <span class="title">find</span><span class="params">(<span class="keyword">int</span> h, Object k)</span> </span>&#123;</span><br><span class="line">        Node&lt;K,V&gt; e = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">if</span> (k != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">do</span> &#123;</span><br><span class="line">                K ek;</span><br><span class="line">                <span class="keyword">if</span> (e.hash == h &amp;&amp;</span><br><span class="line">                    ((ek = e.key) == k || (ek != <span class="keyword">null</span> &amp;&amp; k.equals(ek))))</span><br><span class="line">                    <span class="keyword">return</span> e;</span><br><span class="line">            &#125; <span class="keyword">while</span> ((e = e.next) != <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果出现hash冲突，系统就在冲突位置的形成一个链表，这个链表在JDK中叫做Bin，由以上源码可知，Node就是一个单链表的节点，这种节点只允许对数据进行查询，不允许修改。</p>
-<p>如果一个Bin中的节点个数超过8，系统就会自动将这个bin转换成红黑树。TREEIFY-THRESHOLD定义了转换的阀值。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The bin count threshold for using a tree rather than list for a</span></span><br><span class="line"><span class="comment">     * bin.  Bins are converted to trees when adding an element to a</span></span><br><span class="line"><span class="comment">     * bin with at least this many nodes. The value must be greater</span></span><br><span class="line"><span class="comment">     * than 2, and should be at least 8 to mesh with assumptions in</span></span><br><span class="line"><span class="comment">     * tree removal about conversion back to plain bins upon</span></span><br><span class="line"><span class="comment">     * shrinkage.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TREEIFY_THRESHOLD = <span class="number">8</span>;</span><br></pre></td></tr></table></figure>
-
-<p>TreeNode就是红黑树中的节点类型，TreeNode源码如下：</p>
-<p>由于TreeNode是继承自Node类的所以Node中所有属性TreeNode中都有。在使用时可以把一个TreeNode就当作一个Node使用。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Nodes for use in TreeBins</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; parent;  <span class="comment">// red-black tree links</span></span><br><span class="line">    TreeNode&lt;K,V&gt; left;</span><br><span class="line">    TreeNode&lt;K,V&gt; right;</span><br><span class="line">    TreeNode&lt;K,V&gt; prev;    <span class="comment">// needed to unlink next upon deletion</span></span><br><span class="line">    <span class="keyword">boolean</span> red;</span><br><span class="line"></span><br><span class="line">    TreeNode(<span class="keyword">int</span> hash, K key, V val, Node&lt;K,V&gt; next,</span><br><span class="line">             TreeNode&lt;K,V&gt; parent) &#123;</span><br><span class="line">        <span class="keyword">super</span>(hash, key, val, next);</span><br><span class="line">        <span class="keyword">this</span>.parent = parent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">Node&lt;K,V&gt; <span class="title">find</span><span class="params">(<span class="keyword">int</span> h, Object k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> findTreeNode(h, k, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Returns the TreeNode (or null if not found) for the given key</span></span><br><span class="line"><span class="comment">         * starting at given root.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> TreeNode&lt;K,V&gt; <span class="title">findTreeNode</span><span class="params">(<span class="keyword">int</span> h, Object k, Class&lt;?&gt; kc)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (k != <span class="keyword">null</span>) &#123;</span><br><span class="line">            TreeNode&lt;K,V&gt; p = <span class="keyword">this</span>;</span><br><span class="line">            <span class="keyword">do</span>  &#123;</span><br><span class="line">                <span class="keyword">int</span> ph, dir; K pk; TreeNode&lt;K,V&gt; q;</span><br><span class="line">                TreeNode&lt;K,V&gt; pl = p.left, pr = p.right;</span><br><span class="line">                <span class="keyword">if</span> ((ph = p.hash) &gt; h)</span><br><span class="line">                    p = pl;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (ph &lt; h)</span><br><span class="line">                    p = pr;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> ((pk = p.key) == k || (pk != <span class="keyword">null</span> &amp;&amp; k.equals(pk)))</span><br><span class="line">                    <span class="keyword">return</span> p;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (pl == <span class="keyword">null</span>)</span><br><span class="line">                    p = pr;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (pr == <span class="keyword">null</span>)</span><br><span class="line">                    p = pl;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> ((kc != <span class="keyword">null</span> ||</span><br><span class="line">                          (kc = comparableClassFor(k)) != <span class="keyword">null</span>) &amp;&amp;</span><br><span class="line">                         (dir = compareComparables(kc, k, pk)) != <span class="number">0</span>)</span><br><span class="line">                    p = (dir &lt; <span class="number">0</span>) ? pl : pr;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> ((q = pr.findTreeNode(h, k, kc)) != <span class="keyword">null</span>)</span><br><span class="line">                    <span class="keyword">return</span> q;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    p = pl;</span><br><span class="line">            &#125; <span class="keyword">while</span> (p != <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>TreeBin是用来封装红黑树的容器，TreeBin的源码如下，在TreeBin中维护一个读写锁，一个线程如果想修改红黑树中的值必须拿到TreeBin的读写锁。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * TreeNodes used at the heads of bins. TreeBins do not hold user</span></span><br><span class="line"><span class="comment">     * keys or values, but instead point to list of TreeNodes and</span></span><br><span class="line"><span class="comment">     * their root. They also maintain a parasitic read-write lock</span></span><br><span class="line"><span class="comment">     * forcing writers (who hold bin lock) to wait for readers (who do</span></span><br><span class="line"><span class="comment">     * not) to complete before tree restructuring operations.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TreeBin</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; root;</span><br><span class="line">    <span class="keyword">volatile</span> TreeNode&lt;K,V&gt; first;</span><br><span class="line">    <span class="keyword">volatile</span> Thread waiter;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">int</span> lockState;</span><br><span class="line">    <span class="comment">// values for lockState</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WRITER = <span class="number">1</span>; <span class="comment">// set while holding write lock</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WAITER = <span class="number">2</span>; <span class="comment">// set when waiting for write lock</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> READER = <span class="number">4</span>; <span class="comment">// increment value for setting read lock</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Tie-breaking utility for ordering insertions when equal</span></span><br><span class="line"><span class="comment">         * hashCodes and non-comparable. We don't require a total</span></span><br><span class="line"><span class="comment">         * order, just a consistent insertion rule to maintain</span></span><br><span class="line"><span class="comment">         * equivalence across rebalancings. Tie-breaking further than</span></span><br><span class="line"><span class="comment">         * necessary simplifies testing a bit.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">tieBreakOrder</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> d;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span> ||</span><br><span class="line">            (d = a.getClass().getName().</span><br><span class="line">             compareTo(b.getClass().getName())) == <span class="number">0</span>)</span><br><span class="line">            d = (System.identityHashCode(a) &lt;= System.identityHashCode(b) ?</span><br><span class="line">                 -<span class="number">1</span> : <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> d;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Creates bin with initial set of nodes headed by b.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    TreeBin(TreeNode&lt;K,V&gt; b) &#123;</span><br><span class="line">        <span class="keyword">super</span>(TREEBIN, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">this</span>.first = b;</span><br><span class="line">        TreeNode&lt;K,V&gt; r = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">for</span> (TreeNode&lt;K,V&gt; x = b, next; x != <span class="keyword">null</span>; x = next) &#123;</span><br><span class="line">            next = (TreeNode&lt;K,V&gt;)x.next;</span><br><span class="line">            x.left = x.right = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (r == <span class="keyword">null</span>) &#123;</span><br><span class="line">                x.parent = <span class="keyword">null</span>;</span><br><span class="line">                x.red = <span class="keyword">false</span>;</span><br><span class="line">                r = x;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                K k = x.key;</span><br><span class="line">                <span class="keyword">int</span> h = x.hash;</span><br><span class="line">                Class&lt;?&gt; kc = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">for</span> (TreeNode&lt;K,V&gt; p = r;;) &#123;</span><br><span class="line">                    <span class="keyword">int</span> dir, ph;</span><br><span class="line">                    K pk = p.key;</span><br><span class="line">                    <span class="keyword">if</span> ((ph = p.hash) &gt; h)</span><br><span class="line">                        dir = -<span class="number">1</span>;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (ph &lt; h)</span><br><span class="line">                        dir = <span class="number">1</span>;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> ((kc == <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                              (kc = comparableClassFor(k)) == <span class="keyword">null</span>) ||</span><br><span class="line">                             (dir = compareComparables(kc, k, pk)) == <span class="number">0</span>)</span><br><span class="line">                        dir = tieBreakOrder(k, pk);</span><br><span class="line">                    TreeNode&lt;K,V&gt; xp = p;</span><br><span class="line">                    <span class="keyword">if</span> ((p = (dir &lt;= <span class="number">0</span>) ? p.left : p.right) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        x.parent = xp;</span><br><span class="line">                        <span class="keyword">if</span> (dir &lt;= <span class="number">0</span>)</span><br><span class="line">                            xp.left = x;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            xp.right = x;</span><br><span class="line">                        r = balanceInsertion(r, x);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.root = r;</span><br><span class="line">        <span class="function"><span class="keyword">assert</span> <span class="title">checkInvariants</span><span class="params">(root)</span></span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="PUT操作"><a href="#PUT操作" class="headerlink" title="PUT操作"></a>PUT操作</h2><p>ConcurrentHashMap的初始化并不在构造函数中实现，而是在第一插入数据时，在put方法中实现。</p>
-<p>put方法源码如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> putVal(key, value, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/** Implementation for put and putIfAbsent */</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(K key, V value, <span class="keyword">boolean</span> onlyIfAbsent)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (key == <span class="keyword">null</span> || value == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">    <span class="keyword">int</span> hash = spread(key.hashCode());</span><br><span class="line">    <span class="keyword">int</span> binCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (Node&lt;K,V&gt;[] tab = table;;) &#123;</span><br><span class="line">        Node&lt;K,V&gt; f; <span class="keyword">int</span> n, i, fh; <span class="comment">//f表示插入位置节点，fh表示插入位置节点的hash值</span></span><br><span class="line">        <span class="keyword">if</span> (tab == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">            tab = initTable();</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((f = tabAt(tab, i = (n - <span class="number">1</span>) &amp; hash)) == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (casTabAt(tab, i, <span class="keyword">null</span>,</span><br><span class="line">                         <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key, value, <span class="keyword">null</span>)))</span><br><span class="line">                <span class="keyword">break</span>;                   <span class="comment">// no lock when adding to empty bin</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((fh = f.hash) == MOVED)</span><br><span class="line">            tab = helpTransfer(tab, f);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            V oldVal = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">synchronized</span> (f) &#123;</span><br><span class="line">                <span class="keyword">if</span> (tabAt(tab, i) == f) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (fh &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                        binCount = <span class="number">1</span>;</span><br><span class="line">                        <span class="keyword">for</span> (Node&lt;K,V&gt; e = f;; ++binCount) &#123;</span><br><span class="line">                            K ek;</span><br><span class="line">                            <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                                ((ek = e.key) == key ||</span><br><span class="line">                                 (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek)))) &#123;</span><br><span class="line">                                oldVal = e.val;</span><br><span class="line">                                <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                    e.val = value;</span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                            Node&lt;K,V&gt; pred = e;</span><br><span class="line">                            <span class="keyword">if</span> ((e = e.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                                pred.next = <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key,</span><br><span class="line">                                                          value, <span class="keyword">null</span>);</span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">instanceof</span> TreeBin) &#123;</span><br><span class="line">                        Node&lt;K,V&gt; p;</span><br><span class="line">                        binCount = <span class="number">2</span>;</span><br><span class="line">                        <span class="keyword">if</span> ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,</span><br><span class="line">                                                              value)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            oldVal = p.val;</span><br><span class="line">                            <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                p.val = value;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (binCount != <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD)</span><br><span class="line">                    treeifyBin(tab, i);</span><br><span class="line">                <span class="keyword">if</span> (oldVal != <span class="keyword">null</span>)</span><br><span class="line">                    <span class="keyword">return</span> oldVal;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    addCount(<span class="number">1L</span>, binCount);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">spread</span><span class="params">(<span class="keyword">int</span> h)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (h ^ (h &gt;&gt;&gt; <span class="number">16</span>)) &amp; HASH_BITS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>put方法大致分以下几步：</p>
-<p>1）如果key和value不为null，则计算hash值。和HashMap相同的是，ConcurrentHashMap也会对key的hashcode高16位和低16位进行异或，不同的是，ConcurrentHashMap中还会将异或出的结果跟一个HASH_BITS变量相与。HASH_BITS定义如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HASH_BITS = <span class="number">0x7fffffff</span>; <span class="comment">// usable bits of normal node hash</span></span><br></pre></td></tr></table></figure>
-
-<p>HASH_BITS指定来可以用来计算hash的位数，默认值为31位。</p>
-<p>2）如果发现table还没初始化，则调用iniTable()方法对table进行初始化。</p>
-<p>3）计算插入位置使用<code>i = (n - 1) &amp; hash)</code>，如果插入位置为空，则新建Node利用CAS操作插入节点，然后返回。</p>
-<p>4）如果插入位置节点的hash值等于-1，则需要扩容，然后进行多线程并发扩容操作。</p>
-<p>5）否则，说明存在hash冲突。首先锁定插入位置节点，如果插入位置节点的hash值&gt;=0，则说明插入点是链表结构，新建Node插入。如果插入位置节点是TreeNode，则新建TreeNode插入。</p>
-<p>在插入Node节点时使用一个for循环进行判断，如果当前节点的key值和插入节点相同，直接将该节点的value修改为插入节点的value（onlyIfAbsent属性可以设置只有插入位置空时才插入）。如果key值不相同则遍历链表继续判断。</p>
-<p>6）检查当前Bin的容量，如果超过了阀值，则要将链表转化成红黑树。</p>
-<p>从put流程中可以发现，JDK1.8处理冲突时使用的是乐观锁，当有冲突时才进行并发处理。</p>
-<h2 id="GET操作"><a href="#GET操作" class="headerlink" title="GET操作"></a>GET操作</h2><p>get方法的源码如下所示：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; e, p; <span class="keyword">int</span> n, eh; K ek;</span><br><span class="line">    <span class="keyword">int</span> h = spread(key.hashCode());</span><br><span class="line">    <span class="keyword">if</span> ((tab = table) != <span class="keyword">null</span> &amp;&amp; (n = tab.length) &gt; <span class="number">0</span> &amp;&amp;</span><br><span class="line">        (e = tabAt(tab, (n - <span class="number">1</span>) &amp; h)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((eh = e.hash) == h) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((ek = e.key) == key || (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek)))</span><br><span class="line">                <span class="keyword">return</span> e.val;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (eh &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> (p = e.find(h, key)) != <span class="keyword">null</span> ? p.val : <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> ((e = e.next) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (e.hash == h &amp;&amp;</span><br><span class="line">                ((ek = e.key) == key || (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek))))</span><br><span class="line">                <span class="keyword">return</span> e.val;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>从上面的源码可以看到get的操作流程为：</p>
-<p>计算key的hash值，定位到table索引位置，如果首节点符合就返回，如果不符合就循环链表，匹配就返回，不匹配就返回null。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>JDK1.8版本的ConcurrentHashMap的数据结构已经接近HashMap，相对而言，ConcurrentHashMap只是增加了同步的操作来控制并发，从JDK1.7版本的ReentrantLock+Segment+HashEntry，到JDK1.8版本中synchronized+CAS+HashEntry+红黑树，ConcurrentHashMap发生了如下变化：</p>
-<ol>
-<li>JDK1.8中将锁的粒度进一步降低，更好的支持高并发场景。JDK1.7中锁住的是Segment对象，一个Segment中包含很多HashEntry。而JDK1.8中加锁的对象是插入点位置的节点。</li>
-<li>JDK1.8中使用红黑树代替链表，提高了查找速度。</li>
-<li>由于锁粒度的降低，JDK1.8中使用Synchronized代替ReentrantLock，增加了灵活度，降低了系统开销。</li>
-</ol>
-<blockquote>
-<p> 参考：<a href="https://juejin.im/post/5aba1030f265da23961269c6">ConcurrentHashMap底层原理</a></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-  </entry>
-  <entry>
     <title>HashMap底层实现原理</title>
     <url>/2018/05/11/Java-HashMap%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</url>
     <content><![CDATA[<p>HashMap底层原理总结，几个Hash集合之间的对比。</p>
@@ -966,6 +902,70 @@
       </tags>
   </entry>
   <entry>
+    <title>ConcurrentHashMap底层实现原理</title>
+    <url>/2018/04/15/Java-ConcurrentHashMap%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</url>
+    <content><![CDATA[<p>在并发编程中使用HashMap可能导致程序死循环。而使用线程安全的HashTable效率又非常低下，基于以上两个原因，便有了ConcurrentHashMap的登场机会。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="使用ConcurrentHashMap的原因"><a href="#使用ConcurrentHashMap的原因" class="headerlink" title="使用ConcurrentHashMap的原因"></a>使用ConcurrentHashMap的原因</h2><h3 id="1）线程不安全的HashMap"><a href="#1）线程不安全的HashMap" class="headerlink" title="1）线程不安全的HashMap"></a>1）线程不安全的HashMap</h3><p>多线程往HashMap中put数据会在HashMap中形成环，一旦形成环，在从HashMap中get数据时，由于Entry的next节点永远不为空，就会产生死循环获取Entry。JDK 8已经不会形成环，但是还是存在数据丢失的风险，所以在多线程环境下不建议使用HashMap</p>
+<h3 id="2）效率低下的HashTable"><a href="#2）效率低下的HashTable" class="headerlink" title="2）效率低下的HashTable"></a>2）效率低下的HashTable</h3><p>HashTable容器使用synchronized来保证线程安全，但在线程竞争激烈的情况下HashTable的效率非常低下。因为当一个线程访问HashTable的同步方法，其他线程也访问HashTable的同步方法时，会进入阻塞或轮询状态。如线程1使用put进行元素添加，线程2不但不能使用put方法添加元素，也不能使用get方法来获取元素，所以竞争越激烈效率越低。</p>
+<h3 id="3）ConcurrentHashMap使用锁分段技术有效提高并发访问率"><a href="#3）ConcurrentHashMap使用锁分段技术有效提高并发访问率" class="headerlink" title="3）ConcurrentHashMap使用锁分段技术有效提高并发访问率"></a>3）ConcurrentHashMap使用锁分段技术有效提高并发访问率</h3><p>HashTable效率低下的原因是所有线程都竞争同一把锁。JDK 1.7中ConcurrentHashMap使用<strong>锁分段技术</strong>，将数据分成一段一段地存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一段数据时候，其他段数据也能被其他线程访问。JDK 1.8摒弃了Segment的概念，直接使用volatile Node数组+链表+红黑树的结构来实现，并发控制使用Synchronized和CAS来操作，看起来就像优化过且线程安全的HashMap。</p>
+<p>下面的内容基于JDK1.8中对ConcurrentHashMap的实现。</p>
+<h2 id="ConcurrentHashMap使用的数据结构"><a href="#ConcurrentHashMap使用的数据结构" class="headerlink" title="ConcurrentHashMap使用的数据结构"></a>ConcurrentHashMap使用的数据结构</h2><p>ConcurrentHashMap中使用一个volatile Node类型的数组来存储所有数据，数组定义源码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The array of bins. Lazily initialized upon first insertion.</span></span><br><span class="line"><span class="comment">     * Size is always a power of two. Accessed directly by iterators.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">volatile</span> Node&lt;K,V&gt;[] table;</span><br></pre></td></tr></table></figure>
+
+<p>table数组在第一次插入数据时才会被初始化，数组的容量总是2的幂，这是因为在计算node的插入位置时，要用以key值计算出的hash码和数组长度-1进行与操作，如果数组长度不是2的幂，长度-1就会出现0位i，详细内容可以参考：<a href="https://xinxingastro.github.io/2018/05/11/Java/HashMap底层实现原理/">HashMap底层实现原理</a>。</p>
+<p>Node类型源码如下所示：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Key-value entry.  This class is never exported out as a</span></span><br><span class="line"><span class="comment">     * user-mutable Map.Entry (i.e., one supporting setValue; see</span></span><br><span class="line"><span class="comment">     * MapEntry below), but can be used for read-only traversals used</span></span><br><span class="line"><span class="comment">     * in bulk tasks.  Subclasses of Node with a negative hash field</span></span><br><span class="line"><span class="comment">     * are special, and contain null keys and values (but are never</span></span><br><span class="line"><span class="comment">     * exported).  Otherwise, keys and vals are never null.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> hash;</span><br><span class="line">    <span class="keyword">final</span> K key;</span><br><span class="line">    <span class="keyword">volatile</span> V val;</span><br><span class="line">    <span class="keyword">volatile</span> Node&lt;K,V&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(<span class="keyword">int</span> hash, K key, V val, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">        <span class="keyword">this</span>.hash = hash;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">        <span class="keyword">this</span>.val = val;</span><br><span class="line">        <span class="keyword">this</span>.next = next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span>       </span>&#123; <span class="keyword">return</span> key; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span>     </span>&#123; <span class="keyword">return</span> val; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span>   </span>&#123; <span class="keyword">return</span> key.hashCode() ^ val.hashCode(); &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span></span>&#123; <span class="keyword">return</span> key + <span class="string">"="</span> + val; &#125;</span><br><span class="line">    <span class="comment">// 这里setValue时会直接抛出异常，所以不允许更新值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        Object k, v, u; Map.Entry&lt;?,?&gt; e;</span><br><span class="line">        <span class="keyword">return</span> ((o <span class="keyword">instanceof</span> Map.Entry) &amp;&amp;</span><br><span class="line">                (k = (e = (Map.Entry&lt;?,?&gt;)o).getKey()) != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                (v = e.getValue()) != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                (k == key || k.equals(key)) &amp;&amp;</span><br><span class="line">                (v == (u = val) || v.equals(u)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Virtualized support for map.get(); overridden in subclasses.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    <span class="function">Node&lt;K,V&gt; <span class="title">find</span><span class="params">(<span class="keyword">int</span> h, Object k)</span> </span>&#123;</span><br><span class="line">        Node&lt;K,V&gt; e = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">if</span> (k != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">do</span> &#123;</span><br><span class="line">                K ek;</span><br><span class="line">                <span class="keyword">if</span> (e.hash == h &amp;&amp;</span><br><span class="line">                    ((ek = e.key) == k || (ek != <span class="keyword">null</span> &amp;&amp; k.equals(ek))))</span><br><span class="line">                    <span class="keyword">return</span> e;</span><br><span class="line">            &#125; <span class="keyword">while</span> ((e = e.next) != <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果出现hash冲突，系统就在冲突位置的形成一个链表，这个链表在JDK中叫做Bin，由以上源码可知，Node就是一个单链表的节点，这种节点只允许对数据进行查询，不允许修改。</p>
+<p>如果一个Bin中的节点个数超过8，系统就会自动将这个bin转换成红黑树。TREEIFY-THRESHOLD定义了转换的阀值。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The bin count threshold for using a tree rather than list for a</span></span><br><span class="line"><span class="comment">     * bin.  Bins are converted to trees when adding an element to a</span></span><br><span class="line"><span class="comment">     * bin with at least this many nodes. The value must be greater</span></span><br><span class="line"><span class="comment">     * than 2, and should be at least 8 to mesh with assumptions in</span></span><br><span class="line"><span class="comment">     * tree removal about conversion back to plain bins upon</span></span><br><span class="line"><span class="comment">     * shrinkage.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TREEIFY_THRESHOLD = <span class="number">8</span>;</span><br></pre></td></tr></table></figure>
+
+<p>TreeNode就是红黑树中的节点类型，TreeNode源码如下：</p>
+<p>由于TreeNode是继承自Node类的所以Node中所有属性TreeNode中都有。在使用时可以把一个TreeNode就当作一个Node使用。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Nodes for use in TreeBins</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; parent;  <span class="comment">// red-black tree links</span></span><br><span class="line">    TreeNode&lt;K,V&gt; left;</span><br><span class="line">    TreeNode&lt;K,V&gt; right;</span><br><span class="line">    TreeNode&lt;K,V&gt; prev;    <span class="comment">// needed to unlink next upon deletion</span></span><br><span class="line">    <span class="keyword">boolean</span> red;</span><br><span class="line"></span><br><span class="line">    TreeNode(<span class="keyword">int</span> hash, K key, V val, Node&lt;K,V&gt; next,</span><br><span class="line">             TreeNode&lt;K,V&gt; parent) &#123;</span><br><span class="line">        <span class="keyword">super</span>(hash, key, val, next);</span><br><span class="line">        <span class="keyword">this</span>.parent = parent;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">Node&lt;K,V&gt; <span class="title">find</span><span class="params">(<span class="keyword">int</span> h, Object k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> findTreeNode(h, k, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Returns the TreeNode (or null if not found) for the given key</span></span><br><span class="line"><span class="comment">         * starting at given root.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    <span class="function"><span class="keyword">final</span> TreeNode&lt;K,V&gt; <span class="title">findTreeNode</span><span class="params">(<span class="keyword">int</span> h, Object k, Class&lt;?&gt; kc)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (k != <span class="keyword">null</span>) &#123;</span><br><span class="line">            TreeNode&lt;K,V&gt; p = <span class="keyword">this</span>;</span><br><span class="line">            <span class="keyword">do</span>  &#123;</span><br><span class="line">                <span class="keyword">int</span> ph, dir; K pk; TreeNode&lt;K,V&gt; q;</span><br><span class="line">                TreeNode&lt;K,V&gt; pl = p.left, pr = p.right;</span><br><span class="line">                <span class="keyword">if</span> ((ph = p.hash) &gt; h)</span><br><span class="line">                    p = pl;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (ph &lt; h)</span><br><span class="line">                    p = pr;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> ((pk = p.key) == k || (pk != <span class="keyword">null</span> &amp;&amp; k.equals(pk)))</span><br><span class="line">                    <span class="keyword">return</span> p;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (pl == <span class="keyword">null</span>)</span><br><span class="line">                    p = pr;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (pr == <span class="keyword">null</span>)</span><br><span class="line">                    p = pl;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> ((kc != <span class="keyword">null</span> ||</span><br><span class="line">                          (kc = comparableClassFor(k)) != <span class="keyword">null</span>) &amp;&amp;</span><br><span class="line">                         (dir = compareComparables(kc, k, pk)) != <span class="number">0</span>)</span><br><span class="line">                    p = (dir &lt; <span class="number">0</span>) ? pl : pr;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> ((q = pr.findTreeNode(h, k, kc)) != <span class="keyword">null</span>)</span><br><span class="line">                    <span class="keyword">return</span> q;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    p = pl;</span><br><span class="line">            &#125; <span class="keyword">while</span> (p != <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>TreeBin是用来封装红黑树的容器，TreeBin的源码如下，在TreeBin中维护一个读写锁，一个线程如果想修改红黑树中的值必须拿到TreeBin的读写锁。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * TreeNodes used at the heads of bins. TreeBins do not hold user</span></span><br><span class="line"><span class="comment">     * keys or values, but instead point to list of TreeNodes and</span></span><br><span class="line"><span class="comment">     * their root. They also maintain a parasitic read-write lock</span></span><br><span class="line"><span class="comment">     * forcing writers (who hold bin lock) to wait for readers (who do</span></span><br><span class="line"><span class="comment">     * not) to complete before tree restructuring operations.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TreeBin</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; root;</span><br><span class="line">    <span class="keyword">volatile</span> TreeNode&lt;K,V&gt; first;</span><br><span class="line">    <span class="keyword">volatile</span> Thread waiter;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">int</span> lockState;</span><br><span class="line">    <span class="comment">// values for lockState</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WRITER = <span class="number">1</span>; <span class="comment">// set while holding write lock</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WAITER = <span class="number">2</span>; <span class="comment">// set when waiting for write lock</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> READER = <span class="number">4</span>; <span class="comment">// increment value for setting read lock</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Tie-breaking utility for ordering insertions when equal</span></span><br><span class="line"><span class="comment">         * hashCodes and non-comparable. We don't require a total</span></span><br><span class="line"><span class="comment">         * order, just a consistent insertion rule to maintain</span></span><br><span class="line"><span class="comment">         * equivalence across rebalancings. Tie-breaking further than</span></span><br><span class="line"><span class="comment">         * necessary simplifies testing a bit.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">tieBreakOrder</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> d;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span> ||</span><br><span class="line">            (d = a.getClass().getName().</span><br><span class="line">             compareTo(b.getClass().getName())) == <span class="number">0</span>)</span><br><span class="line">            d = (System.identityHashCode(a) &lt;= System.identityHashCode(b) ?</span><br><span class="line">                 -<span class="number">1</span> : <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> d;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Creates bin with initial set of nodes headed by b.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    TreeBin(TreeNode&lt;K,V&gt; b) &#123;</span><br><span class="line">        <span class="keyword">super</span>(TREEBIN, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">this</span>.first = b;</span><br><span class="line">        TreeNode&lt;K,V&gt; r = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">for</span> (TreeNode&lt;K,V&gt; x = b, next; x != <span class="keyword">null</span>; x = next) &#123;</span><br><span class="line">            next = (TreeNode&lt;K,V&gt;)x.next;</span><br><span class="line">            x.left = x.right = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (r == <span class="keyword">null</span>) &#123;</span><br><span class="line">                x.parent = <span class="keyword">null</span>;</span><br><span class="line">                x.red = <span class="keyword">false</span>;</span><br><span class="line">                r = x;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                K k = x.key;</span><br><span class="line">                <span class="keyword">int</span> h = x.hash;</span><br><span class="line">                Class&lt;?&gt; kc = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">for</span> (TreeNode&lt;K,V&gt; p = r;;) &#123;</span><br><span class="line">                    <span class="keyword">int</span> dir, ph;</span><br><span class="line">                    K pk = p.key;</span><br><span class="line">                    <span class="keyword">if</span> ((ph = p.hash) &gt; h)</span><br><span class="line">                        dir = -<span class="number">1</span>;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (ph &lt; h)</span><br><span class="line">                        dir = <span class="number">1</span>;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> ((kc == <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                              (kc = comparableClassFor(k)) == <span class="keyword">null</span>) ||</span><br><span class="line">                             (dir = compareComparables(kc, k, pk)) == <span class="number">0</span>)</span><br><span class="line">                        dir = tieBreakOrder(k, pk);</span><br><span class="line">                    TreeNode&lt;K,V&gt; xp = p;</span><br><span class="line">                    <span class="keyword">if</span> ((p = (dir &lt;= <span class="number">0</span>) ? p.left : p.right) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        x.parent = xp;</span><br><span class="line">                        <span class="keyword">if</span> (dir &lt;= <span class="number">0</span>)</span><br><span class="line">                            xp.left = x;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            xp.right = x;</span><br><span class="line">                        r = balanceInsertion(r, x);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.root = r;</span><br><span class="line">        <span class="function"><span class="keyword">assert</span> <span class="title">checkInvariants</span><span class="params">(root)</span></span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="PUT操作"><a href="#PUT操作" class="headerlink" title="PUT操作"></a>PUT操作</h2><p>ConcurrentHashMap的初始化并不在构造函数中实现，而是在第一插入数据时，在put方法中实现。</p>
+<p>put方法源码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> putVal(key, value, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/** Implementation for put and putIfAbsent */</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(K key, V value, <span class="keyword">boolean</span> onlyIfAbsent)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (key == <span class="keyword">null</span> || value == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">    <span class="keyword">int</span> hash = spread(key.hashCode());</span><br><span class="line">    <span class="keyword">int</span> binCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (Node&lt;K,V&gt;[] tab = table;;) &#123;</span><br><span class="line">        Node&lt;K,V&gt; f; <span class="keyword">int</span> n, i, fh; <span class="comment">//f表示插入位置节点，fh表示插入位置节点的hash值</span></span><br><span class="line">        <span class="keyword">if</span> (tab == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">            tab = initTable();</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((f = tabAt(tab, i = (n - <span class="number">1</span>) &amp; hash)) == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (casTabAt(tab, i, <span class="keyword">null</span>,</span><br><span class="line">                         <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key, value, <span class="keyword">null</span>)))</span><br><span class="line">                <span class="keyword">break</span>;                   <span class="comment">// no lock when adding to empty bin</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((fh = f.hash) == MOVED)</span><br><span class="line">            tab = helpTransfer(tab, f);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            V oldVal = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">synchronized</span> (f) &#123;</span><br><span class="line">                <span class="keyword">if</span> (tabAt(tab, i) == f) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (fh &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                        binCount = <span class="number">1</span>;</span><br><span class="line">                        <span class="keyword">for</span> (Node&lt;K,V&gt; e = f;; ++binCount) &#123;</span><br><span class="line">                            K ek;</span><br><span class="line">                            <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                                ((ek = e.key) == key ||</span><br><span class="line">                                 (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek)))) &#123;</span><br><span class="line">                                oldVal = e.val;</span><br><span class="line">                                <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                    e.val = value;</span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                            Node&lt;K,V&gt; pred = e;</span><br><span class="line">                            <span class="keyword">if</span> ((e = e.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                                pred.next = <span class="keyword">new</span> Node&lt;K,V&gt;(hash, key,</span><br><span class="line">                                                          value, <span class="keyword">null</span>);</span><br><span class="line">                                <span class="keyword">break</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">instanceof</span> TreeBin) &#123;</span><br><span class="line">                        Node&lt;K,V&gt; p;</span><br><span class="line">                        binCount = <span class="number">2</span>;</span><br><span class="line">                        <span class="keyword">if</span> ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,</span><br><span class="line">                                                              value)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                            oldVal = p.val;</span><br><span class="line">                            <span class="keyword">if</span> (!onlyIfAbsent)</span><br><span class="line">                                p.val = value;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (binCount != <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD)</span><br><span class="line">                    treeifyBin(tab, i);</span><br><span class="line">                <span class="keyword">if</span> (oldVal != <span class="keyword">null</span>)</span><br><span class="line">                    <span class="keyword">return</span> oldVal;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    addCount(<span class="number">1L</span>, binCount);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">spread</span><span class="params">(<span class="keyword">int</span> h)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (h ^ (h &gt;&gt;&gt; <span class="number">16</span>)) &amp; HASH_BITS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>put方法大致分以下几步：</p>
+<p>1）如果key和value不为null，则计算hash值。和HashMap相同的是，ConcurrentHashMap也会对key的hashcode高16位和低16位进行异或，不同的是，ConcurrentHashMap中还会将异或出的结果跟一个HASH_BITS变量相与。HASH_BITS定义如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HASH_BITS = <span class="number">0x7fffffff</span>; <span class="comment">// usable bits of normal node hash</span></span><br></pre></td></tr></table></figure>
+
+<p>HASH_BITS指定来可以用来计算hash的位数，默认值为31位。</p>
+<p>2）如果发现table还没初始化，则调用iniTable()方法对table进行初始化。</p>
+<p>3）计算插入位置使用<code>i = (n - 1) &amp; hash)</code>，如果插入位置为空，则新建Node利用CAS操作插入节点，然后返回。</p>
+<p>4）如果插入位置节点的hash值等于-1，则需要扩容，然后进行多线程并发扩容操作。</p>
+<p>5）否则，说明存在hash冲突。首先锁定插入位置节点，如果插入位置节点的hash值&gt;=0，则说明插入点是链表结构，新建Node插入。如果插入位置节点是TreeNode，则新建TreeNode插入。</p>
+<p>在插入Node节点时使用一个for循环进行判断，如果当前节点的key值和插入节点相同，直接将该节点的value修改为插入节点的value（onlyIfAbsent属性可以设置只有插入位置空时才插入）。如果key值不相同则遍历链表继续判断。</p>
+<p>6）检查当前Bin的容量，如果超过了阀值，则要将链表转化成红黑树。</p>
+<p>从put流程中可以发现，JDK1.8处理冲突时使用的是乐观锁，当有冲突时才进行并发处理。</p>
+<h2 id="GET操作"><a href="#GET操作" class="headerlink" title="GET操作"></a>GET操作</h2><p>get方法的源码如下所示：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; e, p; <span class="keyword">int</span> n, eh; K ek;</span><br><span class="line">    <span class="keyword">int</span> h = spread(key.hashCode());</span><br><span class="line">    <span class="keyword">if</span> ((tab = table) != <span class="keyword">null</span> &amp;&amp; (n = tab.length) &gt; <span class="number">0</span> &amp;&amp;</span><br><span class="line">        (e = tabAt(tab, (n - <span class="number">1</span>) &amp; h)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((eh = e.hash) == h) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((ek = e.key) == key || (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek)))</span><br><span class="line">                <span class="keyword">return</span> e.val;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (eh &lt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> (p = e.find(h, key)) != <span class="keyword">null</span> ? p.val : <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span> ((e = e.next) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (e.hash == h &amp;&amp;</span><br><span class="line">                ((ek = e.key) == key || (ek != <span class="keyword">null</span> &amp;&amp; key.equals(ek))))</span><br><span class="line">                <span class="keyword">return</span> e.val;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上面的源码可以看到get的操作流程为：</p>
+<p>计算key的hash值，定位到table索引位置，如果首节点符合就返回，如果不符合就循环链表，匹配就返回，不匹配就返回null。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>JDK1.8版本的ConcurrentHashMap的数据结构已经接近HashMap，相对而言，ConcurrentHashMap只是增加了同步的操作来控制并发，从JDK1.7版本的ReentrantLock+Segment+HashEntry，到JDK1.8版本中synchronized+CAS+HashEntry+红黑树，ConcurrentHashMap发生了如下变化：</p>
+<ol>
+<li>JDK1.8中将锁的粒度进一步降低，更好的支持高并发场景。JDK1.7中锁住的是Segment对象，一个Segment中包含很多HashEntry。而JDK1.8中加锁的对象是插入点位置的节点。</li>
+<li>JDK1.8中使用红黑树代替链表，提高了查找速度。</li>
+<li>由于锁粒度的降低，JDK1.8中使用Synchronized代替ReentrantLock，增加了灵活度，降低了系统开销。</li>
+</ol>
+<blockquote>
+<p> 参考：<a href="https://juejin.im/post/5aba1030f265da23961269c6">ConcurrentHashMap底层原理</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Java中遍历Map的方法</title>
     <url>/2018/05/03/Java-Java%E4%B8%AD%E9%81%8D%E5%8E%86Map%E7%9A%84%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<p>如HashMap, TreeMap, ConcurrentHashMap等。</p>
@@ -1174,22 +1174,6 @@
 <li>通过创建唯一性索引，可以保证数据库表中每一行数据的唯一性；</li>
 </ul>
 ]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Spring MVC框架学习笔记</title>
-    <url>/2018/08/06/Java-SpringMVC%E6%A1%86%E6%9E%B6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p>Spring Web MVC是一个原生的构建在Servlet API上的Web框架，很早就被包含在Spring框架之中。Spring Web MVC最主要的两个作用是：1. 处理从客服端发来的请求，从请求中接收传入的参数。2. 将处理后的结果数据返回给页面。</p>
-<a id="more"></a>
-
-<hr>
-<h2 id="Spring-MVC处理流程"><a href="#Spring-MVC处理流程" class="headerlink" title="Spring MVC处理流程"></a>Spring MVC处理流程</h2><p>Spring Web MVC框架处理请求的流程如下图所示：</p>
-<p><img src="springmvc01.png" alt="springmvc01"></p>
-<p>WebApplicationContext层级图如下所示：</p>
-<p><img src="springmvc02.png" alt="springmvc02"></p>
-<h2 id="Spring-MVC入门项目"><a href="#Spring-MVC入门项目" class="headerlink" title="Spring MVC入门项目"></a>Spring MVC入门项目</h2>]]></content>
       <categories>
         <category>Java</category>
       </categories>
@@ -1764,6 +1748,22 @@
       </categories>
   </entry>
   <entry>
+    <title>Spring MVC框架学习笔记</title>
+    <url>/2018/08/06/Java-SpringMVC%E6%A1%86%E6%9E%B6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p>Spring Web MVC是一个原生的构建在Servlet API上的Web框架，很早就被包含在Spring框架之中。Spring Web MVC最主要的两个作用是：1. 处理从客服端发来的请求，从请求中接收传入的参数。2. 将处理后的结果数据返回给页面。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="Spring-MVC处理流程"><a href="#Spring-MVC处理流程" class="headerlink" title="Spring MVC处理流程"></a>Spring MVC处理流程</h2><p>Spring Web MVC框架处理请求的流程如下图所示：</p>
+<p><img src="springmvc01.png" alt="springmvc01"></p>
+<p>WebApplicationContext层级图如下所示：</p>
+<p><img src="springmvc02.png" alt="springmvc02"></p>
+<h2 id="Spring-MVC入门项目"><a href="#Spring-MVC入门项目" class="headerlink" title="Spring MVC入门项目"></a>Spring MVC入门项目</h2>]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>为什么重写equals方法就必须重写hashCode方法</title>
     <url>/2017/08/14/Java-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E5%86%99equals%E6%96%B9%E6%B3%95%E5%B0%B1%E5%BF%85%E9%A1%BB%E9%87%8D%E5%86%99hashCode%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<p>SUN的官方文档中规定，如果重定义equals方法，就必须重定义hashCode方法,以便用户可以将对象插入到散列(哈希)表中。</p>
@@ -2175,6 +2175,33 @@
       </tags>
   </entry>
   <entry>
+    <title>MacOS里使用sed命令修改文件内容</title>
+    <url>/2017/06/04/%E5%85%B6%E4%BB%96-MacOS%E9%87%8C%E4%BD%BF%E7%94%A8sed%E5%91%BD%E4%BB%A4%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9/</url>
+    <content><![CDATA[<p>Mac上sed命令使用的一个小例子。</p>
+<a id="more"></a>
+
+<hr>
+<p>Mac上-i命令和Linux上有一点不同：</p>
+<blockquote>
+<p>-i <u>extension</u></p>
+<p>Edit files in-place, saving backups with the specified extension.  If a zero-length extension  is given, no backup will be saved.  It is not recommended to give a zero-length extension when  in-place editing files, as you risk corruption or partial content in situations where disk space is exhausted, etc.</p>
+</blockquote>
+<p>Mac上-i后面需要加一个字符串，表示备份文件的扩展名，如果添加一个空串，就不会有备份文件。</p>
+<p>一个小例子：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">cd ~/myProjects/Blog</span><br><span class="line">hexo new $1</span><br><span class="line">if  [ "$2" ] ;then </span><br><span class="line">    sed -i "" "s/categories:/categories: $2/g" source/_posts/$1.md</span><br><span class="line">    mv source/_posts/$1.md source/_posts/$2/</span><br><span class="line">    open source/_posts/$2/$1.md</span><br><span class="line">else</span><br><span class="line">    open source/_posts/$1.md</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>用hexo创建一个博客文件，如果命令后面跟了分类信息，则将分类信息补充到categories: 后面。</p>
+<p>注意：如果要在字符串中添加传入参数，则必须使用双引号，使用单引号无法引用传入参数。如上面如果将<code>&quot;s/categories:/categories: $2/g&quot;</code> 换成<code>&#39;s/categories:/categories: $2/g&#39;</code>，在文件中只会写入<code>categories: $2</code>。</p>
+]]></content>
+      <categories>
+        <category>其他</category>
+      </categories>
+      <tags>
+        <tag>MacOS</tag>
+        <tag>sed</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux设置开机自启程序方法</title>
     <url>/2018/07/12/%E5%85%B6%E4%BB%96-Linux%E8%AE%BE%E7%BD%AE%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E7%A8%8B%E5%BA%8F%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<p>本文讲解在Linux中设置开机自启动程序的方法。</p>
@@ -2201,33 +2228,6 @@
       <categories>
         <category>其他</category>
       </categories>
-  </entry>
-  <entry>
-    <title>MacOS里使用sed命令修改文件内容</title>
-    <url>/2017/06/04/%E5%85%B6%E4%BB%96-MacOS%E9%87%8C%E4%BD%BF%E7%94%A8sed%E5%91%BD%E4%BB%A4%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9/</url>
-    <content><![CDATA[<p>Mac上sed命令使用的一个小例子。</p>
-<a id="more"></a>
-
-<hr>
-<p>Mac上-i命令和Linux上有一点不同：</p>
-<blockquote>
-<p>-i <u>extension</u></p>
-<p>Edit files in-place, saving backups with the specified extension.  If a zero-length extension  is given, no backup will be saved.  It is not recommended to give a zero-length extension when  in-place editing files, as you risk corruption or partial content in situations where disk space is exhausted, etc.</p>
-</blockquote>
-<p>Mac上-i后面需要加一个字符串，表示备份文件的扩展名，如果添加一个空串，就不会有备份文件。</p>
-<p>一个小例子：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">cd ~/myProjects/Blog</span><br><span class="line">hexo new $1</span><br><span class="line">if  [ "$2" ] ;then </span><br><span class="line">    sed -i "" "s/categories:/categories: $2/g" source/_posts/$1.md</span><br><span class="line">    mv source/_posts/$1.md source/_posts/$2/</span><br><span class="line">    open source/_posts/$2/$1.md</span><br><span class="line">else</span><br><span class="line">    open source/_posts/$1.md</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-
-<p>用hexo创建一个博客文件，如果命令后面跟了分类信息，则将分类信息补充到categories: 后面。</p>
-<p>注意：如果要在字符串中添加传入参数，则必须使用双引号，使用单引号无法引用传入参数。如上面如果将<code>&quot;s/categories:/categories: $2/g&quot;</code> 换成<code>&#39;s/categories:/categories: $2/g&#39;</code>，在文件中只会写入<code>categories: $2</code>。</p>
-]]></content>
-      <categories>
-        <category>其他</category>
-      </categories>
-      <tags>
-        <tag>MacOS</tag>
-        <tag>sed</tag>
-      </tags>
   </entry>
   <entry>
     <title>Mac安装配置JDK</title>
@@ -2490,381 +2490,36 @@
       </tags>
   </entry>
   <entry>
-    <title>LRU Cache的原理及实现</title>
-    <url>/2018/07/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-LRUCache%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E7%8E%B0/</url>
-    <content><![CDATA[<p>LRU近期最少使用缓存替换策略的原理及实现。</p>
+    <title>B-Tree总结</title>
+    <url>/2017/08/13/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>B-Tree（B树）是一种自平衡查找树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，倒在对数时间内完成，B树概括来说是一个一般化的二分搜索树，可以拥有多余2个子节点。与自平衡二叉查找树不同，B树为系统大块数据的读写操作做了优化。B树减少定位记录时所经历的中间过程，从而加快存取速度。B树这种数据结构可以用来描述外部存储。这种数据结构常被引用在数据库和文件系统上。</p>
 <a id="more"></a>
 
 <hr>
-<blockquote>
-<p>局部性原理：CPU访问存储器时，无论是存取指令还是存取数据，所访问的存储单元都趋于聚集在一个较小的连续区域中。</p>
-<p>三种不同的局部性：</p>
-<p>时间局部性（Temporal Locality）：如果一个信息项正在被访问，那么在近期它很可能还会被再次访问。程序循环、堆栈等是产生时间局部性的原因。</p>
-<p>空间局部性（Spatial Locality）：在最近的将来将用到的信息很可能与现在正在使用的信息在空间地址上是临近的。</p>
-<p>顺序局部性（Order Locality）：在典型程序中，除转移类指令外，大部分指令是顺序进行的。顺序执行和非顺序执行的比例大致是5:1。此外，对大型数组访问也是顺序的。指令的顺序执行、数组的连续存放等是产生顺序局部性的原因。</p>
-</blockquote>
-<blockquote>
-<p>LRU(Least Recently Used)近期最少使用算法，是内存管理的一种页面置换算法，通常用与缓存的淘汰策略实现，由于缓存的内存非常宝贵，所以需要根据某种规则来剔除数据，保证内存不被撑满。</p>
-</blockquote>
-<p>常用的缓存Redis中可以设置内存的最大使用量，当内存的使用量超过这个最大值时，Redis就会实施淘汰策略，Redis中有6种常用的数据淘汰策略：</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>volatile-lru</td>
-<td>从已设置过期时间的数据集中挑选<strong>最近最少使用</strong>的数据淘汰</td>
-</tr>
-<tr>
-<td>volatile-ttl</td>
-<td>从已设置过期时间的数据集中挑选<strong>将要过期</strong>的数据淘汰</td>
-</tr>
-<tr>
-<td>volatile-random</td>
-<td>从已设置过期时间的数据集中<strong>随机挑选</strong>数据淘汰</td>
-</tr>
-<tr>
-<td>allkeys-lru</td>
-<td>从全部数据集中挑选<strong>最近最少使用</strong>的数据淘汰</td>
-</tr>
-<tr>
-<td>allkeys-random</td>
-<td>从全部数据集中<strong>随机挑选</strong>数据淘汰</td>
-</tr>
-<tr>
-<td>no-enviction</td>
-<td>禁止驱逐数据</td>
-</tr>
-</tbody></table>
-<p>在Mybatis中也实现了使用LRU策略的缓存，我们通过Mybatis中的<a href="https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/cache/decorators/LruCache.java">LruCache.java</a>看一下LRU Cache的实现原理。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.ibatis.cache.decorators;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.LinkedHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReadWriteLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.cache.Cache;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Lru (least recently used) cache decorator</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Clinton Begin</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LruCache</span> <span class="keyword">implements</span> <span class="title">Cache</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> Cache delegate;</span><br><span class="line">  <span class="keyword">private</span> Map&lt;Object, Object&gt; keyMap;</span><br><span class="line">  <span class="keyword">private</span> Object eldestKey;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">LruCache</span><span class="params">(Cache delegate)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.delegate = delegate;</span><br><span class="line">    setSize(<span class="number">1024</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSize</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> size)</span> </span>&#123;</span><br><span class="line">    keyMap = <span class="keyword">new</span> LinkedHashMap&lt;Object, Object&gt;(size, .<span class="number">75F</span>, <span class="keyword">true</span>) &#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">4267176411845948333L</span>;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;Object, Object&gt; eldest)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> tooBig = size() &gt; size;</span><br><span class="line">        <span class="keyword">if</span> (tooBig) &#123;</span><br><span class="line">          eldestKey = eldest.getKey();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> tooBig;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Object key, Object value)</span> </span>&#123;</span><br><span class="line">    delegate.putObject(key, value);</span><br><span class="line">    cycleKeyList(key);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">removeObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> delegate.removeObject(key);</span><br><span class="line">  &#125;</span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">cycleKeyList</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    keyMap.put(key, key);</span><br><span class="line">    <span class="keyword">if</span> (eldestKey != <span class="keyword">null</span>) &#123;</span><br><span class="line">      delegate.removeObject(eldestKey);</span><br><span class="line">      eldestKey = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    keyMap.get(key); <span class="comment">//touch</span></span><br><span class="line">    <span class="keyword">return</span> delegate.getObject(key);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>LruCache类中定义了三个属性，其中keyMap指向一个LinkedHashMap对象用来存储缓存数据，eldestKey指向当前数据中最老的节点（既LinkedHashMap中的头节点）。</p>
-<p>在LurCache的构造方法中指定缓存的默认大小是1024个节点，在新建LinkedHashMap对象时指定了LinkedHashMap的容量（默认1024），负载因子0.75，并且指定元素的顺序为按<strong>访问顺序</strong>排序，在指定按照访问顺序排序后，我们每次调用get方法后都会将这次访问的节点移至链表末尾，不断访问可以形成按照访问顺序排序的链表，这就是为什么链表头节点是链表中最近最少访问的节点。（关于LinkedHashMap的实现原理请参考：LinkedHashMap底层实现原理）</p>
-<p>在新建LinkedHashMap对象时，还重写了LinkedHashMap的removeEldestEntry方法，在该方法中判断，如果当前链表的节点数大于1024时就将tooBig变量设为true，然后将eldestKey指向LinkedHashMap的头节点，在cycleKeyList方法中每次向链表中put完节点后，都会检查eldestKey是否为null，如果不为null就删除eldestKey指向的节点，然后将eldestKey设为null，至此就实现了使用LRU策略的缓存。</p>
-<blockquote>
-<p>参考：<a href="http://ifeve.com/动手实现一个-lru-cache/#more-37981">动手实现一个 LRU cache</a></p>
-<p><a href="http://wiki.jikexueyuan.com/project/java-collection/linkedhashmap.html">LinkedHashMap 的实现原理</a></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Leetcode题解</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>优质技术博客推荐</title>
-    <url>/2018/04/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E4%BC%98%E8%B4%A8%E6%8A%80%E6%9C%AF%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[<p>记录了一些优质的技术博客。</p>
-<a id="more"></a>
-
-<p><a href="https://blog.csdn.net/jackfrued">骆昊的技术专栏</a></p>
-<p><a href="http://www.cnblogs.com/zyf-zhaoyafei/p/4716297.html">计算机网络之面试常考题</a></p>
-<p><a href="http://blog.51cto.com/hyman1994/1663623">数据库常见面试题</a></p>
-<p><a href="https://blog.csdn.net/hectorhua/article/details/13767361">数据库常见笔试面试题</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/23713529">常见面试题整理—数据库篇（每位开发者必备）</a></p>
-<p><a href="http://blog.codinglabs.org/articles/theory-of-mysql-index.html">MySQL索引背后的数据结构及算法原理</a></p>
-<p><a href="https://blog.csdn.net/v_JULY_v/article/details/6279498">十道海量数据处理面试题与十个方法大总结</a></p>
-<p><a href="https://www.nowcoder.com/discuss/68802?type=0&order=0&pos=3&page=1">2018校招笔试真题汇总</a></p>
-<p><a href="https://blog.csdn.net/acingdreamer/article/details/78479476">2018秋招面经-后端开发</a></p>
-<p><a href="https://blog.csdn.net/u013007900/article/details/79008993">技术面试的系统设计题</a></p>
-<p><a href="https://blog.csdn.net/justloveyou_">Rico’s Blogs</a></p>
-<p><a href="https://blog.csdn.net/u012813201">LingLee</a></p>
-<p><a href="https://blog.csdn.net/xuhuanfeng232">曾经沧海难为水，除却巫山不是云</a></p>
-<p><a href="http://www.cnblogs.com/JavaArchitect/">hsm_computer</a></p>
-<p><a href="http://www.importnew.com/">ImportNew</a></p>
-<p><a href="http://ifeve.com/">并发编程网</a></p>
-<p><a href="http://blog.codinglabs.org/">CodingLabs</a></p>
-<p><a href="http://design-patterns.readthedocs.io/zh_CN/latest/">图说设计模式</a></p>
-<p><a href="https://blog.csdn.net/quinnnorris">QuinnNorris的博客</a></p>
-<p><a href="https://www.cnblogs.com/xrq730/">五月的仓颉</a></p>
-]]></content>
-      <categories>
-        <category>计算机基础</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>同步、异步、阻塞、非阻塞总结</title>
-    <url>/2018/07/18/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>本文对于同步、异步、阻塞和非阻塞等概念进行总结。</p>
-<a id="more"></a>
-
-<hr>
-<p>对于一个线程调用一个方法，同步异步说的是这个方法的返回方式，既方法和线程之间的通信机制，而阻塞非阻塞说的是这个线程在发起这个调用后的执行状态。</p>
-<p><strong>同步(Synchronization)</strong>：这个方法在没有得到结果之前不返回，既等到方法执行完以后再返回。</p>
-<p><strong>异步(Asynchronization)</strong>：这个方法被调用后立即返回，等到方法执行完后会通知线程来处理这个方法执行结果。</p>
-<p><strong>阻塞(Blocking)</strong>：线程在调用这个方法后原地等待(挂起)，等到这个方法返回后再继续执行。</p>
-<p><strong>非阻塞(Non-blocking)</strong>：线程在调用这个方法后继续向下执行。</p>
-<p>举一个例子：</p>
-<p>小明想订一张机票，所以他给航空公司客服打电话。</p>
-<p>如果客服是<strong>同步</strong>通信机制，那就就会告诉他，你等一会儿不要挂电话，查到结果以后告诉你。</p>
-<p>如果客服是<strong>异步</strong>通信机制，那么就会告诉他，我现在会去查，我查到以后打电话通知你。</p>
-<p>如果小明是<strong>阻塞式</strong>的，那么他在问完客服以后就什么都不干，一直等待，直到客服返回给他结果，他再进行处理。</p>
-<p>如果小明是<strong>非阻塞式</strong>的，那么他在打完电话后就去干其他事，直到客服给他回电话时或者查到结果时，他再回来处理。</p>
-<p>上面小明的状态和客服的状态两两组合就会出现四种模式：</p>
-<p><strong>同步阻塞</strong>：小明问完后拿着电话什么都不干等结果，客服查到结果后再告诉他。</p>
-<p><strong>同步非阻塞</strong>：小明问完后拿着电话干其他事，时不时检查一下客服是否返回结果。</p>
-<p><strong>异步阻塞</strong>：小明问完后挂了电话在电话前等待，什么都不做，客服查到结果后打电话通知他。</p>
-<p><strong>异步非阻塞</strong>：小明问完后挂了电话继续干其他事，客服查到结果后打电话通知他。</p>
-<p>Node.js就使用异步非阻塞的I/O模型。</p>
-]]></content>
-      <categories>
-        <category>计算机基础</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>什么是UTF-8编码</title>
-    <url>/2018/08/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E4%BB%80%E4%B9%88%E6%98%AFUTF-8%E7%BC%96%E7%A0%81/</url>
-    <content><![CDATA[<p>UTF-8（8-bit Unicode Transformation Format）是一种针对Unicode的可变长度字元编码，也是一种前缀码。它可以用来表示Unicode标准中的任何字元，且其编码中的第一个位元组仍和ASCII相容，这使得原来处理ASCII字元的软件无需或只须做少部分修改，即可继续使用。因此，它逐渐成为电子邮件、网页及其他存储或传送文字的应用中，优先采用的编码。</p>
-<a id="more"></a>
-
-<hr>
-<p>在计算机体系里，无论是硬盘中的文件，网络上的页面，还是我们的电子邮件，所有的数据在底层都是一堆01串，为什么数据都可以按照10串的形式存储或者传输，就是因为有编码的存在，我们平常所说的编码方式就是一种将我们熟悉的符号翻译成对应的01串的规则。</p>
-<p>ASCII（<strong>A</strong>merican <strong>S</strong>tandard <strong>C</strong>ode for <strong>I</strong>nformation <strong>I</strong>nterchange，<strong>美国信息交换标准代码</strong> ）是上世纪60年代美国制定的一套编码规则，一直沿用至今。ASCII码中一共定义了128个字符对应的编码，如下图所示：</p>
-<p><img src="asciifull.gif" alt="asciifull"></p>
-<p>对于英语，128个字符是够用了，但是对于其他语言如法语、俄语、汉语，128个字符是远远不够用的，很多欧洲国家都对ASCII码进行了扩展，但是不同的国家使用不同的编码，我们想要打开不同国家的文件，就需要知道这个文件对应的编码方式，否则就会出现乱码，如果有一种编码，将世界上所有的符号都纳入其中，给每一个符号定义一个独一无二的编码，那就会解决乱码的问题了，Unicode码就是这样的一种符号编码，Unicode是一个很大的集合，可以容纳100多万个符号，每个符号对应唯一的编码。由于定义的符号数量巨大，所以每个符号的编码可能需要1~4个字节来存储。</p>
-<p>Unicode只是一个编码集合，它定义了符号和编码的对应关系，但是没有定义怎样存储这些符号，UTF-8中定义了这些符号应该怎样存储。</p>
-<p>UTF-8是互联网上使用最广泛的一种Unicode的实现方式，它是一种变长的编码方式可以使用1~4表示一个符号，根据不同的符号变化字节的长度，UTF-8的编码规则如下表所示：</p>
-<table>
-<thead>
-<tr>
-<th align="center">码点位数</th>
-<th>码点范围</th>
-<th>字节序列</th>
-<th>Byte1</th>
-<th>Byte2</th>
-<th>Byte3</th>
-<th>Byte4</th>
-<th>Byte5</th>
-<th>Byte6</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">7</td>
-<td>0000~007F</td>
-<td>1</td>
-<td>0xxxxxxx</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">11</td>
-<td>0080~07FF</td>
-<td>2</td>
-<td>110xxxxx</td>
-<td>10xxxxxx</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">16</td>
-<td>0800~FFFF</td>
-<td>3</td>
-<td>1110xxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">21</td>
-<td>10000~1FFFFF</td>
-<td>4</td>
-<td>11110xxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">26</td>
-<td>200000~3FFFFFF</td>
-<td>5</td>
-<td>111110xx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td></td>
-</tr>
-<tr>
-<td align="center">31</td>
-<td>4000000~7FFFFFFF</td>
-<td>6</td>
-<td>1111110x</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-</tr>
-</tbody></table>
-<p>上表中x代表可以存储编码的位，由上表可以看到UTF-8的编码规则非常简单:</p>
-<ol>
-<li>对于单字节的符号，字节的第一位设置为0，后买7为是这个符号的Unicode码。因此对于英语，UTF-8和ASCII码是相同的。</li>
-<li>对于n &gt; 1个字节的符号，第一个字节最高位1的个数代表编码的字节数，剩下的字节每个字节以10开头。</li>
-</ol>
-<p>有了UTF-8定义的编码存储方式，我们拿到一段编码后就能清楚的看到这段编码由多少字节组成，每一个字节中编码的内容，得到字符编码后，通过查询Unicode编码表我们就可以得知这个符号是什么了。</p>
-<p>参考：<a href="https://zh.wikipedia.org/wiki/UTF-8">UTF-8</a></p>
-<p><a href="http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html">字符编码笔记：ASCII，Unicode 和 UTF-8</a></p>
-]]></content>
-      <categories>
-        <category>计算机基础</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>并发、并行、串行总结</title>
-    <url>/2018/07/18/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E5%B9%B6%E5%8F%91%E5%B9%B6%E8%A1%8C%E4%B8%B2%E8%A1%8C%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>本文对并发、并行、串行的概念进行总结。</p>
-<a id="more"></a>
-
-<hr>
-<p><img src="ConcurrentAndParallel.jpg" alt="ConcurrentAndParallel"></p>
-<p><strong>并发</strong>是两队人交替使用一台咖啡机，<strong>并行</strong>是两队人使用两台咖啡机，<strong>串行</strong>是一个队列使用一台咖啡机。一个<strong>并发程序</strong>如果可以被多个CPU同时执行，那么就说这个并发程序可以被并行的执行，如果只有一个CPU那么就不能叫并行执行，因为并发程序中的多个线程是被这一个CPU轮流切换的执行。如果这个CPU不支持轮流切换的执行多个线程，那么这个CPU就只能串行的执行非并发程序。</p>
-<blockquote>
-<p>如果某个系统支持两个或者多个动作（Action）<strong>同时存在</strong>，那么这个系统就是一个<strong>并发系统</strong>。如果某个系统支持两个或者多个动作<strong>同时执行</strong>，那么这个系统就是一个<strong>并行系统</strong>。并发系统与并行系统这两个定义之间的关键差异在于<strong>“存在”</strong>这个词。</p>
-<p>在并发程序中可以同时拥有两个或者多个线程。这意味着，如果程序在单核处理器上运行，那么这两个线程将交替地换入或者换出内存。这些线程是同时“存在”的——每个线程都处于执行过程中的某个状态。如果程序能够并行执行，那么就一定是运行在多核处理器上。此时，程序中的每个线程都将分配到一个独立的处理器核上，因此可以同时运行。</p>
-<p>我相信你已经能够得出结论——<strong>“并行”概念是“并发”概念的一个子集</strong>。也就是说，你可以编写一个拥有多个线程或者进程的并发程序，但如果没有多核处理器来执行这个程序，那么就不能以并行方式来运行代码。因此，凡是在求解单个问题时涉及多个执行流程的编程模式或者执行行为，都属于并发编程的范畴。</p>
-<p>摘自：《并发的艺术》 — 〔美〕布雷谢斯</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>计算机基础</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>死锁总结</title>
-    <url>/2017/08/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E6%AD%BB%E9%94%81%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>分析死锁形成的原理，与避免死锁的方法。</p>
-<a id="more"></a>
-
-<hr>
-<h2 id="死锁的形成原理"><a href="#死锁的形成原理" class="headerlink" title="死锁的形成原理"></a>死锁的形成原理</h2><p>先用一段代码来模拟死锁:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeadLockDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String A = <span class="string">"A"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String B = <span class="string">"B"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">synchronized</span>(A) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.currentThread().sleep(<span class="number">2000</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (interruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">synchronized</span>(B) &#123;</span><br><span class="line">                        System.out.println(<span class="string">"t1"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread t2 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">synchronized</span>(B) &#123;</span><br><span class="line">                    <span class="keyword">synchronized</span>(A) &#123;</span><br><span class="line">                        System.out.println(<span class="string">"t2"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面的代码t1线程锁定资源A，然后睡眠2秒后需要锁定资源B才能结束运行，t2线程直接锁定了资源B，然后需要锁定资源A才能结束运行，由于两个线程都无法拿到需要的资源，所以都处于阻塞状态。</p>
-<h2 id="避免死锁的方法"><a href="#避免死锁的方法" class="headerlink" title="避免死锁的方法"></a>避免死锁的方法</h2><ol>
-<li>避免一个线程同时获取多个锁。</li>
-<li>避免一个线程在锁内同时占用多个资源，尽量保证每个锁子占用一个资源。</li>
-<li>使用定时锁lock.tryLock(timeout)来代替内部锁机制。</li>
-<li>对于数据库锁，加锁和解锁必须在一个数据库连接里，否则会出现解锁失败的情况。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>计算机基础</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>计算机网络知识点总结</title>
-    <url>/2018/07/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>计算机网络知识点总结。</p>
-<a id="more"></a>
-
-<hr>
-<h2 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h2><p>HTTP构建在TCP/IP协议上，默认端口<strong>80</strong>，是<strong>无连接状态</strong>的。</p>
-<blockquote>
-<p>参考：<a href="https://juejin.im/entry/5981c5df518825359a2b9476">HTTP1.0、HTTP1.1 和 HTTP2.0 的区别</a></p>
-</blockquote>
-<h3 id="HTTP报文"><a href="#HTTP报文" class="headerlink" title="HTTP报文"></a>HTTP报文</h3><h4 id="HTTP请求报文头如下所示"><a href="#HTTP请求报文头如下所示" class="headerlink" title="HTTP请求报文头如下所示"></a>HTTP请求报文头如下所示</h4><p><img src="httpRequest.png" alt="httpRequest"></p>
-<h4 id="HTTP响应报文头如下所示"><a href="#HTTP响应报文头如下所示" class="headerlink" title="HTTP响应报文头如下所示"></a>HTTP响应报文头如下所示</h4><p><img src="httpResponse.png" alt="httpResponse"></p>
-<h3 id="HTTP版本号的作用"><a href="#HTTP版本号的作用" class="headerlink" title="HTTP版本号的作用"></a>HTTP版本号的作用</h3><p>版本号说明的是应用程序支持的最高HTTP版本，例如与HTTP 1.1的应用通信的HTTP 1.2应用知道它不支持HTTP 1.2的新特性，最多只能支持到HTTP 1.1的特性。</p>
-<h3 id="HTTP-1-0-1-1-2-0-的区别"><a href="#HTTP-1-0-1-1-2-0-的区别" class="headerlink" title="HTTP 1.0 / 1.1 / 2.0 的区别"></a>HTTP 1.0 / 1.1 / 2.0 的区别</h3><h4 id="HTTP-1-0-和-HTTP-1-1的区别"><a href="#HTTP-1-0-和-HTTP-1-1的区别" class="headerlink" title="HTTP 1.0 和 HTTP 1.1的区别"></a>HTTP 1.0 和 HTTP 1.1的区别</h4><ol>
-<li><strong>缓存处理</strong>：在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。</li>
-<li><strong>带宽优化及网络连接的使用</strong>：HTTP1.0中，存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能，HTTP1.1则在请求头引入了range头域，它允许只请求资源的某个部分，即返回码是206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。</li>
-<li><strong>错误通知的管理</strong>：在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。</li>
-<li><strong>Host头处</strong>：在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname）。但随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都应支持Host头域，且请求消息中如果没有Host头域会报告一个错误（400 Bad Request）。</li>
-<li><strong>长连接</strong>：HTTP 1.1支持长连接（PersistentConnection）和请求的流水线（Pipelining）处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启Connection： keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。</li>
-</ol>
-<h4 id="HTTP-2-0-和-HTTP-1-1-的区别"><a href="#HTTP-2-0-和-HTTP-1-1-的区别" class="headerlink" title="HTTP 2.0 和 HTTP 1.1 的区别"></a>HTTP 2.0 和 HTTP 1.1 的区别</h4><ol>
-<li><strong>新的二进制格式</strong>（Binary Format），HTTP1.x的解析是基于文本。基于文本协议的格式解析存在天然缺陷，文本的表现形式有多样性，要做到健壮性考虑的场景必然很多，二进制则不同，只认0和1的组合。基于这种考虑HTTP2.0的协议解析决定采用二进制格式，实现方便且健壮。</li>
-<li><strong>多路复用</strong>（MultiPlexing），即连接共享，即每一个request都是是用作连接共享机制的。一个request对应一个id，这样一个连接上可以有多个request，每个连接的request可以随机的混杂在一起，接收方可以根据request的 id将request再归属到各自不同的服务端请求里面。</li>
-<li><strong>header压缩</strong>，如上文中所言，对前面提到过HTTP1.x的header带有大量信息，而且每次都要重复发送，HTTP2.0使用encoder来减少需要传输的header大小，通讯双方各自cache一份header fields表，既避免了重复header的传输，又减小了需要传输的大小。</li>
-<li><strong>服务端推送</strong>（server push），同SPDY一样，HTTP2.0也具有server push功能。</li>
-</ol>
-<p><strong>HTTP2.0多路复用有多好？</strong>HTTP 性能优化的关键并不在于高带宽，而是低延迟。TCP 连接会随着时间进行自我「调谐」，起初会限制连接的最大速度，如果数据成功传输，会随着时间的推移提高传输的速度。这种调谐则被称为 <strong>TCP 慢启动</strong>。由于这种原因，让原本就具有突发性和短时性的 HTTP 连接变的十分低效。HTTP/2 通过让所有数据流共用同一个连接，可以更有效地使用 TCP 连接，让高带宽也能真正的服务于 HTTP 的性能提升。</p>
-<h4 id="流的概念"><a href="#流的概念" class="headerlink" title="流的概念"></a>流的概念</h4><p>流（Stream），服务器和客户端在HTTP/2连接内用于交换帧数据的独立双向序列，逻辑上可看做一个较为完整的交互处理单元，即表达一次完整的资源请求-响应数据交换流程；一个业务处理单元，在一个流内进行处理完毕，这个流生命周期完结。</p>
-<p>特点如下：</p>
+<h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>文件系统中的文件是以树的形式存储的，查找文件的效率跟树的高度直接相关，为了加快文件查找速度，我们使用M叉查找树，因为一个完全二叉树的高度大约是$log_2N$，而一个完全M叉树的高度大约是$log_MN$。</p>
+<p>建立M叉树的方式跟建立二叉树的方式相同，在二叉树查找树中，需要一个关键字来决定两个分支到底用哪个分支，在M叉查找树中，需要M-1个关键字来决定选取哪个分支。为了保证查找的性能，我们要让这个M叉树保持平衡。实现这种想法使用的数据结构叫B树。</p>
+<p>一个M叉B树具有以下特性：</p>
 <ul>
-<li>一个HTTP/2连接可同时保持多个打开的流，任一端点交换帧 </li>
-<li>流可被客户端或服务器单独或共享创建和使用 </li>
-<li>流可被任一端关闭 </li>
-<li>在流内发送和接收数据都要按照顺序 </li>
-<li>流的标识符自然数表示，1~2^31-1区间，有创建流的终端分配 </li>
-<li>流与流之间逻辑上是并行、独立存在</li>
+<li>数据项存储在树叶上。</li>
+<li>非叶节点存储M-1个关键字以指示搜索的方向，关键字i代表子树i+1中的最小的关键字。</li>
+<li>树的根或者是一片树叶，或者其儿子数载2～M之间。</li>
+<li>除根外，所有非叶节点的儿子数在M/2(向上取整)～M之间。</li>
+<li>所有的树叶都在相同的深度上。</li>
 </ul>
-<h4 id="多路复用原理"><a href="#多路复用原理" class="headerlink" title="多路复用原理"></a>多路复用原理</h4><h4 id=""><a href="#" class="headerlink" title=""></a><img src="http%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.png" alt="http多路复用"></h4><p>需要抽象化一些，就好理解了：</p>
-<ol>
-<li>每一个帧可看做是一个学生，流可以认为是组（流标识符为帧的属性值），一个班级（一个连接）内学生被分为若干个小组，每一个小组分配不同的具体任务。 </li>
-<li>HTTP/1.* 一次请求-响应，建立一个连接，用完关闭；每一个小组任务都需要建立一个班级，多个小组任务多个班级，1:1比例 </li>
-<li>HTTP/1.1 Pipeling解决方式为，若干个小组任务排队串行化单线程处理，后面小组任务等待前面小组任务完成才能获得执行机会，一旦有任务处理超时等，后续任务只能被阻塞，毫无办法，也就是人们常说的线头阻塞 </li>
-<li>HTTP/2多个小组任务可同时并行（严格意义上是并发）在班级内执行。一旦某个小组任务耗时严重，但不会影响到其它小组任务正常执行 </li>
-<li>针对一个班级资源维护要比多个班级资源维护经济多了，这也是多路复用出现的原因 </li>
-</ol>
-<blockquote>
-<p>参考：<a href="http://www.blogjava.net/yongboy/archive/2015/03/19/423611.html">HTTP/2笔记之流和多路复用</a></p>
-</blockquote>
-<h3 id="HTTP常用方法"><a href="#HTTP常用方法" class="headerlink" title="HTTP常用方法"></a>HTTP常用方法</h3><ul>
-<li>GET : 获取资源</li>
-<li>POST : 传输实体主体</li>
-<li>PUT : 传输文件</li>
-<li>HEAD : 获得报文首部</li>
-<li>DELETE : 删除文件</li>
-<li>OPTIONS : 询问支持的方法</li>
-</ul>
-<h4 id="GET方法和POST方法的区别"><a href="#GET方法和POST方法的区别" class="headerlink" title="GET方法和POST方法的区别"></a>GET方法和POST方法的区别</h4><ol>
-<li>GET重点在从服务器上获取资源，POST重点在向服务器发送数据；</li>
-<li>GET传输数据是通过URL请求，以field（字段）= value的形式，置于URL后，并用”?”连接，多个请求数据间用”&amp;”连接，如<a href="http://127.0.0.1/Test/login.action?name=admin&amp;password=admin，这个过程用户是可见的；post传输数据通过Http的post机制，将字段与对应值封存在请求实体中发送给服务器，这个过程对用户是不可见的；">http://127.0.0.1/Test/login.action?name=admin&amp;password=admin，这个过程用户是可见的；post传输数据通过Http的post机制，将字段与对应值封存在请求实体中发送给服务器，这个过程对用户是不可见的；</a></li>
-<li>Get传输的数据量小，因为受URL长度限制，但效率较高；Post可以传输大量数据，所以上传文件时只能用Post方式</li>
-<li>get是不安全的，因为URL是可见的，可能会泄露私密信息，如密码等；post较get安全性较高 </li>
-<li>get方式只能支持ASCII字符，向服务器传的中文字符可能会乱码；post支持标准字符集，可以正确传递中文字符。</li>
-</ol>
-<h3 id="HTTPS-和-HTTP的区别"><a href="#HTTPS-和-HTTP的区别" class="headerlink" title="HTTPS 和 HTTP的区别"></a>HTTPS 和 HTTP的区别</h3><ol>
-<li>HTTPS协议需要到CA申请证书，一般免费证书很少，需要交费。</li>
-<li>HTTP协议运行在TCP之上，所有传输的内容都是明文，HTTPS运行在SSL/TLS之上，SSL/TLS运行在TCP之上，所有传输的内容都经过加密的。</li>
-<li>HTTP和HTTPS使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。</li>
-<li>HTTPS可以有效的防止运营商劫持，解决了防劫持的一个大问题。 </li>
-</ol>
-<h3 id="一次HTTP请求的完整流程"><a href="#一次HTTP请求的完整流程" class="headerlink" title="一次HTTP请求的完整流程"></a>一次HTTP请求的完整流程</h3><blockquote>
-<p>参考：<a href="https://www.linux178.com/web/httprequest.html">一次完整的HTTP事务是怎样一个过程？</a></p>
-</blockquote>
-<h4 id="域名解析"><a href="#域名解析" class="headerlink" title="域名解析"></a>域名解析</h4><h4 id="发起TCP3次握手"><a href="#发起TCP3次握手" class="headerlink" title="发起TCP3次握手"></a>发起TCP3次握手</h4><h4 id="建立TCP连接后发起HTTP请求"><a href="#建立TCP连接后发起HTTP请求" class="headerlink" title="建立TCP连接后发起HTTP请求"></a>建立TCP连接后发起HTTP请求</h4><h4 id="服务器响应HTTP请求，浏览器得到HTML代码"><a href="#服务器响应HTTP请求，浏览器得到HTML代码" class="headerlink" title="服务器响应HTTP请求，浏览器得到HTML代码"></a>服务器响应HTTP请求，浏览器得到HTML代码</h4><h4 id="浏览器解析HTML代码，并请求HTML代码中的资源"><a href="#浏览器解析HTML代码，并请求HTML代码中的资源" class="headerlink" title="浏览器解析HTML代码，并请求HTML代码中的资源"></a>浏览器解析HTML代码，并请求HTML代码中的资源</h4><h4 id="资源请求完后关闭连接，服务器发起TCP4次挥手"><a href="#资源请求完后关闭连接，服务器发起TCP4次挥手" class="headerlink" title="资源请求完后关闭连接，服务器发起TCP4次挥手"></a>资源请求完后关闭连接，服务器发起TCP4次挥手</h4><h4 id="浏览器对页面进行渲染呈现给用户"><a href="#浏览器对页面进行渲染呈现给用户" class="headerlink" title="浏览器对页面进行渲染呈现给用户"></a>浏览器对页面进行渲染呈现给用户</h4><h3 id="TCP-IP-的分层结构"><a href="#TCP-IP-的分层结构" class="headerlink" title="TCP/IP 的分层结构"></a>TCP/IP 的分层结构</h3><p><strong>应用层</strong>：决定了向用户提供<strong>应用服务</strong>时通信的活动，HTTP（HyperText Transfer Protocol，超文本传输协议）、FTP（File Transfer Protocol，文件传输协议）、DNS（Domain Name System，域名系统）位于本层。</p>
-<p><strong>传输层</strong>：传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。在传输层有两个性质不同的协议：TCP（Transmission Control Protocol，传输控制协议）和 UDP（User Data Protocol，用户数据报协议）。</p>
-<p><strong>网络层</strong>：用来处理在网络上流动的数据包，数据包是网络传输的最小数据单位，与对方计算机之间通过多台计算机或网络设备进行传输时，网络层所起的作用就是在众多的选项内选择一条传输路线。IP协议。</p>
-<p><strong>链路层</strong>：处理连接网络的硬件部分。</p>
+<p>一个5叉B树如下所示：</p>
+<p><img src="B-Tree.png" alt="B-Tree"></p>
+<p>在B树中，内部（非叶子）节点可以拥有可变数量的子节点（数量范围预先定义好）。当数据被插入或从一个节点中移除，它的子节点数量发生变化。为了维持在预先设定的数量范围内，内部节点可能会被合并或者分离。因为子节点数量有一定的允许范围，所以B树不需要像其他自平衡查找树那样频繁地重新保持平衡，但是由于节点没有被完全填充，可能浪费了一些空间。子节点数量的上界和下界依特定的实现而设置。例如，在一个2-3 B树（通常简称<a href="https://zh.wikipedia.org/wiki/2-3%E6%A0%91">2-3树</a>），每一个内部节点只能有2或3个子节点。</p>
+<p>B树中每一个内部节点会包含一定数量的键值。通常，键值的数量被选定在d和2d之间。在实际中，键值占用了节点中大部分的空间。因数2将保证节点可以被拆分或组合。如果一个内部节点有2d个键值，那么添加一个键值给此节点的过程，将会拆分2d键值为2个d键值的节点，并把中间值节点添加给父节点。每一个拆分的节点需要最小数目的键值。相似地，如果一个内部节点和他的邻居两者都有d个键值，那么将通过它与邻居的合并来删除一个键值。删除此键值将导致此节点拥有d−1个键值（与邻居的合并则加上d个键值，再加上从邻居节点的父节点移来的一个键值）结果为完全填充的2d个键值。</p>
+<p><strong>一个Ｂ树通过约束所有叶子节点在相同深度来保持平衡</strong>。深度在元素添加至树的过程中缓慢增长，而整体深度极少地增长，并导致所有叶子节点与根节点距离加1。</p>
+<p>在存取节点数据所耗时间远超过处理节点数据所耗时间的情况下，Ｂ树在可选的实现中拥有很多优势，因为存取节点的开销被分摊到里层节点的多次操作上。这通常出现在当节点存储在二级存储器如硬盘存储器上。通过最大化内部里层节点的子节点的数量，树的高度减小，存取节点的开销被缩减。另外，重新平衡树的动作也更少出现。子节点的最大数量取决于，每个子节点必需存储的信息量，和完整磁盘块的大小或者二次存储器中类似的容量。虽然2-3 树更易于解释，实际运用中，Ｂ树使用<a href="https://zh.wikipedia.org/w/index.php?title=%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8%E5%99%A8&action=edit&redlink=1">二级存储器</a>，需要要大量数目的子节点来提升效率。</p>
+<p>一个Ｂ树在它内部节点中存储键值，但不需在叶子节点上存储这些键值的记录。大体上的一类包含一些变体，如B+树和Ｂ*树。</p>
+<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>在Ｂ+树中，这些键值的拷贝被存储在内部节点；键值和记录存储在叶子节点；另外，一个叶子节点可以包含一个指针，指向另一个叶子节点以加速顺序存取。</p>
+<p>一个B+树的例子如下图所示：</p>
+<p><img src="Bplustree.png" alt="Bplustree"></p>
+<p>B+ 树通常用于数据库和操作系统的文件系统中。NTFS, ReiserFS, NSS, XFS, JFS, ReFS 和BFS等文件系统都在使用B+树作为元数据索引。B+ 树的特点是能够保持数据稳定有序，其插入与修改拥有较稳定的对数时间复杂度。B+ 树元素自底向上插入。</p>
 ]]></content>
       <categories>
-        <category>计算机基础</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>静态链接和动态链接的区别</title>
-    <url>/2017/08/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
-    <content><![CDATA[<p>本文讲解静态链接和动态链接的区别个各自优缺点。</p>
-<a id="more"></a>
-
-<hr>
-<p>静态链接：在编译连接时直接将需要的执行代码拷贝到调用处。</p>
-<ul>
-<li>优点：程序发布时不需要依赖库，可以独立运行。</li>
-<li>缺点：程序的体积会相对大一些。</li>
-</ul>
-<p>动态链接：在编译连接时不直接拷贝代码，而是通过记录一系列符号和参数，在程序运行或加载时将这些信息传递给操作系统，操作系统负责将需要的动态库加载到内存中，程序在运行到指定的代码时，去执行内存中已经加载的动态库可执行代码，最终达到运行时连接的目的。</p>
-<ul>
-<li>优点：多个程序可以共享同一段代码。</li>
-<li>缺点：运行时加载会影响程序执行性能。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>计算机基础</category>
+        <category>算法与数据结构</category>
       </categories>
   </entry>
   <entry>
@@ -2906,39 +2561,6 @@
       </tags>
   </entry>
   <entry>
-    <title>B-Tree总结</title>
-    <url>/2017/08/13/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>B-Tree（B树）是一种自平衡查找树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，倒在对数时间内完成，B树概括来说是一个一般化的二分搜索树，可以拥有多余2个子节点。与自平衡二叉查找树不同，B树为系统大块数据的读写操作做了优化。B树减少定位记录时所经历的中间过程，从而加快存取速度。B树这种数据结构可以用来描述外部存储。这种数据结构常被引用在数据库和文件系统上。</p>
-<a id="more"></a>
-
-<hr>
-<h2 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h2><p>文件系统中的文件是以树的形式存储的，查找文件的效率跟树的高度直接相关，为了加快文件查找速度，我们使用M叉查找树，因为一个完全二叉树的高度大约是$log_2N$，而一个完全M叉树的高度大约是$log_MN$。</p>
-<p>建立M叉树的方式跟建立二叉树的方式相同，在二叉树查找树中，需要一个关键字来决定两个分支到底用哪个分支，在M叉查找树中，需要M-1个关键字来决定选取哪个分支。为了保证查找的性能，我们要让这个M叉树保持平衡。实现这种想法使用的数据结构叫B树。</p>
-<p>一个M叉B树具有以下特性：</p>
-<ul>
-<li>数据项存储在树叶上。</li>
-<li>非叶节点存储M-1个关键字以指示搜索的方向，关键字i代表子树i+1中的最小的关键字。</li>
-<li>树的根或者是一片树叶，或者其儿子数载2～M之间。</li>
-<li>除根外，所有非叶节点的儿子数在M/2(向上取整)～M之间。</li>
-<li>所有的树叶都在相同的深度上。</li>
-</ul>
-<p>一个5叉B树如下所示：</p>
-<p><img src="B-Tree.png" alt="B-Tree"></p>
-<p>在B树中，内部（非叶子）节点可以拥有可变数量的子节点（数量范围预先定义好）。当数据被插入或从一个节点中移除，它的子节点数量发生变化。为了维持在预先设定的数量范围内，内部节点可能会被合并或者分离。因为子节点数量有一定的允许范围，所以B树不需要像其他自平衡查找树那样频繁地重新保持平衡，但是由于节点没有被完全填充，可能浪费了一些空间。子节点数量的上界和下界依特定的实现而设置。例如，在一个2-3 B树（通常简称<a href="https://zh.wikipedia.org/wiki/2-3%E6%A0%91">2-3树</a>），每一个内部节点只能有2或3个子节点。</p>
-<p>B树中每一个内部节点会包含一定数量的键值。通常，键值的数量被选定在d和2d之间。在实际中，键值占用了节点中大部分的空间。因数2将保证节点可以被拆分或组合。如果一个内部节点有2d个键值，那么添加一个键值给此节点的过程，将会拆分2d键值为2个d键值的节点，并把中间值节点添加给父节点。每一个拆分的节点需要最小数目的键值。相似地，如果一个内部节点和他的邻居两者都有d个键值，那么将通过它与邻居的合并来删除一个键值。删除此键值将导致此节点拥有d−1个键值（与邻居的合并则加上d个键值，再加上从邻居节点的父节点移来的一个键值）结果为完全填充的2d个键值。</p>
-<p><strong>一个Ｂ树通过约束所有叶子节点在相同深度来保持平衡</strong>。深度在元素添加至树的过程中缓慢增长，而整体深度极少地增长，并导致所有叶子节点与根节点距离加1。</p>
-<p>在存取节点数据所耗时间远超过处理节点数据所耗时间的情况下，Ｂ树在可选的实现中拥有很多优势，因为存取节点的开销被分摊到里层节点的多次操作上。这通常出现在当节点存储在二级存储器如硬盘存储器上。通过最大化内部里层节点的子节点的数量，树的高度减小，存取节点的开销被缩减。另外，重新平衡树的动作也更少出现。子节点的最大数量取决于，每个子节点必需存储的信息量，和完整磁盘块的大小或者二次存储器中类似的容量。虽然2-3 树更易于解释，实际运用中，Ｂ树使用<a href="https://zh.wikipedia.org/w/index.php?title=%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8%E5%99%A8&action=edit&redlink=1">二级存储器</a>，需要要大量数目的子节点来提升效率。</p>
-<p>一个Ｂ树在它内部节点中存储键值，但不需在叶子节点上存储这些键值的记录。大体上的一类包含一些变体，如B+树和Ｂ*树。</p>
-<h3 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h3><p>在Ｂ+树中，这些键值的拷贝被存储在内部节点；键值和记录存储在叶子节点；另外，一个叶子节点可以包含一个指针，指向另一个叶子节点以加速顺序存取。</p>
-<p>一个B+树的例子如下图所示：</p>
-<p><img src="Bplustree.png" alt="Bplustree"></p>
-<p>B+ 树通常用于数据库和操作系统的文件系统中。NTFS, ReiserFS, NSS, XFS, JFS, ReFS 和BFS等文件系统都在使用B+树作为元数据索引。B+ 树的特点是能够保持数据稳定有序，其插入与修改拥有较稳定的对数时间复杂度。B+ 树元素自底向上插入。</p>
-]]></content>
-      <categories>
-        <category>算法与数据结构</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Hash算法解决冲突的方法</title>
     <url>/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-Hash%E7%AE%97%E6%B3%95%E8%A7%A3%E5%86%B3%E5%86%B2%E7%AA%81%E7%9A%84%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<p>本文介绍4中Hash算法中用于解决冲突的方法。</p>
@@ -2956,6 +2578,49 @@
       <categories>
         <category>算法与数据结构</category>
       </categories>
+  </entry>
+  <entry>
+    <title>二维数组中的查找</title>
+    <url>/2018/05/09/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/</url>
+    <content><![CDATA[<p>在二维数组中查找。</p>
+<p>相关题目：剑指Offer面试题4：二维数组中的查找Leetcode 74. Search a 2D Matrix, Leetcode 240. Search a 2D Matrix II。</p>
+<a id="more"></a>
+
+<hr>
+<p><strong>问题1: 数组中的元素有什么特征？</strong></p>
+<p><strong>问题2: 异常情况怎样处理？如matrix == null，matrix.length == 0, matrix[0].length == 0?</strong></p>
+<hr>
+<p>一般有两种情况，第一种情况：数组中的元素每行从左到右递增（递减），每列从上到下递增（递减），这时候我们可以用算法1。</p>
+<h3 id="算法1-从非最小最大元素开始搜索"><a href="#算法1-从非最小最大元素开始搜索" class="headerlink" title="算法1: 从非最小最大元素开始搜索"></a>算法1: 从非最小最大元素开始搜索</h3><p>第一种矩阵如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1	2	8	9</span><br><span class="line">2	4	9	12</span><br><span class="line">4	7	10	13</span><br><span class="line">6	8	11	15</span><br></pre></td></tr></table></figure>
+
+<p>这种情况下我们需要从右上角或者左下角开始搜索，每一次判断可以排除一行或者一列。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">searchMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (matrix == <span class="keyword">null</span> || matrix.length == <span class="number">0</span> || matrix[<span class="number">0</span>].length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">int</span> row = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> col = (matrix[<span class="number">0</span>].length - <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">while</span> (row &lt;= (matrix.length - <span class="number">1</span>) &amp;&amp; col &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (matrix[row][col] == target) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (matrix[row][col] &lt; target) row++;</span><br><span class="line">        <span class="keyword">else</span> col--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>时间复杂度：O(n), Leetcode 15ms.</p>
+<p>空间复杂度：O(1)</p>
+<p>Leetcode 240. Search a 2D Matrix II 就可以用该解法。</p>
+<hr>
+<p>第二种情况是：在第一中情况的条件下，新加一个条件：每行最后一个元素要大于下一行第一个元素。显然这种情况下我们还可以使用O(n)时间的算法1，但是我们可以根据新加的条件使用另一种速度更快的算法。</p>
+<h3 id="算法2-二分查找"><a href="#算法2-二分查找" class="headerlink" title="算法2: 二分查找"></a>算法2: 二分查找</h3><p>第二种矩阵如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1	3	5	7</span><br><span class="line">10	11	16	20</span><br><span class="line">23	30	34	50</span><br></pre></td></tr></table></figure>
+
+<p>由于矩阵在内存中是按顺序存储的，所以我们可以把整个矩阵当成一个有序数组，在数组上进行二分查找，这就涉及到一个问题：矩阵下标和数组下标的映射：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int m &#x3D; matrix.length;</span><br><span class="line">int n &#x3D; matrix[0].length;</span><br><span class="line"></span><br><span class="line">matrix[x][y] &#x3D;&gt; array[x * n + y]</span><br><span class="line">array[x]     &#x3D;&gt; matrix[x &#x2F; n][x % n]</span><br></pre></td></tr></table></figure>
+
+<p>有了上面的映射规则，我们可以得到如下代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">searchMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (matrix == <span class="keyword">null</span> || matrix.length == <span class="number">0</span> || matrix[<span class="number">0</span>].length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">int</span> m = matrix.length;</span><br><span class="line">    <span class="keyword">int</span> n = matrix[<span class="number">0</span>].length;</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> end = m * n - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> mid, num;</span><br><span class="line">    <span class="keyword">while</span> (start &lt;= end) &#123;</span><br><span class="line">        mid = (start + end) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">        num = matrix[mid/n][mid%n];</span><br><span class="line">        <span class="keyword">if</span> (num == target) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (num &gt; target) end = mid - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> start = mid + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Leetcode 74. Search a 2D Matrix 就可以用这种解法。</p>
+<p>时间复杂度：O(log(n*m))，Leetcode: 11ms</p>
+<p>空间复杂度：O(1)</p>
+]]></content>
+      <categories>
+        <category>算法与数据结构</category>
+      </categories>
+      <tags>
+        <tag>数组</tag>
+      </tags>
   </entry>
   <entry>
     <title>二叉树遍历算法总结</title>
@@ -3003,68 +2668,6 @@
       <tags>
         <tag>二叉树</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>二维数组中的查找</title>
-    <url>/2018/05/09/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/</url>
-    <content><![CDATA[<p>在二维数组中查找。</p>
-<p>相关题目：剑指Offer面试题4：二维数组中的查找Leetcode 74. Search a 2D Matrix, Leetcode 240. Search a 2D Matrix II。</p>
-<a id="more"></a>
-
-<hr>
-<p><strong>问题1: 数组中的元素有什么特征？</strong></p>
-<p><strong>问题2: 异常情况怎样处理？如matrix == null，matrix.length == 0, matrix[0].length == 0?</strong></p>
-<hr>
-<p>一般有两种情况，第一种情况：数组中的元素每行从左到右递增（递减），每列从上到下递增（递减），这时候我们可以用算法1。</p>
-<h3 id="算法1-从非最小最大元素开始搜索"><a href="#算法1-从非最小最大元素开始搜索" class="headerlink" title="算法1: 从非最小最大元素开始搜索"></a>算法1: 从非最小最大元素开始搜索</h3><p>第一种矩阵如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1	2	8	9</span><br><span class="line">2	4	9	12</span><br><span class="line">4	7	10	13</span><br><span class="line">6	8	11	15</span><br></pre></td></tr></table></figure>
-
-<p>这种情况下我们需要从右上角或者左下角开始搜索，每一次判断可以排除一行或者一列。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">searchMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (matrix == <span class="keyword">null</span> || matrix.length == <span class="number">0</span> || matrix[<span class="number">0</span>].length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">int</span> row = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> col = (matrix[<span class="number">0</span>].length - <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">while</span> (row &lt;= (matrix.length - <span class="number">1</span>) &amp;&amp; col &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (matrix[row][col] == target) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (matrix[row][col] &lt; target) row++;</span><br><span class="line">        <span class="keyword">else</span> col--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>时间复杂度：O(n), Leetcode 15ms.</p>
-<p>空间复杂度：O(1)</p>
-<p>Leetcode 240. Search a 2D Matrix II 就可以用该解法。</p>
-<hr>
-<p>第二种情况是：在第一中情况的条件下，新加一个条件：每行最后一个元素要大于下一行第一个元素。显然这种情况下我们还可以使用O(n)时间的算法1，但是我们可以根据新加的条件使用另一种速度更快的算法。</p>
-<h3 id="算法2-二分查找"><a href="#算法2-二分查找" class="headerlink" title="算法2: 二分查找"></a>算法2: 二分查找</h3><p>第二种矩阵如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1	3	5	7</span><br><span class="line">10	11	16	20</span><br><span class="line">23	30	34	50</span><br></pre></td></tr></table></figure>
-
-<p>由于矩阵在内存中是按顺序存储的，所以我们可以把整个矩阵当成一个有序数组，在数组上进行二分查找，这就涉及到一个问题：矩阵下标和数组下标的映射：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int m &#x3D; matrix.length;</span><br><span class="line">int n &#x3D; matrix[0].length;</span><br><span class="line"></span><br><span class="line">matrix[x][y] &#x3D;&gt; array[x * n + y]</span><br><span class="line">array[x]     &#x3D;&gt; matrix[x &#x2F; n][x % n]</span><br></pre></td></tr></table></figure>
-
-<p>有了上面的映射规则，我们可以得到如下代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">searchMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (matrix == <span class="keyword">null</span> || matrix.length == <span class="number">0</span> || matrix[<span class="number">0</span>].length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">int</span> m = matrix.length;</span><br><span class="line">    <span class="keyword">int</span> n = matrix[<span class="number">0</span>].length;</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> end = m * n - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> mid, num;</span><br><span class="line">    <span class="keyword">while</span> (start &lt;= end) &#123;</span><br><span class="line">        mid = (start + end) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">        num = matrix[mid/n][mid%n];</span><br><span class="line">        <span class="keyword">if</span> (num == target) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (num &gt; target) end = mid - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> start = mid + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Leetcode 74. Search a 2D Matrix 就可以用这种解法。</p>
-<p>时间复杂度：O(log(n*m))，Leetcode: 11ms</p>
-<p>空间复杂度：O(1)</p>
-]]></content>
-      <categories>
-        <category>算法与数据结构</category>
-      </categories>
-      <tags>
-        <tag>数组</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>全排列</title>
-    <url>/2018/06/22/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%85%A8%E6%8E%92%E5%88%97/</url>
-    <content><![CDATA[<p>求数组或字符串的全排列算法。</p>
-<a id="more"></a>
-
-<hr>
-<h3 id="不包含重复元素的序列求全排列"><a href="#不包含重复元素的序列求全排列" class="headerlink" title="不包含重复元素的序列求全排列"></a>不包含重复元素的序列求全排列</h3><p>我们将第一个元素看作一部分A，其余元素看作一部分B，让第一个元素和后面的某一个元素交换，然后求B的全排列，递归执行上面语句，知道第二部分的开始指针到达数组末尾，我就得到一个排列。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">permutation</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> start)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (start == nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : nums) &#123;</span><br><span class="line">            <span class="comment">//得到一个排列</span></span><br><span class="line">            System.out.print(nums);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; nums.length; i++) &#123;</span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">        permutation(nums, start + <span class="number">1</span>);</span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = nums[a];</span><br><span class="line">    nums[a] = nums[b];</span><br><span class="line">    nums[b] = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="包含重复元素的序列求全排列"><a href="#包含重复元素的序列求全排列" class="headerlink" title="包含重复元素的序列求全排列"></a>包含重复元素的序列求全排列</h3><p>推荐使用Set这种数据结构存储排列结果，可以完美解决排列重复的问题。</p>
-<p>还有一种方案是：添加if语句判断该元素是否重复，如果重复则不交换，这种方法不保证能完全解决重复元素的问题。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//放在Set中的数据类型必须实现Comparable接口的compareTo方法</span></span><br><span class="line">Set&lt;String&gt; res = <span class="keyword">new</span> TreeSet&lt;&gt;();</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">permutation2</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> start)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (start == nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : nums) &#123;</span><br><span class="line">            sb.append(i);</span><br><span class="line">        &#125;</span><br><span class="line">        res.add(sb.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">//swap nums[i] nums[start]</span></span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">        permutation2(nums, start + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">//swap nums[i] nums[start]</span></span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = nums[a];</span><br><span class="line">    nums[a] = nums[b];</span><br><span class="line">    nums[b] = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>算法与数据结构</category>
-      </categories>
   </entry>
   <entry>
     <title>排序算法总结</title>
@@ -3404,6 +3007,25 @@
       </tags>
   </entry>
   <entry>
+    <title>全排列</title>
+    <url>/2018/06/22/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E5%85%A8%E6%8E%92%E5%88%97/</url>
+    <content><![CDATA[<p>求数组或字符串的全排列算法。</p>
+<a id="more"></a>
+
+<hr>
+<h3 id="不包含重复元素的序列求全排列"><a href="#不包含重复元素的序列求全排列" class="headerlink" title="不包含重复元素的序列求全排列"></a>不包含重复元素的序列求全排列</h3><p>我们将第一个元素看作一部分A，其余元素看作一部分B，让第一个元素和后面的某一个元素交换，然后求B的全排列，递归执行上面语句，知道第二部分的开始指针到达数组末尾，我就得到一个排列。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">permutation</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> start)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (start == nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : nums) &#123;</span><br><span class="line">            <span class="comment">//得到一个排列</span></span><br><span class="line">            System.out.print(nums);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; nums.length; i++) &#123;</span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">        permutation(nums, start + <span class="number">1</span>);</span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = nums[a];</span><br><span class="line">    nums[a] = nums[b];</span><br><span class="line">    nums[b] = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="包含重复元素的序列求全排列"><a href="#包含重复元素的序列求全排列" class="headerlink" title="包含重复元素的序列求全排列"></a>包含重复元素的序列求全排列</h3><p>推荐使用Set这种数据结构存储排列结果，可以完美解决排列重复的问题。</p>
+<p>还有一种方案是：添加if语句判断该元素是否重复，如果重复则不交换，这种方法不保证能完全解决重复元素的问题。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//放在Set中的数据类型必须实现Comparable接口的compareTo方法</span></span><br><span class="line">Set&lt;String&gt; res = <span class="keyword">new</span> TreeSet&lt;&gt;();</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">permutation2</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> start)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (start == nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : nums) &#123;</span><br><span class="line">            sb.append(i);</span><br><span class="line">        &#125;</span><br><span class="line">        res.add(sb.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">//swap nums[i] nums[start]</span></span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">        permutation2(nums, start + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">//swap nums[i] nums[start]</span></span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = nums[a];</span><br><span class="line">    nums[a] = nums[b];</span><br><span class="line">    nums[b] = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>算法与数据结构</category>
+      </categories>
+  </entry>
+  <entry>
     <title>数组中只出现1次的数字</title>
     <url>/2018/06/20/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%95%B0%E7%BB%84%E4%B8%AD%E5%8F%AA%E5%87%BA%E7%8E%B01%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97/</url>
     <content><![CDATA[<p>找出数组中只出现1次的数字。</p>
@@ -3442,6 +3064,28 @@
       </categories>
       <tags>
         <tag>数组</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>滑动窗口算法</title>
+    <url>/2018/06/12/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<p>滑动窗口算法可以应用在很多查找字符串子串的算法中。</p>
+<p>参考：<a href="https://leetcode.com/problems/find-all-anagrams-in-a-string/discuss/92007/Sliding-Window-algorithm-template-to-solve-all-the-Leetcode-substring-search-problem.">Sliding Window algorithm template to solve all the Leetcode substring search problem.</a></p>
+<a id="more"></a>
+
+<hr>
+<h4 id="算法1-基本滑动窗口算法"><a href="#算法1-基本滑动窗口算法" class="headerlink" title="算法1: 基本滑动窗口算法"></a>算法1: 基本滑动窗口算法</h4><p>使用HashMap存储target字符串中字符出现的次数，适用范围最广。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">slidingWindowTemplate</span><span class="params">(String s, String t)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//初始化一个集合用来存储结果</span></span><br><span class="line">    List&lt;Integer&gt; result = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">if</span>(t.length()&gt; s.length()) <span class="keyword">return</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建一个HashMap用来存储目标子串中字符的出现次数</span></span><br><span class="line">    Map&lt;Character, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">char</span> c : t.toCharArray())&#123;</span><br><span class="line">        map.put(c, map.getOrDefault(c, <span class="number">0</span>) + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//维护一个counter检查是否和目标串匹配</span></span><br><span class="line">    <span class="comment">//这里是map.size()而不是t.size()所以下面counter--的时候判断条件是map.get(c)==0</span></span><br><span class="line">    <span class="comment">//如果这里是t.length()由于可能存在重复数字，若以下面counter--的时候判断条件应该是map.get(c)&gt;0 </span></span><br><span class="line">    <span class="keyword">int</span> counter = map.size();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//两个指针：begin:滑窗的左指针，end:滑窗的右指针</span></span><br><span class="line">    <span class="keyword">int</span> begin = <span class="number">0</span>, end = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(end &lt; s.length())&#123;</span><br><span class="line">        <span class="keyword">char</span> c = s.charAt(end);</span><br><span class="line">        <span class="keyword">if</span>( map.containsKey(c) )&#123;</span><br><span class="line">            map.put(c, map.get(c)-<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(map.get(c) == <span class="number">0</span>) counter--;</span><br><span class="line">        &#125;</span><br><span class="line">        end++;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(counter == <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">char</span> tempc = s.charAt(begin);</span><br><span class="line">            <span class="keyword">if</span>(map.containsKey(tempc))&#123;</span><br><span class="line">                map.put(tempc, map.get(tempc) + <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">if</span>(map.get(tempc) &gt; <span class="number">0</span>) counter++;</span><br><span class="line">            &#125;</span><br><span class="line">            begin++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果一直target中字符的取值范围，如target中只包含大写字母、小写字母或数字，则该算法可以进一步优化，主要的优化点就是将HashMap换成数组，对数组的操作要比对HashMap的entry操作快很多。</p>
+<h4 id="算法2-使用数组作为map的滑动窗口算法"><a href="#算法2-使用数组作为map的滑动窗口算法" class="headerlink" title="算法2: 使用数组作为map的滑动窗口算法"></a>算法2: 使用数组作为map的滑动窗口算法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findAnagrams</span><span class="params">(String s, String p)</span> </span>&#123;</span><br><span class="line">    List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span>[] map = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">char</span> c : p.toCharArray())</span><br><span class="line">        map[c]++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> count = p.length();</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> end = <span class="number">0</span>; end &lt; s.length(); end++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (map[s.charAt(end)]-- &gt; <span class="number">0</span>)&#123;</span><br><span class="line">            count--;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//if (end - start + 1 == p.length())</span></span><br><span class="line">                <span class="comment">//res.add(start);</span></span><br><span class="line">            <span class="keyword">if</span> (++map[s.charAt(start)] &gt; <span class="number">0</span>)</span><br><span class="line">                count++;</span><br><span class="line">            start++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>算法与数据结构</category>
+      </categories>
+      <tags>
+        <tag>字符串</tag>
       </tags>
   </entry>
   <entry>
@@ -3504,28 +3148,6 @@
       </tags>
   </entry>
   <entry>
-    <title>滑动窗口算法</title>
-    <url>/2018/06/12/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/</url>
-    <content><![CDATA[<p>滑动窗口算法可以应用在很多查找字符串子串的算法中。</p>
-<p>参考：<a href="https://leetcode.com/problems/find-all-anagrams-in-a-string/discuss/92007/Sliding-Window-algorithm-template-to-solve-all-the-Leetcode-substring-search-problem.">Sliding Window algorithm template to solve all the Leetcode substring search problem.</a></p>
-<a id="more"></a>
-
-<hr>
-<h4 id="算法1-基本滑动窗口算法"><a href="#算法1-基本滑动窗口算法" class="headerlink" title="算法1: 基本滑动窗口算法"></a>算法1: 基本滑动窗口算法</h4><p>使用HashMap存储target字符串中字符出现的次数，适用范围最广。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">slidingWindowTemplate</span><span class="params">(String s, String t)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//初始化一个集合用来存储结果</span></span><br><span class="line">    List&lt;Integer&gt; result = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">if</span>(t.length()&gt; s.length()) <span class="keyword">return</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建一个HashMap用来存储目标子串中字符的出现次数</span></span><br><span class="line">    Map&lt;Character, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">char</span> c : t.toCharArray())&#123;</span><br><span class="line">        map.put(c, map.getOrDefault(c, <span class="number">0</span>) + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//维护一个counter检查是否和目标串匹配</span></span><br><span class="line">    <span class="comment">//这里是map.size()而不是t.size()所以下面counter--的时候判断条件是map.get(c)==0</span></span><br><span class="line">    <span class="comment">//如果这里是t.length()由于可能存在重复数字，若以下面counter--的时候判断条件应该是map.get(c)&gt;0 </span></span><br><span class="line">    <span class="keyword">int</span> counter = map.size();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//两个指针：begin:滑窗的左指针，end:滑窗的右指针</span></span><br><span class="line">    <span class="keyword">int</span> begin = <span class="number">0</span>, end = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(end &lt; s.length())&#123;</span><br><span class="line">        <span class="keyword">char</span> c = s.charAt(end);</span><br><span class="line">        <span class="keyword">if</span>( map.containsKey(c) )&#123;</span><br><span class="line">            map.put(c, map.get(c)-<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(map.get(c) == <span class="number">0</span>) counter--;</span><br><span class="line">        &#125;</span><br><span class="line">        end++;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(counter == <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">char</span> tempc = s.charAt(begin);</span><br><span class="line">            <span class="keyword">if</span>(map.containsKey(tempc))&#123;</span><br><span class="line">                map.put(tempc, map.get(tempc) + <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">if</span>(map.get(tempc) &gt; <span class="number">0</span>) counter++;</span><br><span class="line">            &#125;</span><br><span class="line">            begin++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果一直target中字符的取值范围，如target中只包含大写字母、小写字母或数字，则该算法可以进一步优化，主要的优化点就是将HashMap换成数组，对数组的操作要比对HashMap的entry操作快很多。</p>
-<h4 id="算法2-使用数组作为map的滑动窗口算法"><a href="#算法2-使用数组作为map的滑动窗口算法" class="headerlink" title="算法2: 使用数组作为map的滑动窗口算法"></a>算法2: 使用数组作为map的滑动窗口算法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findAnagrams</span><span class="params">(String s, String p)</span> </span>&#123;</span><br><span class="line">    List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span>[] map = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">char</span> c : p.toCharArray())</span><br><span class="line">        map[c]++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> count = p.length();</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> end = <span class="number">0</span>; end &lt; s.length(); end++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (map[s.charAt(end)]-- &gt; <span class="number">0</span>)&#123;</span><br><span class="line">            count--;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//if (end - start + 1 == p.length())</span></span><br><span class="line">                <span class="comment">//res.add(start);</span></span><br><span class="line">            <span class="keyword">if</span> (++map[s.charAt(start)] &gt; <span class="number">0</span>)</span><br><span class="line">                count++;</span><br><span class="line">            start++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>算法与数据结构</category>
-      </categories>
-      <tags>
-        <tag>字符串</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>连续子数组最大累乘积</title>
     <url>/2017/06/30/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E8%BF%9E%E7%BB%AD%E5%AD%90%E6%95%B0%E7%BB%84%E6%9C%80%E5%A4%A7%E7%B4%AF%E4%B9%98%E7%A7%AF/</url>
     <content><![CDATA[<p>求连续子数组的最大乘积。相关题目：Leetcode 152. Maximum Product Subarray</p>
@@ -3572,6 +3194,384 @@
       <tags>
         <tag>二叉树</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>什么是UTF-8编码</title>
+    <url>/2018/08/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E4%BB%80%E4%B9%88%E6%98%AFUTF-8%E7%BC%96%E7%A0%81/</url>
+    <content><![CDATA[<p>UTF-8（8-bit Unicode Transformation Format）是一种针对Unicode的可变长度字元编码，也是一种前缀码。它可以用来表示Unicode标准中的任何字元，且其编码中的第一个位元组仍和ASCII相容，这使得原来处理ASCII字元的软件无需或只须做少部分修改，即可继续使用。因此，它逐渐成为电子邮件、网页及其他存储或传送文字的应用中，优先采用的编码。</p>
+<a id="more"></a>
+
+<hr>
+<p>在计算机体系里，无论是硬盘中的文件，网络上的页面，还是我们的电子邮件，所有的数据在底层都是一堆01串，为什么数据都可以按照10串的形式存储或者传输，就是因为有编码的存在，我们平常所说的编码方式就是一种将我们熟悉的符号翻译成对应的01串的规则。</p>
+<p>ASCII（<strong>A</strong>merican <strong>S</strong>tandard <strong>C</strong>ode for <strong>I</strong>nformation <strong>I</strong>nterchange，<strong>美国信息交换标准代码</strong> ）是上世纪60年代美国制定的一套编码规则，一直沿用至今。ASCII码中一共定义了128个字符对应的编码，如下图所示：</p>
+<p><img src="asciifull.gif" alt="asciifull"></p>
+<p>对于英语，128个字符是够用了，但是对于其他语言如法语、俄语、汉语，128个字符是远远不够用的，很多欧洲国家都对ASCII码进行了扩展，但是不同的国家使用不同的编码，我们想要打开不同国家的文件，就需要知道这个文件对应的编码方式，否则就会出现乱码，如果有一种编码，将世界上所有的符号都纳入其中，给每一个符号定义一个独一无二的编码，那就会解决乱码的问题了，Unicode码就是这样的一种符号编码，Unicode是一个很大的集合，可以容纳100多万个符号，每个符号对应唯一的编码。由于定义的符号数量巨大，所以每个符号的编码可能需要1~4个字节来存储。</p>
+<p>Unicode只是一个编码集合，它定义了符号和编码的对应关系，但是没有定义怎样存储这些符号，UTF-8中定义了这些符号应该怎样存储。</p>
+<p>UTF-8是互联网上使用最广泛的一种Unicode的实现方式，它是一种变长的编码方式可以使用1~4表示一个符号，根据不同的符号变化字节的长度，UTF-8的编码规则如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th align="center">码点位数</th>
+<th>码点范围</th>
+<th>字节序列</th>
+<th>Byte1</th>
+<th>Byte2</th>
+<th>Byte3</th>
+<th>Byte4</th>
+<th>Byte5</th>
+<th>Byte6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">7</td>
+<td>0000~007F</td>
+<td>1</td>
+<td>0xxxxxxx</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td>0080~07FF</td>
+<td>2</td>
+<td>110xxxxx</td>
+<td>10xxxxxx</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td>0800~FFFF</td>
+<td>3</td>
+<td>1110xxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">21</td>
+<td>10000~1FFFFF</td>
+<td>4</td>
+<td>11110xxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">26</td>
+<td>200000~3FFFFFF</td>
+<td>5</td>
+<td>111110xx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td></td>
+</tr>
+<tr>
+<td align="center">31</td>
+<td>4000000~7FFFFFFF</td>
+<td>6</td>
+<td>1111110x</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+<td>10xxxxxx</td>
+</tr>
+</tbody></table>
+<p>上表中x代表可以存储编码的位，由上表可以看到UTF-8的编码规则非常简单:</p>
+<ol>
+<li>对于单字节的符号，字节的第一位设置为0，后买7为是这个符号的Unicode码。因此对于英语，UTF-8和ASCII码是相同的。</li>
+<li>对于n &gt; 1个字节的符号，第一个字节最高位1的个数代表编码的字节数，剩下的字节每个字节以10开头。</li>
+</ol>
+<p>有了UTF-8定义的编码存储方式，我们拿到一段编码后就能清楚的看到这段编码由多少字节组成，每一个字节中编码的内容，得到字符编码后，通过查询Unicode编码表我们就可以得知这个符号是什么了。</p>
+<p>参考：<a href="https://zh.wikipedia.org/wiki/UTF-8">UTF-8</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html">字符编码笔记：ASCII，Unicode 和 UTF-8</a></p>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>LRU Cache的原理及实现</title>
+    <url>/2018/07/19/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-LRUCache%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E7%8E%B0/</url>
+    <content><![CDATA[<p>LRU近期最少使用缓存替换策略的原理及实现。</p>
+<a id="more"></a>
+
+<hr>
+<blockquote>
+<p>局部性原理：CPU访问存储器时，无论是存取指令还是存取数据，所访问的存储单元都趋于聚集在一个较小的连续区域中。</p>
+<p>三种不同的局部性：</p>
+<p>时间局部性（Temporal Locality）：如果一个信息项正在被访问，那么在近期它很可能还会被再次访问。程序循环、堆栈等是产生时间局部性的原因。</p>
+<p>空间局部性（Spatial Locality）：在最近的将来将用到的信息很可能与现在正在使用的信息在空间地址上是临近的。</p>
+<p>顺序局部性（Order Locality）：在典型程序中，除转移类指令外，大部分指令是顺序进行的。顺序执行和非顺序执行的比例大致是5:1。此外，对大型数组访问也是顺序的。指令的顺序执行、数组的连续存放等是产生顺序局部性的原因。</p>
+</blockquote>
+<blockquote>
+<p>LRU(Least Recently Used)近期最少使用算法，是内存管理的一种页面置换算法，通常用与缓存的淘汰策略实现，由于缓存的内存非常宝贵，所以需要根据某种规则来剔除数据，保证内存不被撑满。</p>
+</blockquote>
+<p>常用的缓存Redis中可以设置内存的最大使用量，当内存的使用量超过这个最大值时，Redis就会实施淘汰策略，Redis中有6种常用的数据淘汰策略：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>volatile-lru</td>
+<td>从已设置过期时间的数据集中挑选<strong>最近最少使用</strong>的数据淘汰</td>
+</tr>
+<tr>
+<td>volatile-ttl</td>
+<td>从已设置过期时间的数据集中挑选<strong>将要过期</strong>的数据淘汰</td>
+</tr>
+<tr>
+<td>volatile-random</td>
+<td>从已设置过期时间的数据集中<strong>随机挑选</strong>数据淘汰</td>
+</tr>
+<tr>
+<td>allkeys-lru</td>
+<td>从全部数据集中挑选<strong>最近最少使用</strong>的数据淘汰</td>
+</tr>
+<tr>
+<td>allkeys-random</td>
+<td>从全部数据集中<strong>随机挑选</strong>数据淘汰</td>
+</tr>
+<tr>
+<td>no-enviction</td>
+<td>禁止驱逐数据</td>
+</tr>
+</tbody></table>
+<p>在Mybatis中也实现了使用LRU策略的缓存，我们通过Mybatis中的<a href="https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/cache/decorators/LruCache.java">LruCache.java</a>看一下LRU Cache的实现原理。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.ibatis.cache.decorators;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.LinkedHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReadWriteLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.cache.Cache;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Lru (least recently used) cache decorator</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Clinton Begin</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LruCache</span> <span class="keyword">implements</span> <span class="title">Cache</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> Cache delegate;</span><br><span class="line">  <span class="keyword">private</span> Map&lt;Object, Object&gt; keyMap;</span><br><span class="line">  <span class="keyword">private</span> Object eldestKey;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">LruCache</span><span class="params">(Cache delegate)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.delegate = delegate;</span><br><span class="line">    setSize(<span class="number">1024</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSize</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> size)</span> </span>&#123;</span><br><span class="line">    keyMap = <span class="keyword">new</span> LinkedHashMap&lt;Object, Object&gt;(size, .<span class="number">75F</span>, <span class="keyword">true</span>) &#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">4267176411845948333L</span>;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;Object, Object&gt; eldest)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> tooBig = size() &gt; size;</span><br><span class="line">        <span class="keyword">if</span> (tooBig) &#123;</span><br><span class="line">          eldestKey = eldest.getKey();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> tooBig;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Object key, Object value)</span> </span>&#123;</span><br><span class="line">    delegate.putObject(key, value);</span><br><span class="line">    cycleKeyList(key);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">removeObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> delegate.removeObject(key);</span><br><span class="line">  &#125;</span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">cycleKeyList</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    keyMap.put(key, key);</span><br><span class="line">    <span class="keyword">if</span> (eldestKey != <span class="keyword">null</span>) &#123;</span><br><span class="line">      delegate.removeObject(eldestKey);</span><br><span class="line">      eldestKey = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    keyMap.get(key); <span class="comment">//touch</span></span><br><span class="line">    <span class="keyword">return</span> delegate.getObject(key);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>LruCache类中定义了三个属性，其中keyMap指向一个LinkedHashMap对象用来存储缓存数据，eldestKey指向当前数据中最老的节点（既LinkedHashMap中的头节点）。</p>
+<p>在LurCache的构造方法中指定缓存的默认大小是1024个节点，在新建LinkedHashMap对象时指定了LinkedHashMap的容量（默认1024），负载因子0.75，并且指定元素的顺序为按<strong>访问顺序</strong>排序，在指定按照访问顺序排序后，我们每次调用get方法后都会将这次访问的节点移至链表末尾，不断访问可以形成按照访问顺序排序的链表，这就是为什么链表头节点是链表中最近最少访问的节点。（关于LinkedHashMap的实现原理请参考：LinkedHashMap底层实现原理）</p>
+<p>在新建LinkedHashMap对象时，还重写了LinkedHashMap的removeEldestEntry方法，在该方法中判断，如果当前链表的节点数大于1024时就将tooBig变量设为true，然后将eldestKey指向LinkedHashMap的头节点，在cycleKeyList方法中每次向链表中put完节点后，都会检查eldestKey是否为null，如果不为null就删除eldestKey指向的节点，然后将eldestKey设为null，至此就实现了使用LRU策略的缓存。</p>
+<blockquote>
+<p>参考：<a href="http://ifeve.com/动手实现一个-lru-cache/#more-37981">动手实现一个 LRU cache</a></p>
+<p><a href="http://wiki.jikexueyuan.com/project/java-collection/linkedhashmap.html">LinkedHashMap 的实现原理</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>优质技术博客推荐</title>
+    <url>/2018/04/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E4%BC%98%E8%B4%A8%E6%8A%80%E6%9C%AF%E5%8D%9A%E5%AE%A2/</url>
+    <content><![CDATA[<p>记录了一些优质的技术博客。</p>
+<a id="more"></a>
+
+<p><a href="https://blog.csdn.net/jackfrued">骆昊的技术专栏</a></p>
+<p><a href="http://www.cnblogs.com/zyf-zhaoyafei/p/4716297.html">计算机网络之面试常考题</a></p>
+<p><a href="http://blog.51cto.com/hyman1994/1663623">数据库常见面试题</a></p>
+<p><a href="https://blog.csdn.net/hectorhua/article/details/13767361">数据库常见笔试面试题</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/23713529">常见面试题整理—数据库篇（每位开发者必备）</a></p>
+<p><a href="http://blog.codinglabs.org/articles/theory-of-mysql-index.html">MySQL索引背后的数据结构及算法原理</a></p>
+<p><a href="https://blog.csdn.net/v_JULY_v/article/details/6279498">十道海量数据处理面试题与十个方法大总结</a></p>
+<p><a href="https://www.nowcoder.com/discuss/68802?type=0&order=0&pos=3&page=1">2018校招笔试真题汇总</a></p>
+<p><a href="https://blog.csdn.net/acingdreamer/article/details/78479476">2018秋招面经-后端开发</a></p>
+<p><a href="https://blog.csdn.net/u013007900/article/details/79008993">技术面试的系统设计题</a></p>
+<p><a href="https://blog.csdn.net/justloveyou_">Rico’s Blogs</a></p>
+<p><a href="https://blog.csdn.net/u012813201">LingLee</a></p>
+<p><a href="https://blog.csdn.net/xuhuanfeng232">曾经沧海难为水，除却巫山不是云</a></p>
+<p><a href="http://www.cnblogs.com/JavaArchitect/">hsm_computer</a></p>
+<p><a href="http://www.importnew.com/">ImportNew</a></p>
+<p><a href="http://ifeve.com/">并发编程网</a></p>
+<p><a href="http://blog.codinglabs.org/">CodingLabs</a></p>
+<p><a href="http://design-patterns.readthedocs.io/zh_CN/latest/">图说设计模式</a></p>
+<p><a href="https://blog.csdn.net/quinnnorris">QuinnNorris的博客</a></p>
+<p><a href="https://www.cnblogs.com/xrq730/">五月的仓颉</a></p>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>同步、异步、阻塞、非阻塞总结</title>
+    <url>/2018/07/18/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>本文对于同步、异步、阻塞和非阻塞等概念进行总结。</p>
+<a id="more"></a>
+
+<hr>
+<p>对于一个线程调用一个方法，同步异步说的是这个方法的返回方式，既方法和线程之间的通信机制，而阻塞非阻塞说的是这个线程在发起这个调用后的执行状态。</p>
+<p><strong>同步(Synchronization)</strong>：这个方法在没有得到结果之前不返回，既等到方法执行完以后再返回。</p>
+<p><strong>异步(Asynchronization)</strong>：这个方法被调用后立即返回，等到方法执行完后会通知线程来处理这个方法执行结果。</p>
+<p><strong>阻塞(Blocking)</strong>：线程在调用这个方法后原地等待(挂起)，等到这个方法返回后再继续执行。</p>
+<p><strong>非阻塞(Non-blocking)</strong>：线程在调用这个方法后继续向下执行。</p>
+<p>举一个例子：</p>
+<p>小明想订一张机票，所以他给航空公司客服打电话。</p>
+<p>如果客服是<strong>同步</strong>通信机制，那就就会告诉他，你等一会儿不要挂电话，查到结果以后告诉你。</p>
+<p>如果客服是<strong>异步</strong>通信机制，那么就会告诉他，我现在会去查，我查到以后打电话通知你。</p>
+<p>如果小明是<strong>阻塞式</strong>的，那么他在问完客服以后就什么都不干，一直等待，直到客服返回给他结果，他再进行处理。</p>
+<p>如果小明是<strong>非阻塞式</strong>的，那么他在打完电话后就去干其他事，直到客服给他回电话时或者查到结果时，他再回来处理。</p>
+<p>上面小明的状态和客服的状态两两组合就会出现四种模式：</p>
+<p><strong>同步阻塞</strong>：小明问完后拿着电话什么都不干等结果，客服查到结果后再告诉他。</p>
+<p><strong>同步非阻塞</strong>：小明问完后拿着电话干其他事，时不时检查一下客服是否返回结果。</p>
+<p><strong>异步阻塞</strong>：小明问完后挂了电话在电话前等待，什么都不做，客服查到结果后打电话通知他。</p>
+<p><strong>异步非阻塞</strong>：小明问完后挂了电话继续干其他事，客服查到结果后打电话通知他。</p>
+<p>Node.js就使用异步非阻塞的I/O模型。</p>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>并发、并行、串行总结</title>
+    <url>/2018/07/18/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E5%B9%B6%E5%8F%91%E5%B9%B6%E8%A1%8C%E4%B8%B2%E8%A1%8C%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>本文对并发、并行、串行的概念进行总结。</p>
+<a id="more"></a>
+
+<hr>
+<p><img src="ConcurrentAndParallel.jpg" alt="ConcurrentAndParallel"></p>
+<p><strong>并发</strong>是两队人交替使用一台咖啡机，<strong>并行</strong>是两队人使用两台咖啡机，<strong>串行</strong>是一个队列使用一台咖啡机。一个<strong>并发程序</strong>如果可以被多个CPU同时执行，那么就说这个并发程序可以被并行的执行，如果只有一个CPU那么就不能叫并行执行，因为并发程序中的多个线程是被这一个CPU轮流切换的执行。如果这个CPU不支持轮流切换的执行多个线程，那么这个CPU就只能串行的执行非并发程序。</p>
+<blockquote>
+<p>如果某个系统支持两个或者多个动作（Action）<strong>同时存在</strong>，那么这个系统就是一个<strong>并发系统</strong>。如果某个系统支持两个或者多个动作<strong>同时执行</strong>，那么这个系统就是一个<strong>并行系统</strong>。并发系统与并行系统这两个定义之间的关键差异在于<strong>“存在”</strong>这个词。</p>
+<p>在并发程序中可以同时拥有两个或者多个线程。这意味着，如果程序在单核处理器上运行，那么这两个线程将交替地换入或者换出内存。这些线程是同时“存在”的——每个线程都处于执行过程中的某个状态。如果程序能够并行执行，那么就一定是运行在多核处理器上。此时，程序中的每个线程都将分配到一个独立的处理器核上，因此可以同时运行。</p>
+<p>我相信你已经能够得出结论——<strong>“并行”概念是“并发”概念的一个子集</strong>。也就是说，你可以编写一个拥有多个线程或者进程的并发程序，但如果没有多核处理器来执行这个程序，那么就不能以并行方式来运行代码。因此，凡是在求解单个问题时涉及多个执行流程的编程模式或者执行行为，都属于并发编程的范畴。</p>
+<p>摘自：《并发的艺术》 — 〔美〕布雷谢斯</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>死锁总结</title>
+    <url>/2017/08/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E6%AD%BB%E9%94%81%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>分析死锁形成的原理，与避免死锁的方法。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="死锁的形成原理"><a href="#死锁的形成原理" class="headerlink" title="死锁的形成原理"></a>死锁的形成原理</h2><p>先用一段代码来模拟死锁:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeadLockDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String A = <span class="string">"A"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String B = <span class="string">"B"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">synchronized</span>(A) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.currentThread().sleep(<span class="number">2000</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (interruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">synchronized</span>(B) &#123;</span><br><span class="line">                        System.out.println(<span class="string">"t1"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread t2 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">synchronized</span>(B) &#123;</span><br><span class="line">                    <span class="keyword">synchronized</span>(A) &#123;</span><br><span class="line">                        System.out.println(<span class="string">"t2"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码t1线程锁定资源A，然后睡眠2秒后需要锁定资源B才能结束运行，t2线程直接锁定了资源B，然后需要锁定资源A才能结束运行，由于两个线程都无法拿到需要的资源，所以都处于阻塞状态。</p>
+<h2 id="避免死锁的方法"><a href="#避免死锁的方法" class="headerlink" title="避免死锁的方法"></a>避免死锁的方法</h2><ol>
+<li>避免一个线程同时获取多个锁。</li>
+<li>避免一个线程在锁内同时占用多个资源，尽量保证每个锁子占用一个资源。</li>
+<li>使用定时锁lock.tryLock(timeout)来代替内部锁机制。</li>
+<li>对于数据库锁，加锁和解锁必须在一个数据库连接里，否则会出现解锁失败的情况。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>计算机网络知识点总结</title>
+    <url>/2018/07/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>计算机网络知识点总结。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h2><p>HTTP构建在TCP/IP协议上，默认端口<strong>80</strong>，是<strong>无连接状态</strong>的。</p>
+<blockquote>
+<p>参考：<a href="https://juejin.im/entry/5981c5df518825359a2b9476">HTTP1.0、HTTP1.1 和 HTTP2.0 的区别</a></p>
+</blockquote>
+<h3 id="HTTP报文"><a href="#HTTP报文" class="headerlink" title="HTTP报文"></a>HTTP报文</h3><h4 id="HTTP请求报文头如下所示"><a href="#HTTP请求报文头如下所示" class="headerlink" title="HTTP请求报文头如下所示"></a>HTTP请求报文头如下所示</h4><p><img src="httpRequest.png" alt="httpRequest"></p>
+<h4 id="HTTP响应报文头如下所示"><a href="#HTTP响应报文头如下所示" class="headerlink" title="HTTP响应报文头如下所示"></a>HTTP响应报文头如下所示</h4><p><img src="httpResponse.png" alt="httpResponse"></p>
+<h3 id="HTTP版本号的作用"><a href="#HTTP版本号的作用" class="headerlink" title="HTTP版本号的作用"></a>HTTP版本号的作用</h3><p>版本号说明的是应用程序支持的最高HTTP版本，例如与HTTP 1.1的应用通信的HTTP 1.2应用知道它不支持HTTP 1.2的新特性，最多只能支持到HTTP 1.1的特性。</p>
+<h3 id="HTTP-1-0-1-1-2-0-的区别"><a href="#HTTP-1-0-1-1-2-0-的区别" class="headerlink" title="HTTP 1.0 / 1.1 / 2.0 的区别"></a>HTTP 1.0 / 1.1 / 2.0 的区别</h3><h4 id="HTTP-1-0-和-HTTP-1-1的区别"><a href="#HTTP-1-0-和-HTTP-1-1的区别" class="headerlink" title="HTTP 1.0 和 HTTP 1.1的区别"></a>HTTP 1.0 和 HTTP 1.1的区别</h4><ol>
+<li><strong>缓存处理</strong>：在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。</li>
+<li><strong>带宽优化及网络连接的使用</strong>：HTTP1.0中，存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能，HTTP1.1则在请求头引入了range头域，它允许只请求资源的某个部分，即返回码是206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。</li>
+<li><strong>错误通知的管理</strong>：在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。</li>
+<li><strong>Host头处</strong>：在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname）。但随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都应支持Host头域，且请求消息中如果没有Host头域会报告一个错误（400 Bad Request）。</li>
+<li><strong>长连接</strong>：HTTP 1.1支持长连接（PersistentConnection）和请求的流水线（Pipelining）处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启Connection： keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。</li>
+</ol>
+<h4 id="HTTP-2-0-和-HTTP-1-1-的区别"><a href="#HTTP-2-0-和-HTTP-1-1-的区别" class="headerlink" title="HTTP 2.0 和 HTTP 1.1 的区别"></a>HTTP 2.0 和 HTTP 1.1 的区别</h4><ol>
+<li><strong>新的二进制格式</strong>（Binary Format），HTTP1.x的解析是基于文本。基于文本协议的格式解析存在天然缺陷，文本的表现形式有多样性，要做到健壮性考虑的场景必然很多，二进制则不同，只认0和1的组合。基于这种考虑HTTP2.0的协议解析决定采用二进制格式，实现方便且健壮。</li>
+<li><strong>多路复用</strong>（MultiPlexing），即连接共享，即每一个request都是是用作连接共享机制的。一个request对应一个id，这样一个连接上可以有多个request，每个连接的request可以随机的混杂在一起，接收方可以根据request的 id将request再归属到各自不同的服务端请求里面。</li>
+<li><strong>header压缩</strong>，如上文中所言，对前面提到过HTTP1.x的header带有大量信息，而且每次都要重复发送，HTTP2.0使用encoder来减少需要传输的header大小，通讯双方各自cache一份header fields表，既避免了重复header的传输，又减小了需要传输的大小。</li>
+<li><strong>服务端推送</strong>（server push），同SPDY一样，HTTP2.0也具有server push功能。</li>
+</ol>
+<p><strong>HTTP2.0多路复用有多好？</strong>HTTP 性能优化的关键并不在于高带宽，而是低延迟。TCP 连接会随着时间进行自我「调谐」，起初会限制连接的最大速度，如果数据成功传输，会随着时间的推移提高传输的速度。这种调谐则被称为 <strong>TCP 慢启动</strong>。由于这种原因，让原本就具有突发性和短时性的 HTTP 连接变的十分低效。HTTP/2 通过让所有数据流共用同一个连接，可以更有效地使用 TCP 连接，让高带宽也能真正的服务于 HTTP 的性能提升。</p>
+<h4 id="流的概念"><a href="#流的概念" class="headerlink" title="流的概念"></a>流的概念</h4><p>流（Stream），服务器和客户端在HTTP/2连接内用于交换帧数据的独立双向序列，逻辑上可看做一个较为完整的交互处理单元，即表达一次完整的资源请求-响应数据交换流程；一个业务处理单元，在一个流内进行处理完毕，这个流生命周期完结。</p>
+<p>特点如下：</p>
+<ul>
+<li>一个HTTP/2连接可同时保持多个打开的流，任一端点交换帧 </li>
+<li>流可被客户端或服务器单独或共享创建和使用 </li>
+<li>流可被任一端关闭 </li>
+<li>在流内发送和接收数据都要按照顺序 </li>
+<li>流的标识符自然数表示，1~2^31-1区间，有创建流的终端分配 </li>
+<li>流与流之间逻辑上是并行、独立存在</li>
+</ul>
+<h4 id="多路复用原理"><a href="#多路复用原理" class="headerlink" title="多路复用原理"></a>多路复用原理</h4><h4 id=""><a href="#" class="headerlink" title=""></a><img src="http%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.png" alt="http多路复用"></h4><p>需要抽象化一些，就好理解了：</p>
+<ol>
+<li>每一个帧可看做是一个学生，流可以认为是组（流标识符为帧的属性值），一个班级（一个连接）内学生被分为若干个小组，每一个小组分配不同的具体任务。 </li>
+<li>HTTP/1.* 一次请求-响应，建立一个连接，用完关闭；每一个小组任务都需要建立一个班级，多个小组任务多个班级，1:1比例 </li>
+<li>HTTP/1.1 Pipeling解决方式为，若干个小组任务排队串行化单线程处理，后面小组任务等待前面小组任务完成才能获得执行机会，一旦有任务处理超时等，后续任务只能被阻塞，毫无办法，也就是人们常说的线头阻塞 </li>
+<li>HTTP/2多个小组任务可同时并行（严格意义上是并发）在班级内执行。一旦某个小组任务耗时严重，但不会影响到其它小组任务正常执行 </li>
+<li>针对一个班级资源维护要比多个班级资源维护经济多了，这也是多路复用出现的原因 </li>
+</ol>
+<blockquote>
+<p>参考：<a href="http://www.blogjava.net/yongboy/archive/2015/03/19/423611.html">HTTP/2笔记之流和多路复用</a></p>
+</blockquote>
+<h3 id="HTTP常用方法"><a href="#HTTP常用方法" class="headerlink" title="HTTP常用方法"></a>HTTP常用方法</h3><ul>
+<li>GET : 获取资源</li>
+<li>POST : 传输实体主体</li>
+<li>PUT : 传输文件</li>
+<li>HEAD : 获得报文首部</li>
+<li>DELETE : 删除文件</li>
+<li>OPTIONS : 询问支持的方法</li>
+</ul>
+<h4 id="GET方法和POST方法的区别"><a href="#GET方法和POST方法的区别" class="headerlink" title="GET方法和POST方法的区别"></a>GET方法和POST方法的区别</h4><ol>
+<li>GET重点在从服务器上获取资源，POST重点在向服务器发送数据；</li>
+<li>GET传输数据是通过URL请求，以field（字段）= value的形式，置于URL后，并用”?”连接，多个请求数据间用”&amp;”连接，如<a href="http://127.0.0.1/Test/login.action?name=admin&amp;password=admin，这个过程用户是可见的；post传输数据通过Http的post机制，将字段与对应值封存在请求实体中发送给服务器，这个过程对用户是不可见的；">http://127.0.0.1/Test/login.action?name=admin&amp;password=admin，这个过程用户是可见的；post传输数据通过Http的post机制，将字段与对应值封存在请求实体中发送给服务器，这个过程对用户是不可见的；</a></li>
+<li>Get传输的数据量小，因为受URL长度限制，但效率较高；Post可以传输大量数据，所以上传文件时只能用Post方式</li>
+<li>get是不安全的，因为URL是可见的，可能会泄露私密信息，如密码等；post较get安全性较高 </li>
+<li>get方式只能支持ASCII字符，向服务器传的中文字符可能会乱码；post支持标准字符集，可以正确传递中文字符。</li>
+</ol>
+<h3 id="HTTPS-和-HTTP的区别"><a href="#HTTPS-和-HTTP的区别" class="headerlink" title="HTTPS 和 HTTP的区别"></a>HTTPS 和 HTTP的区别</h3><ol>
+<li>HTTPS协议需要到CA申请证书，一般免费证书很少，需要交费。</li>
+<li>HTTP协议运行在TCP之上，所有传输的内容都是明文，HTTPS运行在SSL/TLS之上，SSL/TLS运行在TCP之上，所有传输的内容都经过加密的。</li>
+<li>HTTP和HTTPS使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。</li>
+<li>HTTPS可以有效的防止运营商劫持，解决了防劫持的一个大问题。 </li>
+</ol>
+<h3 id="一次HTTP请求的完整流程"><a href="#一次HTTP请求的完整流程" class="headerlink" title="一次HTTP请求的完整流程"></a>一次HTTP请求的完整流程</h3><blockquote>
+<p>参考：<a href="https://www.linux178.com/web/httprequest.html">一次完整的HTTP事务是怎样一个过程？</a></p>
+</blockquote>
+<h4 id="域名解析"><a href="#域名解析" class="headerlink" title="域名解析"></a>域名解析</h4><h4 id="发起TCP3次握手"><a href="#发起TCP3次握手" class="headerlink" title="发起TCP3次握手"></a>发起TCP3次握手</h4><h4 id="建立TCP连接后发起HTTP请求"><a href="#建立TCP连接后发起HTTP请求" class="headerlink" title="建立TCP连接后发起HTTP请求"></a>建立TCP连接后发起HTTP请求</h4><h4 id="服务器响应HTTP请求，浏览器得到HTML代码"><a href="#服务器响应HTTP请求，浏览器得到HTML代码" class="headerlink" title="服务器响应HTTP请求，浏览器得到HTML代码"></a>服务器响应HTTP请求，浏览器得到HTML代码</h4><h4 id="浏览器解析HTML代码，并请求HTML代码中的资源"><a href="#浏览器解析HTML代码，并请求HTML代码中的资源" class="headerlink" title="浏览器解析HTML代码，并请求HTML代码中的资源"></a>浏览器解析HTML代码，并请求HTML代码中的资源</h4><h4 id="资源请求完后关闭连接，服务器发起TCP4次挥手"><a href="#资源请求完后关闭连接，服务器发起TCP4次挥手" class="headerlink" title="资源请求完后关闭连接，服务器发起TCP4次挥手"></a>资源请求完后关闭连接，服务器发起TCP4次挥手</h4><h4 id="浏览器对页面进行渲染呈现给用户"><a href="#浏览器对页面进行渲染呈现给用户" class="headerlink" title="浏览器对页面进行渲染呈现给用户"></a>浏览器对页面进行渲染呈现给用户</h4><h3 id="TCP-IP-的分层结构"><a href="#TCP-IP-的分层结构" class="headerlink" title="TCP/IP 的分层结构"></a>TCP/IP 的分层结构</h3><p><strong>应用层</strong>：决定了向用户提供<strong>应用服务</strong>时通信的活动，HTTP（HyperText Transfer Protocol，超文本传输协议）、FTP（File Transfer Protocol，文件传输协议）、DNS（Domain Name System，域名系统）位于本层。</p>
+<p><strong>传输层</strong>：传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。在传输层有两个性质不同的协议：TCP（Transmission Control Protocol，传输控制协议）和 UDP（User Data Protocol，用户数据报协议）。</p>
+<p><strong>网络层</strong>：用来处理在网络上流动的数据包，数据包是网络传输的最小数据单位，与对方计算机之间通过多台计算机或网络设备进行传输时，网络层所起的作用就是在众多的选项内选择一条传输路线。IP协议。</p>
+<p><strong>链路层</strong>：处理连接网络的硬件部分。</p>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>静态链接和动态链接的区别</title>
+    <url>/2017/08/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E7%9A%84%E5%8C%BA%E5%88%AB/</url>
+    <content><![CDATA[<p>本文讲解静态链接和动态链接的区别个各自优缺点。</p>
+<a id="more"></a>
+
+<hr>
+<p>静态链接：在编译连接时直接将需要的执行代码拷贝到调用处。</p>
+<ul>
+<li>优点：程序发布时不需要依赖库，可以独立运行。</li>
+<li>缺点：程序的体积会相对大一些。</li>
+</ul>
+<p>动态链接：在编译连接时不直接拷贝代码，而是通过记录一系列符号和参数，在程序运行或加载时将这些信息传递给操作系统，操作系统负责将需要的动态库加载到内存中，程序在运行到指定的代码时，去执行内存中已经加载的动态库可执行代码，最终达到运行时连接的目的。</p>
+<ul>
+<li>优点：多个程序可以共享同一段代码。</li>
+<li>缺点：运行时加载会影响程序执行性能。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机基础</category>
+      </categories>
   </entry>
   <entry>
     <title>代理模式（Proxy Pattern）</title>

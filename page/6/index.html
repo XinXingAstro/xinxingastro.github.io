@@ -15,6 +15,8 @@
 
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
@@ -127,7 +129,7 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">7</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -194,7 +196,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/06/04/%E5%85%B6%E4%BB%96-MacOS%E9%87%8C%E4%BD%BF%E7%94%A8sed%E5%91%BD%E4%BB%A4%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9/">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2018/03/16/%E5%85%B6%E4%BB%96-%E5%85%B3%E4%BA%8EMacOS%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
@@ -208,7 +210,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2017/06/04/%E5%85%B6%E4%BB%96-MacOS%E9%87%8C%E4%BD%BF%E7%94%A8sed%E5%91%BD%E4%BB%A4%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9/" class="post-title-link" itemprop="url">MacOS里使用sed命令修改文件内容</a>
+            <a href="/2018/03/16/%E5%85%B6%E4%BB%96-%E5%85%B3%E4%BA%8EMacOS%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE/" class="post-title-link" itemprop="url">关于MacOS环境变量和自定义命令</a>
         </h2>
 
         <div class="post-meta">
@@ -218,7 +220,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2017-06-04 21:59:37" itemprop="dateCreated datePublished" datetime="2017-06-04T21:59:37+08:00">2017-06-04</time>
+              <time title="创建时间：2018-03-17 00:57:47" itemprop="dateCreated datePublished" datetime="2018-03-17T00:57:47+08:00">2018-03-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -239,8 +241,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2017/06/04/%E5%85%B6%E4%BB%96-MacOS%E9%87%8C%E4%BD%BF%E7%94%A8sed%E5%91%BD%E4%BB%A4%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/06/04/其他-MacOS里使用sed命令修改文件内容/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2018/03/16/%E5%85%B6%E4%BB%96-%E5%85%B3%E4%BA%8EMacOS%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/03/16/其他-关于MacOS环境变量设置/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -255,10 +257,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Mac上sed命令使用的一个小例子。</p>
+          <p><strong>OSX系统环境变量加载顺序:</strong></p>
+<blockquote>
+<p><strong>/etc/profile</strong> -&gt; <strong>/etc/paths</strong> -&gt; <strong>~/.bash_porfile</strong> -&gt; <strong>~/.bash_login</strong> -&gt; <strong>~/.profile</strong> -&gt; <strong>~/.bashrc</strong></p>
+</blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2017/06/04/%E5%85%B6%E4%BB%96-MacOS%E9%87%8C%E4%BD%BF%E7%94%A8sed%E5%91%BD%E4%BB%A4%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9/#more" rel="contents">
+              <a class="btn" href="/2018/03/16/%E5%85%B6%E4%BB%96-%E5%85%B3%E4%BA%8EMacOS%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -282,7 +287,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/04/30/Java-%E8%BD%AC-Java%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%8F%8A%E6%8A%80%E6%9C%AF%E6%A0%88/">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2018/03/16/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
@@ -296,7 +301,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2017/04/30/Java-%E8%BD%AC-Java%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%8F%8A%E6%8A%80%E6%9C%AF%E6%A0%88/" class="post-title-link" itemprop="url">Java学习路线及阿里Java技术栈</a>
+            <a href="/2018/03/16/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">单例模式（Singleton Pattern）</a>
         </h2>
 
         <div class="post-meta">
@@ -306,7 +311,359 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2017-05-01 00:43:56" itemprop="dateCreated datePublished" datetime="2017-05-01T00:43:56+08:00">2017-05-01</time>
+              <time title="创建时间：2018-03-16 23:52:12" itemprop="dateCreated datePublished" datetime="2018-03-16T23:52:12+08:00">2018-03-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2018/03/16/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/03/16/设计模式-单例模式/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>五种方式构建单例模式：懒汉式，饿汉式，双重检测锁（不推荐），静态内部类（推荐），枚举单类（推荐）</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/03/16/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2018/01/01/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E5%8F%8A%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%88%86%E7%B1%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+      <meta itemprop="name" content="Xing Xin">
+      <meta itemprop="description" content="Xing's Tech Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xing's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/01/01/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E5%8F%8A%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%88%86%E7%B1%BB/" class="post-title-link" itemprop="url">设计原则及设计模式分类</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-01-01 17:14:12" itemprop="dateCreated datePublished" datetime="2018-01-01T17:14:12+08:00">2018-01-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2018/01/01/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E5%8F%8A%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%88%86%E7%B1%BB/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/01/01/设计模式-设计原则及设计模式分类/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本文是对所有设计模式的分类以及说明。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/01/01/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E5%8F%8A%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%88%86%E7%B1%BB/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/08/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E6%AD%BB%E9%94%81%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+      <meta itemprop="name" content="Xing Xin">
+      <meta itemprop="description" content="Xing's Tech Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xing's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/08/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E6%AD%BB%E9%94%81%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">死锁总结</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-16 12:29:00" itemprop="dateCreated datePublished" datetime="2017-08-16T12:29:00+08:00">2017-08-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2017/08/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E6%AD%BB%E9%94%81%E6%80%BB%E7%BB%93/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/16/计算机基础-死锁总结/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>分析死锁形成的原理，与避免死锁的方法。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/08/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80-%E6%AD%BB%E9%94%81%E6%80%BB%E7%BB%93/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-Hash%E7%AE%97%E6%B3%95%E8%A7%A3%E5%86%B3%E5%86%B2%E7%AA%81%E7%9A%84%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+      <meta itemprop="name" content="Xing Xin">
+      <meta itemprop="description" content="Xing's Tech Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xing's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-Hash%E7%AE%97%E6%B3%95%E8%A7%A3%E5%86%B3%E5%86%B2%E7%AA%81%E7%9A%84%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">Hash算法解决冲突的方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-14 16:40:32" itemprop="dateCreated datePublished" datetime="2017-08-14T16:40:32+08:00">2017-08-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">算法与数据结构</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-Hash%E7%AE%97%E6%B3%95%E8%A7%A3%E5%86%B3%E5%86%B2%E7%AA%81%E7%9A%84%E6%96%B9%E6%B3%95/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/14/算法与数据结构-Hash算法解决冲突的方法/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本文介绍4中Hash算法中用于解决冲突的方法。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/08/14/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-Hash%E7%AE%97%E6%B3%95%E8%A7%A3%E5%86%B3%E5%86%B2%E7%AA%81%E7%9A%84%E6%96%B9%E6%B3%95/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/08/14/Java-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E5%86%99equals%E6%96%B9%E6%B3%95%E5%B0%B1%E5%BF%85%E9%A1%BB%E9%87%8D%E5%86%99hashCode%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+      <meta itemprop="name" content="Xing Xin">
+      <meta itemprop="description" content="Xing's Tech Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xing's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/08/14/Java-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E5%86%99equals%E6%96%B9%E6%B3%95%E5%B0%B1%E5%BF%85%E9%A1%BB%E9%87%8D%E5%86%99hashCode%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">为什么重写equals方法就必须重写hashCode方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-14 16:26:25" itemprop="dateCreated datePublished" datetime="2017-08-14T16:26:25+08:00">2017-08-14</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -327,8 +684,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2017/04/30/Java-%E8%BD%AC-Java%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%8F%8A%E6%8A%80%E6%9C%AF%E6%A0%88/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/04/30/Java-转-Java学习路线及技术栈/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2017/08/14/Java-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E5%86%99equals%E6%96%B9%E6%B3%95%E5%B0%B1%E5%BF%85%E9%A1%BB%E9%87%8D%E5%86%99hashCode%E6%96%B9%E6%B3%95/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/14/Java-为什么重写equals方法就必须重写hashCode方法/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -343,13 +700,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <blockquote>
-<p>本文转载自：<a href="https://blog.csdn.net/justloveyou_/article/details/69055978">Java知识图谱(附：阿里Java学习计划)</a></p>
-</blockquote>
-<p>本文主要描绘了Java基础学习过程，给出Java知识结构图，以及阿里Java岗学习计划，对Java学习爱好者、准备及将要从事Java开发方面的同学大有裨益。 </p>
+          <p>SUN的官方文档中规定，如果重定义equals方法，就必须重定义hashCode方法,以便用户可以将对象插入到散列(哈希)表中。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2017/04/30/Java-%E8%BD%AC-Java%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%8F%8A%E6%8A%80%E6%9C%AF%E6%A0%88/#more" rel="contents">
+              <a class="btn" href="/2017/08/14/Java-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E5%86%99equals%E6%96%B9%E6%B3%95%E5%B0%B1%E5%BF%85%E9%A1%BB%E9%87%8D%E5%86%99hashCode%E6%96%B9%E6%B3%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -373,7 +727,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/03/28/%E5%85%B6%E4%BB%96-Git%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/08/13/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
@@ -387,7 +741,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2017/03/28/%E5%85%B6%E4%BB%96-Git%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" class="post-title-link" itemprop="url">Git使用指南</a>
+            <a href="/2017/08/13/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">B-Tree总结</a>
         </h2>
 
         <div class="post-meta">
@@ -397,7 +751,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2017-03-28 09:28:07" itemprop="dateCreated datePublished" datetime="2017-03-28T09:28:07+08:00">2017-03-28</time>
+              <time title="创建时间：2017-08-14 00:22:16" itemprop="dateCreated datePublished" datetime="2017-08-14T00:22:16+08:00">2017-08-14</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -405,7 +759,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%85%B6%E4%BB%96/" itemprop="url" rel="index"><span itemprop="name">其他</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">算法与数据结构</span></a>
                 </span>
             </span>
 
@@ -418,8 +772,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2017/03/28/%E5%85%B6%E4%BB%96-Git%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/03/28/其他-Git使用指南/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2017/08/13/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/13/算法与数据结构-B-Tree总结/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -434,98 +788,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Git是现在最流行的分布式版本控制系统，Git可以在离线状态下工作而且它的分支管理操作特别好用。本文是最精简的Git使用指南</p>
+          <p>B-Tree（B树）是一种自平衡查找树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，倒在对数时间内完成，B树概括来说是一个一般化的二分搜索树，可以拥有多余2个子节点。与自平衡二叉查找树不同，B树为系统大块数据的读写操作做了优化。B树减少定位记录时所经历的中间过程，从而加快存取速度。B树这种数据结构可以用来描述外部存储。这种数据结构常被引用在数据库和文件系统上。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2017/03/28/%E5%85%B6%E4%BB%96-Git%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2017/03/21/%E5%85%B6%E4%BB%96-Win10%E5%AE%89%E8%A3%85MySQL/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
-      <meta itemprop="name" content="Xing Xin">
-      <meta itemprop="description" content="Xing's Tech Blog">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Xing's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2017/03/21/%E5%85%B6%E4%BB%96-Win10%E5%AE%89%E8%A3%85MySQL/" class="post-title-link" itemprop="url">在Win10上安装配置MySQL</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2017-03-21 11:51:47" itemprop="dateCreated datePublished" datetime="2017-03-21T11:51:47+08:00">2017-03-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%85%B6%E4%BB%96/" itemprop="url" rel="index"><span itemprop="name">其他</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2017/03/21/%E5%85%B6%E4%BB%96-Win10%E5%AE%89%E8%A3%85MySQL/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/03/21/其他-Win10安装MySQL/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>由于网上很多在Win10上的MySQL安装教程不对或者对新版MySQL不适用，所以我总结一下我的安装过程</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2017/03/21/%E5%85%B6%E4%BB%96-Win10%E5%AE%89%E8%A3%85MySQL/#more" rel="contents">
+              <a class="btn" href="/2017/08/13/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-B-Tree%E6%80%BB%E7%BB%93/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -548,7 +814,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -623,7 +889,7 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -769,6 +1035,13 @@
 
 
   
+
+  
+      
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
+
 
   
 
