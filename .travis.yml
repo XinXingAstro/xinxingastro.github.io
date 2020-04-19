@@ -29,20 +29,20 @@ cache:
  directories:
    - node_modules
 
-before_install:
- # Git Config
- - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
- - git config --global user.name "XinXingAstro"
- - git config --global user.email "1178252981@qq.com"
+# before_install:
+#  # Git Config
+#  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+#  - git config --global user.name "XinXingAstro"
+#  - git config --global user.email "1178252981@qq.com"
 
- # Restore last modified time
- - "git ls-files -z | while read -d '' path; do touch -d \"$(git log -1 --format=\"@%ct\" \"$path\")\" \"$path\"; done"
+#  # Restore last modified time
+#  - "git ls-files -z | while read -d '' path; do touch -d \"$(git log -1 --format=\"@%ct\" \"$path\")\" \"$path\"; done"
 
- # Submodules
- - git submodule update --recursive --remote --init
+#  # Submodules
+#  - git submodule update --recursive --remote --init
 
- # Deploy history
- - git clone --branch=source --single-branch https://github.com/XinXingAstro/xinxingastro.github.io.git .deploy_git
+#  # Deploy history
+#  - git clone --branch=source --single-branch https://github.com/XinXingAstro/xinxingastro.github.io.git .deploy_git
 
 #  # SSH Setup
 #  - openssl aes-256-cbc -K $encrypted_693585a97b8c_key -iv $encrypted_693585a97b8c_iv -in deploy_key.enc -out deploy_key -d
