@@ -4,9 +4,6 @@ tags:
   - null
   - null
 comments: true
-mathjax: false
-typora-copy-images-to: ../../images
-typora-root-url: ../../../source
 date: 2018-04-15 08:17:33
 categories: Java
 ---

@@ -8,7 +8,7 @@ mathjax: false
 typora-copy-images-to: ../../images
 typora-root-url: ../../../source
 date: 2018-07-19 19:40:29
-categories: Leetcode题解
+categories: 计算机基础
 ---
 
 LRU近期最少使用缓存替换策略的原理及实现。
