@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -128,24 +128,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -272,19 +267,19 @@
       
         <p>在卸载完Ubuntu后，重启电脑发现Boot Menu中还有Ubuntu的启动项，这篇文章告诉你正确删除无用启动项的方法。</p>
 <a id="more"></a>
-
-<hr>
-<h3 id="清除BIOS中无用的引导项"><a href="#清除BIOS中无用的引导项" class="headerlink" title="清除BIOS中无用的引导项"></a>清除BIOS中无用的引导项</h3><p>我们在装完Ubuntu系统后将其卸载，重启时发现BIOS的Boot Menu中还有Ubuntu系统的引导，Boot Menu中存在无用的启动项是因为电脑的EFI分区中存在该系统的引导文件，由于正常情况下EFI分区是不可见的，所以我们需要使用windows中的diskpart工具给EFI分区分配盘符，先让它在资源管理器中出现，然后我们再使用管理员权限进入EFI分区，删除分区中的多余文件，操作步骤如下：</p>
+<hr />
+<h3 id="清除bios中无用的引导项"><a class="markdownIt-Anchor" href="#清除bios中无用的引导项"></a> 清除BIOS中无用的引导项</h3>
+<p>我们在装完Ubuntu系统后将其卸载，重启时发现BIOS的Boot Menu中还有Ubuntu系统的引导，Boot Menu中存在无用的启动项是因为电脑的EFI分区中存在该系统的引导文件，由于正常情况下EFI分区是不可见的，所以我们需要使用windows中的diskpart工具给EFI分区分配盘符，先让它在资源管理器中出现，然后我们再使用管理员权限进入EFI分区，删除分区中的多余文件，操作步骤如下：</p>
 <p>1）右键开始菜单，运行，<code>diskpart</code></p>
 <p>2）<code>list disk</code>列出所有磁盘信息。</p>
-<p><img src="bios01-1179206.png" alt="bios01-1179206"></p>
+<p><img src="bios01-1179206.png" alt="bios01-1179206" /></p>
 <p>3）<code>select disk 0</code>要选中系统安装盘，我这里只有一个盘所以选0。</p>
 <p>4）<code>list partition</code>列出磁盘中的分区信息。</p>
-<p><img src="bios02.png" alt="bios02"></p>
+<p><img src="bios02.png" alt="bios02" /></p>
 <p>5）其中类型为系统的分区就是EFI分区一般大小再一二百MB，<code>select partition 2</code>选中EFI分区。</p>
 <p>6）<code>assign letter=p</code>给EFI分区分配盘符，这样就可以在资源管理器中看到EFI分区了，但是这时候我们是无法进入该分区的，因为权限不够，我们需要使用管理员权限进入该分区。</p>
 <p>7）可以用管理员权限随便打开一个软件，比如winrar，7z。然后通过该软件就可以进入该分区了。</p>
-<p><img src="bios03.png" alt="bios03"></p>
+<p><img src="bios03.png" alt="bios03" /></p>
 <p>这是我用管理员权限进入EFI分区后7z，里面的内容，在EFI文件夹中会有一个ubuntu文件夹，或者grub文件夹，我们将其右键删除即可。</p>
 <p>8）然后我们回到命令行输入<code>remove letter=p</code>删除EFI分区的盘符。</p>
 <p>重启时进入Boot Menu，发现之前装过的Ubuntu系统引导就没有了。</p>
@@ -380,7 +375,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#清除BIOS中无用的引导项"><span class="nav-number">1.</span> <span class="nav-text">清除BIOS中无用的引导项</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#清除bios中无用的引导项"><span class="nav-number">1.</span> <span class="nav-text"> 清除BIOS中无用的引导项</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -458,7 +453,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

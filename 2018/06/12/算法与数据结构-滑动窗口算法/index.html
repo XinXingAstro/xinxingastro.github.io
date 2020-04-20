@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -267,14 +262,13 @@
         <p>滑动窗口算法可以应用在很多查找字符串子串的算法中。</p>
 <p>参考：<a href="https://leetcode.com/problems/find-all-anagrams-in-a-string/discuss/92007/Sliding-Window-algorithm-template-to-solve-all-the-Leetcode-substring-search-problem.">Sliding Window algorithm template to solve all the Leetcode substring search problem.</a></p>
 <a id="more"></a>
-
-<hr>
-<h4 id="算法1-基本滑动窗口算法"><a href="#算法1-基本滑动窗口算法" class="headerlink" title="算法1: 基本滑动窗口算法"></a>算法1: 基本滑动窗口算法</h4><p>使用HashMap存储target字符串中字符出现的次数，适用范围最广。</p>
+<hr />
+<h4 id="算法1-基本滑动窗口算法"><a class="markdownIt-Anchor" href="#算法1-基本滑动窗口算法"></a> 算法1: 基本滑动窗口算法</h4>
+<p>使用HashMap存储target字符串中字符出现的次数，适用范围最广。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">slidingWindowTemplate</span><span class="params">(String s, String t)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//初始化一个集合用来存储结果</span></span><br><span class="line">    List&lt;Integer&gt; result = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">if</span>(t.length()&gt; s.length()) <span class="keyword">return</span> result;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建一个HashMap用来存储目标子串中字符的出现次数</span></span><br><span class="line">    Map&lt;Character, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">char</span> c : t.toCharArray())&#123;</span><br><span class="line">        map.put(c, map.getOrDefault(c, <span class="number">0</span>) + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//维护一个counter检查是否和目标串匹配</span></span><br><span class="line">    <span class="comment">//这里是map.size()而不是t.size()所以下面counter--的时候判断条件是map.get(c)==0</span></span><br><span class="line">    <span class="comment">//如果这里是t.length()由于可能存在重复数字，若以下面counter--的时候判断条件应该是map.get(c)&gt;0 </span></span><br><span class="line">    <span class="keyword">int</span> counter = map.size();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//两个指针：begin:滑窗的左指针，end:滑窗的右指针</span></span><br><span class="line">    <span class="keyword">int</span> begin = <span class="number">0</span>, end = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(end &lt; s.length())&#123;</span><br><span class="line">        <span class="keyword">char</span> c = s.charAt(end);</span><br><span class="line">        <span class="keyword">if</span>( map.containsKey(c) )&#123;</span><br><span class="line">            map.put(c, map.get(c)-<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(map.get(c) == <span class="number">0</span>) counter--;</span><br><span class="line">        &#125;</span><br><span class="line">        end++;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(counter == <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">char</span> tempc = s.charAt(begin);</span><br><span class="line">            <span class="keyword">if</span>(map.containsKey(tempc))&#123;</span><br><span class="line">                map.put(tempc, map.get(tempc) + <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">if</span>(map.get(tempc) &gt; <span class="number">0</span>) counter++;</span><br><span class="line">            &#125;</span><br><span class="line">            begin++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>如果一直target中字符的取值范围，如target中只包含大写字母、小写字母或数字，则该算法可以进一步优化，主要的优化点就是将HashMap换成数组，对数组的操作要比对HashMap的entry操作快很多。</p>
-<h4 id="算法2-使用数组作为map的滑动窗口算法"><a href="#算法2-使用数组作为map的滑动窗口算法" class="headerlink" title="算法2: 使用数组作为map的滑动窗口算法"></a>算法2: 使用数组作为map的滑动窗口算法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findAnagrams</span><span class="params">(String s, String p)</span> </span>&#123;</span><br><span class="line">    List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span>[] map = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">char</span> c : p.toCharArray())</span><br><span class="line">        map[c]++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> count = p.length();</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> end = <span class="number">0</span>; end &lt; s.length(); end++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (map[s.charAt(end)]-- &gt; <span class="number">0</span>)&#123;</span><br><span class="line">            count--;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//if (end - start + 1 == p.length())</span></span><br><span class="line">                <span class="comment">//res.add(start);</span></span><br><span class="line">            <span class="keyword">if</span> (++map[s.charAt(start)] &gt; <span class="number">0</span>)</span><br><span class="line">                count++;</span><br><span class="line">            start++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<h4 id="算法2-使用数组作为map的滑动窗口算法"><a class="markdownIt-Anchor" href="#算法2-使用数组作为map的滑动窗口算法"></a> 算法2: 使用数组作为map的滑动窗口算法</h4>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findAnagrams</span><span class="params">(String s, String p)</span> </span>&#123;</span><br><span class="line">    List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span>[] map = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">256</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">char</span> c : p.toCharArray())</span><br><span class="line">        map[c]++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> count = p.length();</span><br><span class="line">    <span class="keyword">int</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> end = <span class="number">0</span>; end &lt; s.length(); end++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (map[s.charAt(end)]-- &gt; <span class="number">0</span>)&#123;</span><br><span class="line">            count--;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//if (end - start + 1 == p.length())</span></span><br><span class="line">                <span class="comment">//res.add(start);</span></span><br><span class="line">            <span class="keyword">if</span> (++map[s.charAt(start)] &gt; <span class="number">0</span>)</span><br><span class="line">                count++;</span><br><span class="line">            start++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -368,7 +362,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#算法1-基本滑动窗口算法"><span class="nav-number">1.</span> <span class="nav-text">算法1: 基本滑动窗口算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#算法2-使用数组作为map的滑动窗口算法"><span class="nav-number">2.</span> <span class="nav-text">算法2: 使用数组作为map的滑动窗口算法</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#算法1-基本滑动窗口算法"><span class="nav-number">1.</span> <span class="nav-text"> 算法1: 基本滑动窗口算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#算法2-使用数组作为map的滑动窗口算法"><span class="nav-number">2.</span> <span class="nav-text"> 算法2: 使用数组作为map的滑动窗口算法</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -446,7 +440,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

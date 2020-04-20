@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -33,8 +33,8 @@
 <meta property="article:published_time" content="2017-06-30T16:00:00.000Z">
 <meta property="article:modified_time" content="2017-06-30T16:00:00.000Z">
 <meta property="article:author" content="Xing Xin">
-<meta property="article:tag" content="数组">
 <meta property="article:tag" content="动态规划">
+<meta property="article:tag" content="数组">
 <meta property="article:tag" content="算法">
 <meta name="twitter:card" content="summary">
 
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,22 +263,19 @@
       
         <p>求连续子数组的最大乘积。相关题目：Leetcode 152. Maximum Product Subarray</p>
 <a id="more"></a>
-
 <blockquote>
 <p>题目：给定一个double类型的数组arr，其中的元素可正、可负、可0，返回子数组的最大乘积。如 arr=[-2.5, 4, 0, 3, 0.5, 8, -1]，子数组[3, 0.5, 8]累乘积可以获得最大值12.</p>
 </blockquote>
-<h4 id="算法：动态规划"><a href="#算法：动态规划" class="headerlink" title="算法：动态规划"></a>算法：动态规划</h4><p>设以arr[i-1]结尾的最小累成积min，以a[i-1]结尾的最大累成积为max，那么以arr[i]结尾的最大累乘积只有以下三种可能：</p>
+<h4 id="算法动态规划"><a class="markdownIt-Anchor" href="#算法动态规划"></a> 算法：动态规划</h4>
+<p>设以arr[i-1]结尾的最小累成积min，以a[i-1]结尾的最大累成积为max，那么以arr[i]结尾的最大累乘积只有以下三种可能：</p>
 <ol>
 <li>max(arr[1]) * arr[2]，如[3, 4, 5]</li>
 <li>min(arr[1]) * arr[2]，如[-2, 3, -4]</li>
 <li>arr[2]，如[0.1 ,0.1, 100]</li>
 </ol>
 <p>这三种结果中最大的就作为以arr[i]的最大累乘积，最小的作为arr[i]的最小累乘机，然后再计算arr[i+1]。</p>
-<p>结果 = Max{以arr[0]结尾的所有子数组的最大累乘积, 以arr[1]结尾的所有子数组的最大累乘积, …… , 以arr[arr.length - 1]结尾的所有子数组的最大累乘积}</p>
+<p>结果 = Max{以arr[0]结尾的所有子数组的最大累乘积, 以arr[1]结尾的所有子数组的最大累乘积, … , 以arr[arr.length - 1]结尾的所有子数组的最大累乘积}</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">maxProduct</span><span class="params">(<span class="keyword">double</span>[] arr)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (arr == <span class="keyword">null</span> || arr.length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">double</span> max = arr[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">double</span> min = arr[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">double</span> res = arr[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">double</span> maxEnd = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">double</span> minEnd = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; arr.length; ++i) &#123;</span><br><span class="line">        maxEnd = max * arr[i];</span><br><span class="line">        minEnd = min * arr[i];</span><br><span class="line">        max = Math.max(Math.max(maxEnd, minEnd), arr[i]);</span><br><span class="line">        min = Math.min(Math.min(maxEnd, minEnd), arr[i]);</span><br><span class="line">        res = Math.max(res, max);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
 
     </div>
 
@@ -300,10 +292,10 @@
       <div class="popular-posts-title"><a href="/2018/05/09/算法与数据结构-二维数组中的查找/" rel="bookmark">二维数组中的查找</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="/2018/06/20/算法与数据结构-数组中只出现1次的数字/" rel="bookmark">数组中只出现1次的数字</a></div>
+      <div class="popular-posts-title"><a href="/2018/05/03/算法与数据结构-数组中重复的数字/" rel="bookmark">数组中重复的数字</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="/2018/05/03/算法与数据结构-数组中重复的数字/" rel="bookmark">数组中重复的数字</a></div>
+      <div class="popular-posts-title"><a href="/2018/06/20/算法与数据结构-数组中只出现1次的数字/" rel="bookmark">数组中只出现1次的数字</a></div>
     </li>
   </ul>
 
@@ -311,8 +303,8 @@
       <footer class="post-footer">
           
           <div class="post-tags">
-              <a href="/tags/%E6%95%B0%E7%BB%84/" rel="tag"><i class="fa fa-tag"></i> 数组</a>
               <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag"><i class="fa fa-tag"></i> 动态规划</a>
+              <a href="/tags/%E6%95%B0%E7%BB%84/" rel="tag"><i class="fa fa-tag"></i> 数组</a>
               <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"><i class="fa fa-tag"></i> 算法</a>
           </div>
 
@@ -394,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#算法：动态规划"><span class="nav-number">1.</span> <span class="nav-text">算法：动态规划</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#算法动态规划"><span class="nav-number">1.</span> <span class="nav-text"> 算法：动态规划</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -472,7 +464,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

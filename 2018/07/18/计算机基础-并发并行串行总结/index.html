@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -126,24 +126,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -270,12 +265,11 @@
       
         <p>本文对并发、并行、串行的概念进行总结。</p>
 <a id="more"></a>
-
-<hr>
-<p><img src="ConcurrentAndParallel.jpg" alt="ConcurrentAndParallel"></p>
+<hr />
+<p><img src="ConcurrentAndParallel.jpg" alt="ConcurrentAndParallel" /></p>
 <p><strong>并发</strong>是两队人交替使用一台咖啡机，<strong>并行</strong>是两队人使用两台咖啡机，<strong>串行</strong>是一个队列使用一台咖啡机。一个<strong>并发程序</strong>如果可以被多个CPU同时执行，那么就说这个并发程序可以被并行的执行，如果只有一个CPU那么就不能叫并行执行，因为并发程序中的多个线程是被这一个CPU轮流切换的执行。如果这个CPU不支持轮流切换的执行多个线程，那么这个CPU就只能串行的执行非并发程序。</p>
 <blockquote>
-<p>如果某个系统支持两个或者多个动作（Action）<strong>同时存在</strong>，那么这个系统就是一个<strong>并发系统</strong>。如果某个系统支持两个或者多个动作<strong>同时执行</strong>，那么这个系统就是一个<strong>并行系统</strong>。并发系统与并行系统这两个定义之间的关键差异在于<strong>“存在”</strong>这个词。</p>
+<p>如果某个系统支持两个或者多个动作（Action）<strong>同时存在</strong>，那么这个系统就是一个<strong>并发系统</strong>。如果某个系统支持两个或者多个动作<strong>同时执行</strong>，那么这个系统就是一个<strong>并行系统</strong>。并发系统与并行系统这两个定义之间的关键差异在于**“存在”**这个词。</p>
 <p>在并发程序中可以同时拥有两个或者多个线程。这意味着，如果程序在单核处理器上运行，那么这两个线程将交替地换入或者换出内存。这些线程是同时“存在”的——每个线程都处于执行过程中的某个状态。如果程序能够并行执行，那么就一定是运行在多核处理器上。此时，程序中的每个线程都将分配到一个独立的处理器核上，因此可以同时运行。</p>
 <p>我相信你已经能够得出结论——<strong>“并行”概念是“并发”概念的一个子集</strong>。也就是说，你可以编写一个拥有多个线程或者进程的并发程序，但如果没有多核处理器来执行这个程序，那么就不能以并行方式来运行代码。因此，凡是在求解单个问题时涉及多个执行流程的编程模式或者执行行为，都属于并发编程的范畴。</p>
 <p>摘自：《并发的艺术》 — 〔美〕布雷谢斯</p>
@@ -446,7 +440,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

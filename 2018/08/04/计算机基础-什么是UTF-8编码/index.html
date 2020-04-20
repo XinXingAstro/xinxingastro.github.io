@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -126,24 +126,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -270,18 +265,17 @@
       
         <p>UTF-8（8-bit Unicode Transformation Format）是一种针对Unicode的可变长度字元编码，也是一种前缀码。它可以用来表示Unicode标准中的任何字元，且其编码中的第一个位元组仍和ASCII相容，这使得原来处理ASCII字元的软件无需或只须做少部分修改，即可继续使用。因此，它逐渐成为电子邮件、网页及其他存储或传送文字的应用中，优先采用的编码。</p>
 <a id="more"></a>
-
-<hr>
+<hr />
 <p>在计算机体系里，无论是硬盘中的文件，网络上的页面，还是我们的电子邮件，所有的数据在底层都是一堆01串，为什么数据都可以按照10串的形式存储或者传输，就是因为有编码的存在，我们平常所说的编码方式就是一种将我们熟悉的符号翻译成对应的01串的规则。</p>
-<p>ASCII（<strong>A</strong>merican <strong>S</strong>tandard <strong>C</strong>ode for <strong>I</strong>nformation <strong>I</strong>nterchange，<strong>美国信息交换标准代码</strong> ）是上世纪60年代美国制定的一套编码规则，一直沿用至今。ASCII码中一共定义了128个字符对应的编码，如下图所示：</p>
-<p><img src="asciifull.gif" alt="asciifull"></p>
+<p>ASCII（<strong>A</strong>merican <strong>S</strong>tandard <strong>C</strong>ode for <strong>I</strong>nformation <strong>I</strong>nterchange，<strong>美国信息交换标准代码</strong> ）是上世纪60年代美国制定的一套编码规则，一直沿用至今。ASCII码中一共定义了128个字符对应的编码，如下图所示：</p>
+<p><img src="asciifull.gif" alt="asciifull" /></p>
 <p>对于英语，128个字符是够用了，但是对于其他语言如法语、俄语、汉语，128个字符是远远不够用的，很多欧洲国家都对ASCII码进行了扩展，但是不同的国家使用不同的编码，我们想要打开不同国家的文件，就需要知道这个文件对应的编码方式，否则就会出现乱码，如果有一种编码，将世界上所有的符号都纳入其中，给每一个符号定义一个独一无二的编码，那就会解决乱码的问题了，Unicode码就是这样的一种符号编码，Unicode是一个很大的集合，可以容纳100多万个符号，每个符号对应唯一的编码。由于定义的符号数量巨大，所以每个符号的编码可能需要1~4个字节来存储。</p>
 <p>Unicode只是一个编码集合，它定义了符号和编码的对应关系，但是没有定义怎样存储这些符号，UTF-8中定义了这些符号应该怎样存储。</p>
 <p>UTF-8是互联网上使用最广泛的一种Unicode的实现方式，它是一种变长的编码方式可以使用1~4表示一个符号，根据不同的符号变化字节的长度，UTF-8的编码规则如下表所示：</p>
 <table>
 <thead>
 <tr>
-<th align="center">码点位数</th>
+<th style="text-align:center">码点位数</th>
 <th>码点范围</th>
 <th>字节序列</th>
 <th>Byte1</th>
@@ -292,8 +286,9 @@
 <th>Byte6</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="center">7</td>
+<tbody>
+<tr>
+<td style="text-align:center">7</td>
 <td>0000~007F</td>
 <td>1</td>
 <td>0xxxxxxx</td>
@@ -304,7 +299,7 @@
 <td></td>
 </tr>
 <tr>
-<td align="center">11</td>
+<td style="text-align:center">11</td>
 <td>0080~07FF</td>
 <td>2</td>
 <td>110xxxxx</td>
@@ -315,7 +310,7 @@
 <td></td>
 </tr>
 <tr>
-<td align="center">16</td>
+<td style="text-align:center">16</td>
 <td>0800~FFFF</td>
 <td>3</td>
 <td>1110xxxx</td>
@@ -326,7 +321,7 @@
 <td></td>
 </tr>
 <tr>
-<td align="center">21</td>
+<td style="text-align:center">21</td>
 <td>10000~1FFFFF</td>
 <td>4</td>
 <td>11110xxx</td>
@@ -337,7 +332,7 @@
 <td></td>
 </tr>
 <tr>
-<td align="center">26</td>
+<td style="text-align:center">26</td>
 <td>200000~3FFFFFF</td>
 <td>5</td>
 <td>111110xx</td>
@@ -348,7 +343,7 @@
 <td></td>
 </tr>
 <tr>
-<td align="center">31</td>
+<td style="text-align:center">31</td>
 <td>4000000~7FFFFFFF</td>
 <td>6</td>
 <td>1111110x</td>
@@ -358,7 +353,8 @@
 <td>10xxxxxx</td>
 <td>10xxxxxx</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
 <p>上表中x代表可以存储编码的位，由上表可以看到UTF-8的编码规则非常简单:</p>
 <ol>
 <li>对于单字节的符号，字节的第一位设置为0，后买7为是这个符号的Unicode码。因此对于英语，UTF-8和ASCII码是相同的。</li>
@@ -533,7 +529,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

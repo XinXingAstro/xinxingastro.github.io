@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -128,24 +128,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -274,43 +269,34 @@
 <p>实例化对象，用工厂方法代替new操作</p>
 <p>将选择实现类、创建对象统一管理控制，将调用者跟实现类解耦。</p>
 <a id="more"></a>
-
-
-<h3 id="简单工厂模式"><a href="#简单工厂模式" class="headerlink" title="简单工厂模式"></a>简单工厂模式</h3><p>因为工厂类的一般是使用静态方法，所以简单工厂模式也叫静态工厂模式，通过接收的参数的不同来返回不同的对象实例。用来生产同一等级结构中的任意产品。增加新的产品，需要修改以有的代码。</p>
+<h3 id="简单工厂模式"><a class="markdownIt-Anchor" href="#简单工厂模式"></a> 简单工厂模式</h3>
+<p>因为工厂类的一般是使用静态方法，所以简单工厂模式也叫静态工厂模式，通过接收的参数的不同来返回不同的对象实例。用来生产同一等级结构中的任意产品。增加新的产品，需要修改以有的代码。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Car</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Audi</span> <span class="keyword">implements</span> <span class="title">Car</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Audi is running"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Benz</span> <span class="keyword">implements</span> <span class="title">Car</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Benz is running"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//简单工厂实现方式1</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CarFactory01</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Car <span class="title">createCar</span><span class="params">(String type)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (type == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type.equals(<span class="string">"Audi"</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Audi();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type.equals(<span class="string">"Benz"</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Benz();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> ...;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//简单工厂实现方式2</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CarFactory02</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Car <span class="title">createAudi</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Audi;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Car <span class="title">createBenz</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Benz();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client01</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Car c1 = CarFactory01.createCar(<span class="string">"Audi"</span>);</span><br><span class="line">        Car c2 = CarFactory02.createCar(<span class="string">"Benz"</span>);</span><br><span class="line">        c1.run(); <span class="comment">//Audi is running</span></span><br><span class="line">        c2.run(); <span class="comment">//Benz is running</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
 <p>简单工厂模式的UML图如下所示：</p>
-<p><img src="%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8FUML.png" alt="简单工厂模式UML"></p>
-<h3 id="工厂方法模式"><a href="#工厂方法模式" class="headerlink" title="工厂方法模式"></a>工厂方法模式</h3><p>为了避免简单工厂模式的缺点（不满足开闭原则，即要进行扩展必须修改代码），出现了工厂方法模式。工厂方面模式和简单工厂模式最大的不同在于，简单工厂模式只有一个（对于一个项目或者一个独立模块而言）工厂类，而工厂方法模式有一组实现了相同接口的工厂类。</p>
+<p><img src="%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8FUML.png" alt="简单工厂模式UML" /></p>
+<h3 id="工厂方法模式"><a class="markdownIt-Anchor" href="#工厂方法模式"></a> 工厂方法模式</h3>
+<p>为了避免简单工厂模式的缺点（不满足开闭原则，即要进行扩展必须修改代码），出现了工厂方法模式。工厂方面模式和简单工厂模式最大的不同在于，简单工厂模式只有一个（对于一个项目或者一个独立模块而言）工厂类，而工厂方法模式有一组实现了相同接口的工厂类。</p>
 <p>用来生产同一等级结构中的固定产品。支持增加任意产品</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CarFactory</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Car <span class="title">createCar</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AudiFactory</span> <span class="keyword">implements</span> <span class="title">CarFactory</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Car <span class="title">createCar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Audi();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BenzFactory</span> <span class="keyword">implements</span> <span class="title">CarFactory</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Car <span class="title">createCar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Benz();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client02</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Car c1 = AudiFactory.createCar();</span><br><span class="line">        Car c2 = BenzFactory.createCar();</span><br><span class="line">        c1.run(); <span class="comment">//Audi is running</span></span><br><span class="line">        c2.run(); <span class="comment">//Benz is running</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>现在如果想要在增加一个BMW工厂，只需要在新建一个BMWFactory类实现Car接口就可以，现有的类和接口都不需要修改。</p>
 <p>工厂方法模式UML图如下：</p>
-<p><img src="%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8FUML.png" alt="工厂方法模式UML"></p>
+<p><img src="%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8FUML.png" alt="工厂方法模式UML" /></p>
 <p>根据设计理论，工厂方法模式更优，但是由于工厂方法模式的结构、代码、编程难道和管理上都比简单工厂模式要复杂，所以实际上一般都使用简单工厂模式。</p>
-<h3 id="抽象工厂模式"><a href="#抽象工厂模式" class="headerlink" title="抽象工厂模式"></a>抽象工厂模式</h3><p>用来生产不同<strong>产品族</strong>的全部产品。对于增加新的产品，无能为力；支持增加产品族。</p>
+<h3 id="抽象工厂模式"><a class="markdownIt-Anchor" href="#抽象工厂模式"></a> 抽象工厂模式</h3>
+<p>用来生产不同<strong>产品族</strong>的全部产品。对于增加新的产品，无能为力；支持增加产品族。</p>
 <p>在有多个业务品种、业务分类时，通过抽象工厂模式产生需要的对象是一种非常好的解决方式。</p>
-<p>抽象工厂模式UML图如下所示：<br><img src="%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8FUML.png" alt="抽象工厂模式UML"></p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><strong>简单工厂模式（静态工厂模式）</strong></p>
+<p>抽象工厂模式UML图如下所示：<br />
+<img src="%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8FUML.png" alt="抽象工厂模式UML" /></p>
+<h3 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h3>
+<p><strong>简单工厂模式（静态工厂模式）</strong></p>
 <ul>
 <li>虽然某种程度不符合设计原则，但实际使用最多</li>
 </ul>
@@ -322,7 +308,8 @@
 <ul>
 <li>不可以增加产品，可以增加产品族</li>
 </ul>
-<h4 id="典型应用场景"><a href="#典型应用场景" class="headerlink" title="典型应用场景"></a>典型应用场景</h4><ul>
+<h4 id="典型应用场景"><a class="markdownIt-Anchor" href="#典型应用场景"></a> 典型应用场景</h4>
+<ul>
 <li>JDK中Calendar的getInstance方法</li>
 <li>JDBC中Connection对象的获取</li>
 <li>Hibernate中SessionFactory创建Session</li>
@@ -419,7 +406,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单工厂模式"><span class="nav-number">1.</span> <span class="nav-text">简单工厂模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工厂方法模式"><span class="nav-number">2.</span> <span class="nav-text">工厂方法模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抽象工厂模式"><span class="nav-number">3.</span> <span class="nav-text">抽象工厂模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#典型应用场景"><span class="nav-number">4.1.</span> <span class="nav-text">典型应用场景</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单工厂模式"><span class="nav-number">1.</span> <span class="nav-text"> 简单工厂模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工厂方法模式"><span class="nav-number">2.</span> <span class="nav-text"> 工厂方法模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抽象工厂模式"><span class="nav-number">3.</span> <span class="nav-text"> 抽象工厂模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text"> 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#典型应用场景"><span class="nav-number">4.1.</span> <span class="nav-text"> 典型应用场景</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -497,7 +484,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

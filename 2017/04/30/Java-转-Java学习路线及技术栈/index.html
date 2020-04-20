@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -127,24 +127,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -272,17 +267,16 @@
         <blockquote>
 <p>本文转载自：<a href="https://blog.csdn.net/justloveyou_/article/details/69055978">Java知识图谱(附：阿里Java学习计划)</a></p>
 </blockquote>
-<p>本文主要描绘了Java基础学习过程，给出Java知识结构图，以及阿里Java岗学习计划，对Java学习爱好者、准备及将要从事Java开发方面的同学大有裨益。 </p>
+<p>本文主要描绘了Java基础学习过程，给出Java知识结构图，以及阿里Java岗学习计划，对Java学习爱好者、准备及将要从事Java开发方面的同学大有裨益。</p>
 <a id="more"></a>
-
-<p>温馨提示：    </p>
+<p>温馨提示：</p>
 <p><strong>由于CSDN对图片的压缩，导致图片观看效果不理想，建议大家通过右键“在新标签页打开图片”进行观看或直接把图片下载下来观看。</strong></p>
 <blockquote>
 <p>JVM</p>
 <ol>
 <li>内存模型(内存分为几部分？堆溢出、栈溢出原因及实例？线上如何排查？)</li>
 <li>类加载机制</li>
-<li>垃圾回收 </li>
+<li>垃圾回收</li>
 </ol>
 <p>Java基础</p>
 <ul>
@@ -311,26 +305,44 @@
 </ul>
 </blockquote>
 <br />
-
 <blockquote>
 <ol>
-<li><p>java内存模型<br>学习内容：学习java内存模型<br>实验方法：写一段代码触发内存溢出，分别触发栈内存和堆内存溢出，写一段代码导致持久代溢出。使用工具查看内存占用情况，学会如何分析内存溢出。</p>
+<li>
+<p>java内存模型<br />
+学习内容：学习java内存模型<br />
+实验方法：写一段代码触发内存溢出，分别触发栈内存和堆内存溢出，写一段代码导致持久代溢出。使用工具查看内存占用情况，学会如何分析内存溢出。</p>
 </li>
-<li><p>多线程<br>学习内容：多线程的NIO实现，IO实现（两种实现，阻塞，非阻塞）<br>试验方法：写一段代码实现多人聊天室，包括双人聊天和多人聊天。</p>
+<li>
+<p>多线程<br />
+学习内容：多线程的NIO实现，IO实现（两种实现，阻塞，非阻塞）<br />
+试验方法：写一段代码实现多人聊天室，包括双人聊天和多人聊天。</p>
 </li>
-<li><p>动态代理（工厂模式）<br>（1）学习内容：JDK动态代理实现，<br>试验方法：一个方法的前置拦截，后置拦截，前置打印获取类名，方法名字，调用参数打印。后置打印返回结果（返回的结果是一个复杂的类）。<br>（2）学习内容：spring框架<br>试验方法：对某一包下，所有类的方法做切面，打印日志。</p>
+<li>
+<p>动态代理（工厂模式）<br />
+（1）学习内容：JDK动态代理实现，<br />
+试验方法：一个方法的前置拦截，后置拦截，前置打印获取类名，方法名字，调用参数打印。后置打印返回结果（返回的结果是一个复杂的类）。<br />
+（2）学习内容：spring框架<br />
+试验方法：对某一包下，所有类的方法做切面，打印日志。</p>
 </li>
-<li><p>反射机制<br>学习内容：java的反射机制<br>试验方法：写一段程序，调用一个Bean下实现了标注（“autocall”）的方法</p>
+<li>
+<p>反射机制<br />
+学习内容：java的反射机制<br />
+试验方法：写一段程序，调用一个Bean下实现了标注（“autocall”）的方法</p>
 </li>
-<li><p>配置数据源<br>学习内容：配置数据源<br>实验方法：自己建一张表，引入数据库连接池，自动插入20万条数据，创建联合索引，验证走索引和不走索引的耗时，查看sql是否走索引，学会查看查询，计划实验，用标注式事务，编程式事务（查看编程式事务源码实现）；用乐观锁和悲观锁实现数据更新。</p>
+<li>
+<p>配置数据源<br />
+学习内容：配置数据源<br />
+实验方法：自己建一张表，引入数据库连接池，自动插入20万条数据，创建联合索引，验证走索引和不走索引的耗时，查看sql是否走索引，学会查看查询，计划实验，用标注式事务，编程式事务（查看编程式事务源码实现）；用乐观锁和悲观锁实现数据更新。</p>
 </li>
 </ol>
 </blockquote>
-<p><br />                           <img src="java%E7%9F%A5%E8%AF%86%E7%BB%93%E6%9E%84.png" alt="java知识结构"></p>
-<p><img src="%E9%98%BF%E9%87%8C%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92-5154784.png" alt="阿里学习计划-5154784"></p>
-<p><img src="%E9%98%BF%E9%87%8C%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%922.png" alt="阿里学习计划2"></p>
-<p>​                                  </p>
-<h4 id="学习需要知道："><a href="#学习需要知道：" class="headerlink" title="学习需要知道："></a><strong>学习需要知道：</strong></h4><p><strong>1、是什么</strong><br><strong>2、解决了什么问题</strong>  </p>
+<p><br />                           <img src="java%E7%9F%A5%E8%AF%86%E7%BB%93%E6%9E%84.png" alt="java知识结构" /></p>
+<p><img src="%E9%98%BF%E9%87%8C%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92-5154784.png" alt="阿里学习计划-5154784" /></p>
+<p><img src="%E9%98%BF%E9%87%8C%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%922.png" alt="阿里学习计划2" /></p>
+<p>​</p>
+<h4 id="学习需要知道"><a class="markdownIt-Anchor" href="#学习需要知道"></a> <strong>学习需要知道：</strong></h4>
+<p><strong>1、是什么</strong><br />
+<strong>2、解决了什么问题</strong></p>
 <p><strong>3、怎么实现的</strong></p>
 
     </div>
@@ -438,7 +450,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#学习需要知道："><span class="nav-number">1.</span> <span class="nav-text">学习需要知道：</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#学习需要知道"><span class="nav-number">1.</span> <span class="nav-text"> 学习需要知道：</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -516,7 +528,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

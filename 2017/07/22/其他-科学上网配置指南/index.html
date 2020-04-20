@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,35 +263,25 @@
       
         <p>科学上网配置和优化详细步骤。</p>
 <a id="more"></a>
-
-<hr>
+<hr />
 <p>首先你需要有一个可以上外网的vpn，推荐安装CentOS 7系统，下面是基本配置过程。</p>
 <p>1）安装ss</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install python-setuptools</span><br><span class="line">easy_install pip</span><br><span class="line">pip install shadowsocks</span><br></pre></td></tr></table></figure>
-
 <p>使用下面这条命令判断一下端口是否能用</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -p 443 -k password -m rc4-md5</span><br></pre></td></tr></table></figure>
-
 <p>2）新建配置文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi ssconfig</span><br></pre></td></tr></table></figure>
-
 <p>输入以下内容</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;server&quot;:&quot;::&quot;,</span><br><span class="line">    &quot;server_port&quot;:刚才测试成功的端口号,</span><br><span class="line">    &quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line">    &quot;local_port&quot;:1080,</span><br><span class="line">    &quot;password&quot;:&quot;你的密码&quot;,</span><br><span class="line">    &quot;timeout&quot;:300,</span><br><span class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">    &quot;fast_open&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>3）设置开机启动</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;etc&#x2F;rc.d&#x2F;</span><br><span class="line">chmod +x rc.local</span><br><span class="line">vi rc.local</span><br></pre></td></tr></table></figure>
-
 <p>添加下面一条语句</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssserver -c 配置文件觉得路径 -d start</span><br></pre></td></tr></table></figure>
-
 <p>优化过程：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;sysctl.d&#x2F;local.conf</span><br></pre></td></tr></table></figure>
-
 <p>添加下面内容：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"># max open files</span><br><span class="line">fs.file-max &#x3D; 51200</span><br><span class="line"># max read buffer</span><br><span class="line">net.core.rmem_max &#x3D; 67108864</span><br><span class="line"># max write buffer</span><br><span class="line">net.core.wmem_max &#x3D; 67108864</span><br><span class="line"># default read buffer</span><br><span class="line">net.core.rmem_default &#x3D; 65536</span><br><span class="line"># default write buffer</span><br><span class="line">net.core.wmem_default &#x3D; 65536</span><br><span class="line"># max processor input queue</span><br><span class="line">net.core.netdev_max_backlog &#x3D; 4096</span><br><span class="line"># max backlog</span><br><span class="line">net.core.somaxconn &#x3D; 4096</span><br><span class="line"></span><br><span class="line"># resist SYN flood attacks</span><br><span class="line">net.ipv4.tcp_syncookies &#x3D; 1</span><br><span class="line"># reuse timewait sockets when safe</span><br><span class="line">net.ipv4.tcp_tw_reuse &#x3D; 1</span><br><span class="line"># turn off fast timewait sockets recycling</span><br><span class="line">net.ipv4.tcp_tw_recycle &#x3D; 0</span><br><span class="line"># short FIN timeout</span><br><span class="line">net.ipv4.tcp_fin_timeout &#x3D; 30</span><br><span class="line"># short keepalive time</span><br><span class="line">net.ipv4.tcp_keepalive_time &#x3D; 1200</span><br><span class="line"># outbound port range</span><br><span class="line">net.ipv4.ip_local_port_range &#x3D; 10000 65000</span><br><span class="line"># max SYN backlog</span><br><span class="line">net.ipv4.tcp_max_syn_backlog &#x3D; 4096</span><br><span class="line"># max timewait sockets held by system simultaneously</span><br><span class="line">net.ipv4.tcp_max_tw_buckets &#x3D; 5000</span><br><span class="line"># turn on TCP Fast Open on both client and server side</span><br><span class="line">net.ipv4.tcp_fastopen &#x3D; 3</span><br><span class="line"># TCP receive buffer</span><br><span class="line">net.ipv4.tcp_rmem &#x3D; 4096 87380 67108864</span><br><span class="line"># TCP write buffer</span><br><span class="line">net.ipv4.tcp_wmem &#x3D; 4096 65536 67108864</span><br><span class="line"># turn on path MTU discovery</span><br><span class="line">net.ipv4.tcp_mtu_probing &#x3D; 1</span><br><span class="line"></span><br><span class="line"># for high-latency network</span><br><span class="line">net.ipv4.tcp_congestion_control &#x3D; hybla</span><br><span class="line"></span><br><span class="line"># for low-latency network, use cubic instead</span><br><span class="line"># net.ipv4.tcp_congestion_control &#x3D; cubic</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl --system</span><br></pre></td></tr></table></figure>
-
 <p>然后重启系统就可以了。</p>
 <p>参考：<a href="https://github.com/shadowsocks/shadowsocks/wiki">shadowsocks wiki</a></p>
 
@@ -465,7 +450,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

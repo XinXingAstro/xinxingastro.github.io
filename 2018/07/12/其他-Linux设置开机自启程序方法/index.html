@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,24 +263,22 @@
       
         <p>本文讲解在Linux中设置开机自启动程序的方法。</p>
 <a id="more"></a>
-
-<hr>
-<h3 id="方法1-在-etc-rc-local中添加启动脚本"><a href="#方法1-在-etc-rc-local中添加启动脚本" class="headerlink" title="方法1: 在/etc/rc.local中添加启动脚本"></a>方法1: 在<code>/etc/rc.local</code>中添加启动脚本</h3><p>注意<code>/etc/rc.local</code>文件默认是没有执行权限的，修改完要给<code>rc.local</code>添加执行权限：</p>
+<hr />
+<h3 id="方法1-在etcrclocal中添加启动脚本"><a class="markdownIt-Anchor" href="#方法1-在etcrclocal中添加启动脚本"></a> 方法1: 在<code>/etc/rc.local</code>中添加启动脚本</h3>
+<p>注意<code>/etc/rc.local</code>文件默认是没有执行权限的，修改完要给<code>rc.local</code>添加执行权限：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmode +x &#x2F;etc&#x2F;rc.local</span><br></pre></td></tr></table></figure>
-
-<h3 id="方法2-使用chkconfig添加自启动服务"><a href="#方法2-使用chkconfig添加自启动服务" class="headerlink" title="方法2: 使用chkconfig添加自启动服务"></a>方法2: 使用chkconfig添加自启动服务</h3><p>在<code>/etc/rc.d/init.d</code>中创建你的执行脚本，加入叫<code>myscript</code>，在这个脚本开头添加下面三行语句：</p>
+<h3 id="方法2-使用chkconfig添加自启动服务"><a class="markdownIt-Anchor" href="#方法2-使用chkconfig添加自启动服务"></a> 方法2: 使用chkconfig添加自启动服务</h3>
+<p>在<code>/etc/rc.d/init.d</code>中创建你的执行脚本，加入叫<code>myscript</code>，在这个脚本开头添加下面三行语句：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#! &#x2F;bin&#x2F;bash  &#x2F;&#x2F;指定执行该脚本的程序</span><br><span class="line"># chkconfig: 2345 10 90  &#x2F;&#x2F;设置启动优先级</span><br><span class="line"># description:  &#x2F;&#x2F;对该服务的描述</span><br></pre></td></tr></table></figure>
 <p>保存后对该脚本文件添加执行权限，然后在chkconfig中加入该服务。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod +x myscript</span><br><span class="line">chkconfig --add myscript</span><br></pre></td></tr></table></figure>
-
 <p>查看<code>myscript</code>服务的启动情况</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chkconfig --list myscript</span><br></pre></td></tr></table></figure>
-
 <p>启动<code>myscript</code>服务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chkconfig myscript on</span><br></pre></td></tr></table></figure>
-
 <p><code>chkconfig</code>命令的更详细内容可以参考：<a href="https://www.cnblogs.com/panjun-Donet/archive/2010/08/10/1796873.html">Linux下chkconfig命令详解</a></p>
-<h3 id="方法3-使用systemctl添加系统服务"><a href="#方法3-使用systemctl添加系统服务" class="headerlink" title="方法3: 使用systemctl添加系统服务"></a>方法3: 使用<code>systemctl</code>添加系统服务</h3><p>参考：<a href="https://blog.csdn.net/yuanguozhengjust/article/details/38019923">在CentOS 7上利用systemctl添加自定义系统服务</a></p>
+<h3 id="方法3-使用systemctl添加系统服务"><a class="markdownIt-Anchor" href="#方法3-使用systemctl添加系统服务"></a> 方法3: 使用<code>systemctl</code>添加系统服务</h3>
+<p>参考：<a href="https://blog.csdn.net/yuanguozhengjust/article/details/38019923">在CentOS 7上利用systemctl添加自定义系统服务</a></p>
 
     </div>
 
@@ -375,7 +368,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法1-在-etc-rc-local中添加启动脚本"><span class="nav-number">1.</span> <span class="nav-text">方法1: 在&#x2F;etc&#x2F;rc.local中添加启动脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法2-使用chkconfig添加自启动服务"><span class="nav-number">2.</span> <span class="nav-text">方法2: 使用chkconfig添加自启动服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法3-使用systemctl添加系统服务"><span class="nav-number">3.</span> <span class="nav-text">方法3: 使用systemctl添加系统服务</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法1-在etcrclocal中添加启动脚本"><span class="nav-number">1.</span> <span class="nav-text"> 方法1: 在&#x2F;etc&#x2F;rc.local中添加启动脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法2-使用chkconfig添加自启动服务"><span class="nav-number">2.</span> <span class="nav-text"> 方法2: 使用chkconfig添加自启动服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法3-使用systemctl添加系统服务"><span class="nav-number">3.</span> <span class="nav-text"> 方法3: 使用systemctl添加系统服务</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -453,7 +446,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

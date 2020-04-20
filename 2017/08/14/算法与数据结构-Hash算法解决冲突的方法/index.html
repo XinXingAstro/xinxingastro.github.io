@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -126,24 +126,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -270,15 +265,17 @@
       
         <p>本文介绍4中Hash算法中用于解决冲突的方法。</p>
 <a id="more"></a>
-
-<hr>
-<h2 id="1-开放地址法"><a href="#1-开放地址法" class="headerlink" title="1.开放地址法"></a>1.开放地址法</h2><p>所谓的开放定址法就是一旦发生了冲突，就去寻找下一个空的散列地址，只要散列表足够大，空的散列地址总能找到，并将记录存入。</p>
+<hr />
+<h2 id="1开放地址法"><a class="markdownIt-Anchor" href="#1开放地址法"></a> 1.开放地址法</h2>
+<p>所谓的开放定址法就是一旦发生了冲突，就去寻找下一个空的散列地址，只要散列表足够大，空的散列地址总能找到，并将记录存入。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fi(key) &#x3D; (f(key) + di) MOD m (di &#x3D; 1,2,3,...,m-1)</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-再哈希法"><a href="#2-再哈希法" class="headerlink" title="2.再哈希法"></a>2.再哈希法</h2><p>再哈希法又叫双哈希法，有多个不同的Hash函数，当发生冲突时，使用第二个，第三个，….，等哈希函数  计算地址，直到无冲突。虽然不易发生聚集，但是增加了计算时间。</p>
-<h2 id="3-拉链法"><a href="#3-拉链法" class="headerlink" title="3.拉链法"></a>3.拉链法</h2><p>每个哈希表节点都有一个next指针，多个哈希表节点可以用next指针构成一个单向链表，被分配到同一个索引上的多个节点可以用这个单向链表连接起来。</p>
-<p><img src="%E6%8B%89%E9%93%BE%E6%B3%95.gif" alt="拉链法"></p>
-<h2 id="4-建立公共溢出区"><a href="#4-建立公共溢出区" class="headerlink" title="4.建立公共溢出区"></a>4.建立公共溢出区</h2><p>将哈希表分为基本表和溢出表两部分，凡是和基本表发生冲突的元素，一律填入溢出表。</p>
+<h2 id="2再哈希法"><a class="markdownIt-Anchor" href="#2再哈希法"></a> 2.再哈希法</h2>
+<p>再哈希法又叫双哈希法，有多个不同的Hash函数，当发生冲突时，使用第二个，第三个，….，等哈希函数  计算地址，直到无冲突。虽然不易发生聚集，但是增加了计算时间。</p>
+<h2 id="3拉链法"><a class="markdownIt-Anchor" href="#3拉链法"></a> 3.拉链法</h2>
+<p>每个哈希表节点都有一个next指针，多个哈希表节点可以用next指针构成一个单向链表，被分配到同一个索引上的多个节点可以用这个单向链表连接起来。</p>
+<p><img src="%E6%8B%89%E9%93%BE%E6%B3%95.gif" alt="拉链法" /></p>
+<h2 id="4建立公共溢出区"><a class="markdownIt-Anchor" href="#4建立公共溢出区"></a> 4.建立公共溢出区</h2>
+<p>将哈希表分为基本表和溢出表两部分，凡是和基本表发生冲突的元素，一律填入溢出表。</p>
 
     </div>
 
@@ -368,7 +365,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-开放地址法"><span class="nav-number">1.</span> <span class="nav-text">1.开放地址法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-再哈希法"><span class="nav-number">2.</span> <span class="nav-text">2.再哈希法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-拉链法"><span class="nav-number">3.</span> <span class="nav-text">3.拉链法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-建立公共溢出区"><span class="nav-number">4.</span> <span class="nav-text">4.建立公共溢出区</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1开放地址法"><span class="nav-number">1.</span> <span class="nav-text"> 1.开放地址法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2再哈希法"><span class="nav-number">2.</span> <span class="nav-text"> 2.再哈希法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3拉链法"><span class="nav-number">3.</span> <span class="nav-text"> 3.拉链法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4建立公共溢出区"><span class="nav-number">4.</span> <span class="nav-text"> 4.建立公共溢出区</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -446,7 +443,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

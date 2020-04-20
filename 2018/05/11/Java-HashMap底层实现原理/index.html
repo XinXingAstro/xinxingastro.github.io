@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -131,24 +131,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -275,78 +270,75 @@
       
         <p>HashMap底层原理总结，几个Hash集合之间的对比。</p>
 <blockquote>
-<p>参考：<a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&mid=2665514069&idx=1&sn=2996d864bbe596d0af763fba3d244fa7&chksm=80d67c16b7a1f500ec6a191eb4a0beac0e95dbd5a7bf8ee01f5ed2cb17960b9ab32c0b965949&mpshare=1&scene=23&srcid=0511zKy6mTSHoIFPfB3xP31n#rd">什么是HashMap？</a></p>
+<p>参考：<a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665514069&amp;idx=1&amp;sn=2996d864bbe596d0af763fba3d244fa7&amp;chksm=80d67c16b7a1f500ec6a191eb4a0beac0e95dbd5a7bf8ee01f5ed2cb17960b9ab32c0b965949&amp;mpshare=1&amp;scene=23&amp;srcid=0511zKy6mTSHoIFPfB3xP31n#rd">什么是HashMap？</a></p>
 <p>参考：<a href="https://tech.meituan.com/java-hashmap.html">Java 8系列之重新认识HashMap</a></p>
 </blockquote>
 <a id="more"></a>
-
-<hr>
-<h3 id="HashMap底层存储结构"><a href="#HashMap底层存储结构" class="headerlink" title="HashMap底层存储结构"></a>HashMap底层存储结构</h3><p>HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做一个Entry。这些Entry分散存储在一个数组当中，这个数组就是HashMap的主干。</p>
+<hr />
+<h3 id="hashmap底层存储结构"><a class="markdownIt-Anchor" href="#hashmap底层存储结构"></a> HashMap底层存储结构</h3>
+<p>HashMap是一个用于存储Key-Value键值对的集合，每一个键值对也叫做一个Entry。这些Entry分散存储在一个数组当中，这个数组就是HashMap的主干。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The table, initialized on first use, and resized as</span></span><br><span class="line"><span class="comment"> * necessary. When allocated, length is always a power of two.</span></span><br><span class="line"><span class="comment"> * (We also tolerate length zero in some operations to allow</span></span><br><span class="line"><span class="comment"> * bootstrapping mechanics that are currently not needed.)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">transient</span> Node&lt;K,V&gt;[] table;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Basic hash bin node, used for most entries.  (See below for</span></span><br><span class="line"><span class="comment"> * TreeNode subclass, and in LinkedHashMap for its Entry subclass.)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> hash;</span><br><span class="line">    <span class="keyword">final</span> K key;</span><br><span class="line">    V value;</span><br><span class="line">    Node&lt;K,V&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123; ... &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span>        </span>&#123; <span class="keyword">return</span> key; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span>      </span>&#123; <span class="keyword">return</span> value; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> key + <span class="string">"="</span> + value; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> Objects.hashCode(key) ^ Objects.hashCode(value);&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V newValue)</span> </span>&#123; ... &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>因为table数组的长度是有限的，再好的hash函数也会出现index冲突的情况，所以我们用<strong>链表</strong>来解决这个问题，table数组的每一个元素不只是一个Entry对象，也是一个链表的头节点，每一个Entry对象通过Next指针指向下一个Entry节点。当新来的Entry映射到冲突数组位置时，只需要插入对应的链表即可。</p>
 <p>需要注意的是：新来的Entry节点插入链表时，会插在链表的头部，因为HashMap的发明者认为，后插入的Entry被查找的可能性更大。</p>
 <p>HashMap中的table数组如下所示：</p>
-<p><img src="hashmap-table.png" alt="hashmap-table"></p>
+<p><img src="hashmap-table.png" alt="hashmap-table" /></p>
 <p>所以，HashMap是数组+链表+红黑树（在Java 8中为了优化Entry的查找性能，新加了红黑树部分）实现的。</p>
-<h3 id="Put方法原理"><a href="#Put方法原理" class="headerlink" title="Put方法原理"></a>Put方法原理</h3><p>调用<code>hashMap.put(&quot;str&quot;, 1)</code>，将会在HashMap的table数组中插入一个Key为“str”的元素，这时候需要我们用一个<code>hash()</code>函数来确定Entry的插入位置，而每种数据类型有自己的<code>hashCode()</code>函数，比如String类型的<code>hashCode()</code>函数如下所示：</p>
+<h3 id="put方法原理"><a class="markdownIt-Anchor" href="#put方法原理"></a> Put方法原理</h3>
+<p>调用<code>hashMap.put(&quot;str&quot;, 1)</code>，将会在HashMap的table数组中插入一个Key为“str”的元素，这时候需要我们用一个<code>hash()</code>函数来确定Entry的插入位置，而每种数据类型有自己的<code>hashCode()</code>函数，比如String类型的<code>hashCode()</code>函数如下所示：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">(<span class="keyword">byte</span>[] value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">byte</span> v : value) &#123;</span><br><span class="line">        h = <span class="number">31</span> * h + (v &amp; <span class="number">0xff</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>所以，<code>put()</code>函数的执行路径是这样的：</p>
 <ol>
 <li>首先<code>put(&quot;str&quot;, 1)</code>会调用HashMap的<code>hash(&quot;str&quot;)</code>方法。</li>
-<li>在<code>hash()</code>内部，会调用String(Latin1)内部的<code>hashcode()</code>获取字符串”str”的hashcode。</li>
-<li>“str”的hashcode被返回给<code>put()</code>，<code>put()</code>通过一定计算得到最终的插入位置index。</li>
+<li>在<code>hash()</code>内部，会调用String(Latin1)内部的<code>hashcode()</code>获取字符串&quot;str&quot;的hashcode。</li>
+<li>&quot;str&quot;的hashcode被返回给<code>put()</code>，<code>put()</code>通过一定计算得到最终的插入位置index。</li>
 <li>最后将这个Entry插入到table的index位置。</li>
 </ol>
 <p>这里就出现了两个问题，问题1: 在<code>put()</code>里怎样得到插入位置index？问题2: 为什么会调用HashMap的<code>hash()</code>函数，直接调用String的<code>hashcode()</code>不好吗？</p>
-<h4 id="问题1-在put-里怎样得到插入位置index？"><a href="#问题1-在put-里怎样得到插入位置index？" class="headerlink" title="问题1: 在put()里怎样得到插入位置index？"></a>问题1: 在<code>put()</code>里怎样得到插入位置index？</h4><p>对于不同的hash码我们希望它被插入到不同的位置，所以我们首先会想到对数组长度的取模运算，但是由于取模运算的效率很低，所以HashMap的发明者用位运算替代了取模运算。</p>
+<h4 id="问题1-在put里怎样得到插入位置index"><a class="markdownIt-Anchor" href="#问题1-在put里怎样得到插入位置index"></a> 问题1: 在<code>put()</code>里怎样得到插入位置index？</h4>
+<p>对于不同的hash码我们希望它被插入到不同的位置，所以我们首先会想到对数组长度的取模运算，但是由于取模运算的效率很低，所以HashMap的发明者用位运算替代了取模运算。</p>
 <p>在<code>put()</code>里是通过如下的语句得到插入位置的：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">index &#x3D; hash(key) &amp; (Length - 1)</span><br></pre></td></tr></table></figure>
-
 <p>其中Length是table数组的长度。为了实现和取模运算相同的功能，这里要求(Length - 1)这部分的二进制表示全为1，我们用HashMap的默认初始长度16举例说明：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">假设&quot;str&quot;的hash吗为: 1001 0110 1011 1110 1101 0010 1001 0101</span><br><span class="line"></span><br><span class="line">Length - 1 &#x3D; 15 : 1111</span><br><span class="line"></span><br><span class="line">hash(&quot;str&quot;) &amp; (Length - 1) &#x3D; 0101</span><br></pre></td></tr></table></figure>
-
 <p>如果(Length - 1)这部分不全为1，假如Length是10，那么<code>Length - 1 = 9 ：1001</code> 那么无论再和任何hash码做与操作，中间两位数都会是0，这样就会出现大量不同的hash码被映射到相同位置的情况。</p>
 <p>所以，<strong>在HashMap中table数组的默认长度是16，并且要求每次自动扩容或者手动扩容时，长度都必须是2的幂。</strong></p>
-<h4 id="问题2-为什么会调用HashMap的hash-函数，直接调用String的hashcode-不好吗？"><a href="#问题2-为什么会调用HashMap的hash-函数，直接调用String的hashcode-不好吗？" class="headerlink" title="问题2: 为什么会调用HashMap的hash()函数，直接调用String的hashcode()不好吗？"></a>问题2: 为什么会调用HashMap的<code>hash()</code>函数，直接调用String的<code>hashcode()</code>不好吗？</h4><p>HashMap中的<code>hash()</code>函数如下所示：</p>
+<h4 id="问题2-为什么会调用hashmap的hash函数直接调用string的hashcode不好吗"><a class="markdownIt-Anchor" href="#问题2-为什么会调用hashmap的hash函数直接调用string的hashcode不好吗"></a> 问题2: 为什么会调用HashMap的<code>hash()</code>函数，直接调用String的<code>hashcode()</code>不好吗？</h4>
+<p>HashMap中的<code>hash()</code>函数如下所示：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>HashMap中的<code>hash()</code>函数是将得到hashcode做进一步处理，它将hashcode的高16位和低16位进行异或操作，这样做的目的是：在table的长度比较小的情况下，也能保证hashcode的高位参与到地址映射的计算当中，同时不会有太大的开销。</p>
 <p>综上所述：从hashcode计算得到table索引的计算过程如下所示：</p>
-<p><img src="hash%E8%BF%87%E7%A8%8B.png" alt="hash过程"></p>
+<p><img src="hash%E8%BF%87%E7%A8%8B.png" alt="hash过程" /></p>
 <p><code>put()</code>方法的执行过程如下所示：</p>
-<p><img src="hash-put.png" alt="hash-put"></p>
-<h3 id="HashMap的扩容机制"><a href="#HashMap的扩容机制" class="headerlink" title="HashMap的扩容机制"></a>HashMap的扩容机制</h3><p>在HashMap中有一下两个属性和扩容相关：</p>
+<p><img src="hash-put.png" alt="hash-put" /></p>
+<h3 id="hashmap的扩容机制"><a class="markdownIt-Anchor" href="#hashmap的扩容机制"></a> HashMap的扩容机制</h3>
+<p>在HashMap中有一下两个属性和扩容相关：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> threshold;</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;</span><br></pre></td></tr></table></figure>
-
 <p>其中<strong>threshold = Length * loadFactor</strong>，Length表示table数组的长度（默认值是16），loadFactor为负载因子（默认值是0.75），阀值threshold表示当table数组中存储的元素超过这个阀值的时候，就需要扩容了。以默认长度16，和默认负载因子0.75为例，threshold = 16 * 0.75 = 12，即当table数组中存储的元素个数超过12个的时候，table数组就该扩容了。</p>
 <p>当然Java中的数组是无法自动扩容的，方法是使用一个新的数组代替已有的容量小的数组，然后将旧数组中的元素经过重新计算放到新数组中，那么怎样对旧元素进行重新映射呢？</p>
 <p>其实很简单，由于我们在扩容时，是使用2的幂扩展，即数组的长度扩大到原来的2倍, 4倍, 8倍…，因此在resize时(Length - 1)这部分相当于在高位新增一个或多个1bit，我们以扩大到原来的两倍为例说明：</p>
-<p><img src="rehash1.png" alt="rehash1"></p>
+<p><img src="rehash1.png" alt="rehash1" /></p>
 <p>(a)中n为16，(b)中n扩大到两倍为32，相当于(n - 1)这部分的高位多了一个1, 然后和原hash码作与操作，这样元素在数组中映射的位置要么不变，要不向后移动16个位置：</p>
-<p><img src="rehash2.png" alt="rehash2"></p>
+<p><img src="rehash2.png" alt="rehash2" /></p>
 <p>因此，我们在扩充HashMap的时候，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”，可以看看下图为16扩充为32的resize示意图：</p>
-<p><img src="rehash3.png" alt="rehash3"></p>
+<p><img src="rehash3.png" alt="rehash3" /></p>
 <p>这个设计确实非常的巧妙，既省去了重新计算hash值的时间，而且同时，由于新增的1bit是0还是1可以认为是随机的，因此resize的过程，均匀的把之前的冲突的节点分散到新的bucket了。这一块就是JDK1.8新增的优化点。有一点注意区别，JDK1.7中resize的时候，旧链表迁移新链表的时候，如果在新表的数组索引位置相同，则链表元素会倒置，但是从上图可以看出，JDK1.8不会倒置。</p>
-<h3 id="HashMap死锁形成原理"><a href="#HashMap死锁形成原理" class="headerlink" title="HashMap死锁形成原理"></a>HashMap死锁形成原理</h3><p>HashMap非线程安全，即任一时刻可以有多个线程同时写HashMap，可能会导致数据的不一致。如果需要满足线程安全，可以用 Collections的synchronizedMap方法使HashMap具有线程安全的能力，或者使用线程安全的ConcurrentHashMap。</p>
+<h3 id="hashmap死锁形成原理"><a class="markdownIt-Anchor" href="#hashmap死锁形成原理"></a> HashMap死锁形成原理</h3>
+<p>HashMap非线程安全，即任一时刻可以有多个线程同时写HashMap，可能会导致数据的不一致。如果需要满足线程安全，可以用 Collections的synchronizedMap方法使HashMap具有线程安全的能力，或者使用线程安全的ConcurrentHashMap。</p>
 <p>要理解HashMap死锁形成的原理，我们要对HashMap的resize里的transfer过程有所了解，transfer过程是将旧数组中的元素复制到新数组中，在Java 8之前，复制过程会导致链表倒置，这也是形成死锁的重要原因（Java 8中已经不会倒置），transfer的基本过程如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 新建节点e指向当前节点，新建节点next指向e.next</span><br><span class="line">2. 将e.next指向新数组中指定位置newTable[i]</span><br><span class="line">3. newTable[i] &#x3D; e</span><br><span class="line">4. e &#x3D; next</span><br></pre></td></tr></table></figure>
-
 <p>举个例子：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">现在有链表1-&gt;2-&gt;3，要将它复制到新数组的newTable[i]位置</span><br><span class="line">1. Node e &#x3D; 1, next &#x3D; e.next;</span><br><span class="line">2. e.next &#x3D; newTable[i];</span><br><span class="line">3. newTable[i] &#x3D; e;</span><br><span class="line">4. e &#x3D; next, next &#x3D; e.next;</span><br><span class="line">执行完后会得到这样的结果：</span><br><span class="line">newTable[i]&#x3D;3-&gt;2-&gt;1</span><br></pre></td></tr></table></figure>
-
 <p>死锁会在这种情况产生：两个线程同时往HashMap里放Entry，同时HashMap正好需要扩容，如果一个线程已经完成了transfer过程，而另一个线程不知道，并且又要进行transfer的时候，死锁就会形成。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">现在Thread1已将完成了transfer，newTable[i]&#x3D;3-&gt;2-&gt;1</span><br><span class="line">在Thread2中:</span><br><span class="line">Node e &#x3D; 1, next &#x3D; e.next;</span><br><span class="line">e.next &#x3D; newTable[i]    : 1 -&gt; newTable[i]&#x3D;3</span><br><span class="line">newTable[i] &#x3D; e         : newTable[i] &#x3D; 1-&gt;3-&gt;2-&gt;1  &#x2F;&#x2F;这时候链表换已经形成了</span><br></pre></td></tr></table></figure>
-
 <p>在形成链表换以后再对HashMap进行Get操作时，就会形成死循环。</p>
 <p>在Java 8中对这里进行了优化，链表复制到新数组时并不会倒置，不会因为多个线程put导致死循环，但是还有很多弊端，比如数据丢失等，因此多线程情况下还是建议使用ConcurrentHashMap。</p>
-<h3 id="HashMap和Hashtable有什么区别"><a href="#HashMap和Hashtable有什么区别" class="headerlink" title="HashMap和Hashtable有什么区别"></a>HashMap和Hashtable有什么区别</h3><p>Java为数据结构中的映射定义了一个接口java.util.Map，此接口主要有四个常用的实现类，分别是HashMap、Hashtable、LinkedHashMap和TreeMap，类继承关系如下图所示：</p>
-<p><img src="hashmap%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png" alt="hashmap继承关系"></p>
+<h3 id="hashmap和hashtable有什么区别"><a class="markdownIt-Anchor" href="#hashmap和hashtable有什么区别"></a> HashMap和Hashtable有什么区别</h3>
+<p>Java为数据结构中的映射定义了一个接口java.util.Map，此接口主要有四个常用的实现类，分别是HashMap、Hashtable、LinkedHashMap和TreeMap，类继承关系如下图所示：</p>
+<p><img src="hashmap%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB.png" alt="hashmap继承关系" /></p>
 <p>Hashtable：Hashtable是遗留类，很多映射的常用功能与HashMap类似，不同的是它承自Dictionary类，并且是线程安全的，任一时间只有一个线程能写Hashtable，并发性不如ConcurrentHashMap，因为ConcurrentHashMap引入了分段锁。Hashtable不建议在新代码中使用，不需要线程安全的场合可以用HashMap替换，需要线程安全的场合可以用ConcurrentHashMap替换。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<h3 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h3>
+<ol>
 <li>扩容是一个特别耗性能的操作，所以当程序员在使用HashMap的时候，估算map的大小，初始化的时候给一个大致的数值，避免map进行频繁的扩容。</li>
 <li>负载因子是可以修改的，也可以大于1，但是建议不要轻易修改，除非情况非常特殊。</li>
 <li>HashMap是线程不安全的，不要在并发的环境中同时操作HashMap，建议使用ConcurrentHashMap。</li>
@@ -458,7 +450,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap底层存储结构"><span class="nav-number">1.</span> <span class="nav-text">HashMap底层存储结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Put方法原理"><span class="nav-number">2.</span> <span class="nav-text">Put方法原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题1-在put-里怎样得到插入位置index？"><span class="nav-number">2.1.</span> <span class="nav-text">问题1: 在put()里怎样得到插入位置index？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题2-为什么会调用HashMap的hash-函数，直接调用String的hashcode-不好吗？"><span class="nav-number">2.2.</span> <span class="nav-text">问题2: 为什么会调用HashMap的hash()函数，直接调用String的hashcode()不好吗？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap的扩容机制"><span class="nav-number">3.</span> <span class="nav-text">HashMap的扩容机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap死锁形成原理"><span class="nav-number">4.</span> <span class="nav-text">HashMap死锁形成原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap和Hashtable有什么区别"><span class="nav-number">5.</span> <span class="nav-text">HashMap和Hashtable有什么区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#hashmap底层存储结构"><span class="nav-number">1.</span> <span class="nav-text"> HashMap底层存储结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#put方法原理"><span class="nav-number">2.</span> <span class="nav-text"> Put方法原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题1-在put里怎样得到插入位置index"><span class="nav-number">2.1.</span> <span class="nav-text"> 问题1: 在put()里怎样得到插入位置index？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题2-为什么会调用hashmap的hash函数直接调用string的hashcode不好吗"><span class="nav-number">2.2.</span> <span class="nav-text"> 问题2: 为什么会调用HashMap的hash()函数，直接调用String的hashcode()不好吗？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hashmap的扩容机制"><span class="nav-number">3.</span> <span class="nav-text"> HashMap的扩容机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hashmap死锁形成原理"><span class="nav-number">4.</span> <span class="nav-text"> HashMap死锁形成原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hashmap和hashtable有什么区别"><span class="nav-number">5.</span> <span class="nav-text"> HashMap和Hashtable有什么区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text"> 总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -536,7 +528,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

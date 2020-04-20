@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -123,24 +123,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,10 +263,23 @@
         <p>HDFS就是一个基于分布式、自动冗余、可以动态扩展的大硬盘，Hadoop目前不支持Java9最好装Java7或者Java8。</p>
 <a id="more"></a>
 <p>虚拟机系统：centos7</p>
-<h4 id="JDK安装"><a href="#JDK安装" class="headerlink" title="JDK安装"></a>JDK安装</h4><p><code>rpm -ivh ./jdk….</code><br><code>rpm -qa | grep jdk</code></p>
-<h4 id="Hadoop安装"><a href="#Hadoop安装" class="headerlink" title="Hadoop安装"></a>Hadoop安装</h4><p><code>tar –xvf ./hadoop-2.7.2.tar.gz</code><br><code>tar -zxvf filename.tar -C /specific dir</code></p>
-<h4 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h4><p><code>export JAVA_HOME=/usr/java/default</code><br><code>export $PATH:/usr/local/hadoop/bin:/usr/local/hadoop/sbin</code></p>
-<h4 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h4><p><code>hostnamectl set-hostname NAME</code><br><code>ifconfig</code><br><code>/etc/sysconfig/network-scripts/ifcfg-enp0s3</code><br><code>service network restart</code><br><code>/etc/hosts</code><br><code>systemctl stop firewalld</code><br><code>systemctl disable firewalld</code></p>
+<h4 id="jdk安装"><a class="markdownIt-Anchor" href="#jdk安装"></a> JDK安装</h4>
+<p><code>rpm -ivh ./jdk….</code><br />
+<code>rpm -qa | grep jdk</code></p>
+<h4 id="hadoop安装"><a class="markdownIt-Anchor" href="#hadoop安装"></a> Hadoop安装</h4>
+<p><code>tar –xvf ./hadoop-2.7.2.tar.gz</code><br />
+<code>tar -zxvf filename.tar -C /specific dir</code></p>
+<h4 id="配置环境变量"><a class="markdownIt-Anchor" href="#配置环境变量"></a> 配置环境变量</h4>
+<p><code>export JAVA_HOME=/usr/java/default</code><br />
+<code>export $PATH:/usr/local/hadoop/bin:/usr/local/hadoop/sbin</code></p>
+<h4 id="网络配置"><a class="markdownIt-Anchor" href="#网络配置"></a> 网络配置</h4>
+<p><code>hostnamectl set-hostname NAME</code><br />
+<code>ifconfig</code><br />
+<code>/etc/sysconfig/network-scripts/ifcfg-enp0s3</code><br />
+<code>service network restart</code><br />
+<code>/etc/hosts</code><br />
+<code>systemctl stop firewalld</code><br />
+<code>systemctl disable firewalld</code></p>
 <p>VirtualBox桥接模式虚拟机连外网配置:</p>
 <table>
 <thead>
@@ -279,7 +287,8 @@
 <th>步骤</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>1.将各个虚拟机的网络连接方式设置成桥接，映射的网卡应为电脑上连网的那个网卡</td>
 </tr>
 <tr>
@@ -327,7 +336,8 @@
 <tr>
 <td>重启网络服务</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
 
     </div>
 
@@ -422,7 +432,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#JDK安装"><span class="nav-number">1.</span> <span class="nav-text">JDK安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hadoop安装"><span class="nav-number">2.</span> <span class="nav-text">Hadoop安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置环境变量"><span class="nav-number">3.</span> <span class="nav-text">配置环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络配置"><span class="nav-number">4.</span> <span class="nav-text">网络配置</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#jdk安装"><span class="nav-number">1.</span> <span class="nav-text"> JDK安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hadoop安装"><span class="nav-number">2.</span> <span class="nav-text"> Hadoop安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置环境变量"><span class="nav-number">3.</span> <span class="nav-text"> 配置环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络配置"><span class="nav-number">4.</span> <span class="nav-text"> 网络配置</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -500,7 +510,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

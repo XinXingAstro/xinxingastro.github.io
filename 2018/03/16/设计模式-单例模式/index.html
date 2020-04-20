@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,51 +263,43 @@
       
         <p>五种方式构建单例模式：懒汉式，饿汉式，双重检测锁（不推荐），静态内部类（推荐），枚举单类（推荐）</p>
 <a id="more"></a>
-
 <p><strong>单例模式就是保证一个类只有一个实例（对象），并且提供一个访问该实例的全局访问点。</strong></p>
 <p>当一个对象的产生需要比较多资源时，如读取配置、产生其他依赖对象时，则可以在应用启动时直接产生一个单例对象，然后驻留内存的方式来解决。</p>
 <p>由于单例模式只生成一个实例，减少了系统开销。单例模式可以设置全局访问点，优化共享资源访问，如可以设计一个单例类，负责所有数据表的映射处理。</p>
 <p>常见5种单例模式实现方式：</p>
-<h4 id="1-饿汉式（线程安全，调用效率高，不能延时加载）"><a href="#1-饿汉式（线程安全，调用效率高，不能延时加载）" class="headerlink" title="1 饿汉式（线程安全，调用效率高，不能延时加载）"></a>1 饿汉式（线程安全，调用效率高，不能延时加载）</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">    <span class="comment">//类初始化时立即加载这个对象，没有延时加载的优势，加载类时，是线程安全的</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="2-懒汉式（线程安全，调用效率不高，可以延时加载）"><a href="#2-懒汉式（线程安全，调用效率不高，可以延时加载）" class="headerlink" title="2 懒汉式（线程安全，调用效率不高，可以延时加载）"></a>2 懒汉式（线程安全，调用效率不高，可以延时加载）</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> /*<span class="keyword">implements</span> <span class="title">Serializable</span>*/ </span>&#123;</span><br><span class="line">    <span class="comment">//类初始化时，不初始化这个对象，延时加载（懒加载），真正用的时候再创建</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//防止反射漏洞可以加上一下语句</span></span><br><span class="line">        <span class="comment">/*if (instance != null) &#123;</span></span><br><span class="line"><span class="comment">            throw new RuntimeException(); //如果instance不为空，再创建的时候抛出异常</span></span><br><span class="line"><span class="comment">        &#125;*/</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//方法同步调用效率低</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//防止反序列化生成多个对象</span></span><br><span class="line">    <span class="comment">//反序列化时，如果定义了reaResolve()则直接返回此方法指定的对象，而不需要单独创建新对象</span></span><br><span class="line">    <span class="comment">/*private Object readResolve() throws ObjectStreamException &#123;</span></span><br><span class="line"><span class="comment">        return instance;</span></span><br><span class="line"><span class="comment">    &#125;*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<h4 id="1-饿汉式线程安全调用效率高不能延时加载"><a class="markdownIt-Anchor" href="#1-饿汉式线程安全调用效率高不能延时加载"></a> 1 饿汉式（线程安全，调用效率高，不能延时加载）</h4>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">    <span class="comment">//类初始化时立即加载这个对象，没有延时加载的优势，加载类时，是线程安全的</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-懒汉式线程安全调用效率不高可以延时加载"><a class="markdownIt-Anchor" href="#2-懒汉式线程安全调用效率不高可以延时加载"></a> 2 懒汉式（线程安全，调用效率不高，可以延时加载）</h4>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> /*<span class="keyword">implements</span> <span class="title">Serializable</span>*/ </span>&#123;</span><br><span class="line">    <span class="comment">//类初始化时，不初始化这个对象，延时加载（懒加载），真正用的时候再创建</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//防止反射漏洞可以加上一下语句</span></span><br><span class="line">        <span class="comment">/*if (instance != null) &#123;</span></span><br><span class="line"><span class="comment">            throw new RuntimeException(); //如果instance不为空，再创建的时候抛出异常</span></span><br><span class="line"><span class="comment">        &#125;*/</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//方法同步调用效率低</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//防止反序列化生成多个对象</span></span><br><span class="line">    <span class="comment">//反序列化时，如果定义了reaResolve()则直接返回此方法指定的对象，而不需要单独创建新对象</span></span><br><span class="line">    <span class="comment">/*private Object readResolve() throws ObjectStreamException &#123;</span></span><br><span class="line"><span class="comment">        return instance;</span></span><br><span class="line"><span class="comment">    &#125;*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>使用反射方式直接调用私有构造器：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;Singleton&gt; class = (Class&lt;Singleton&gt;) class.forName("com.xinxing.Singleton");</span><br><span class="line">Constructor&lt;Singleton&gt; constructor = <span class="class"><span class="keyword">class</span>.<span class="title">getDeclaredConstructor</span>(<span class="title">null</span>)</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span>.<span class="title">setAccessible</span>(<span class="title">true</span>)</span>; <span class="comment">//关闭权限访问检测，以访问私有成员</span></span><br><span class="line">Singleton s1 = constructor.newInstance();</span><br><span class="line">Singleton s2 = constructor.newInstance(); <span class="comment">//如果上面没有防漏洞代码，这里s1和s2不相等</span></span><br></pre></td></tr></table></figure>
-
 <p>通过反序列化的方式构造多个对象：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Singleton s1 = Singleton.getInstance();</span><br><span class="line"></span><br><span class="line">FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(<span class="string">"d:/a.txt"</span>);</span><br><span class="line">OubjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(fos);</span><br><span class="line">oos.writeObject(s1); <span class="comment">//将s1对象写出到文件</span></span><br><span class="line">oos.close();</span><br><span class="line">fos.close();</span><br><span class="line">ObjectInputStream ois = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"d:/a.txt"</span>));</span><br><span class="line">Singleton s2 = (Singleton) ois.readObject(); <span class="comment">//此时如果没有上面的房序列化代码，这里的s1和s2不同</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="3-静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）"><a href="#3-静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）" class="headerlink" title="3 静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）"></a>3 静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）</h4><p>类在被加载时是线程安全的，也是一种懒加载方式，很多框架都用这种框架。</p>
+<h4 id="3-静态内部类式线程安全调用效率高可以延时加载推荐使用"><a class="markdownIt-Anchor" href="#3-静态内部类式线程安全调用效率高可以延时加载推荐使用"></a> 3 静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）</h4>
+<p>类在被加载时是线程安全的，也是一种懒加载方式，很多框架都用这种框架。</p>
 <ul>
 <li>外部类没有static属性，则不会像饿汉模式那样立即加载对象。</li>
 <li>只有真正调用getInstanc()时，才会加载静态内部类，加载类时是线程安全的，instance是static final类型，保证了内存中只有这样一个实例存在，而且只能被赋值一次。</li>
 <li>兼备了线程安全、并发高效、延迟加载的优势</li>
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">    <span class="comment">//使用静态内部类实现懒加载</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonInnerClass</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> SingletonClass.instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="4-枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）"><a href="#4-枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）" class="headerlink" title="4 枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）"></a>4 枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）</h4><p>优点：有句JVM从根本上提供保障，避免和反射和反序列化调用私有方法的漏洞，简单高效</p>
+<h4 id="4-枚举单例线程安全调用效率高不能延时加载建议使用"><a class="markdownIt-Anchor" href="#4-枚举单例线程安全调用效率高不能延时加载建议使用"></a> 4 枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）</h4>
+<p>优点：有句JVM从根本上提供保障，避免和反射和反序列化调用私有方法的漏洞，简单高效</p>
 <p>缺点：没有延时加载的效果</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Singleton &#123;</span><br><span class="line">    <span class="comment">//定义一个枚举元素，它就代表了Singelton的一个实例</span></span><br><span class="line">    INSTANCE;</span><br><span class="line">    <span class="comment">//添加自己需要的操作</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">singletonOperation</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用方法</span></span><br><span class="line">Singleton s = Singleton.INSTANCE; <span class="comment">//获得Singleton对象</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="5-双重检测锁式（不建议使用）"><a href="#5-双重检测锁式（不建议使用）" class="headerlink" title="5 双重检测锁式（不建议使用）"></a>5 双重检测锁式（不建议使用）</h4><p>由于懒汉模式是将方法放到同步块里，执行时整个方法都被锁定效率比较低，该模式将同步内容放到if内部，提高了执行效率，不必每次获取对象时都进行同步，只有第一次才同步创建以后就不会同步了。</p>
+<h4 id="5-双重检测锁式不建议使用"><a class="markdownIt-Anchor" href="#5-双重检测锁式不建议使用"></a> 5 双重检测锁式（不建议使用）</h4>
+<p>由于懒汉模式是将方法放到同步块里，执行时整个方法都被锁定效率比较低，该模式将同步内容放到if内部，提高了执行效率，不必每次获取对象时都进行同步，只有第一次才同步创建以后就不会同步了。</p>
 <p>问题：由于编译器优化原因和JVM底层内部模型原因，偶尔会出现问题，不建议使用</p>
-<h4 id="五种单例模式在多线程环境下的效率"><a href="#五种单例模式在多线程环境下的效率" class="headerlink" title="五种单例模式在多线程环境下的效率"></a>五种单例模式在多线程环境下的效率</h4><table>
+<h4 id="五种单例模式在多线程环境下的效率"><a class="markdownIt-Anchor" href="#五种单例模式在多线程环境下的效率"></a> 五种单例模式在多线程环境下的效率</h4>
+<table>
 <thead>
 <tr>
 <th>饿汉式</th>
 <th>22ms</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>懒汉式</td>
 <td>636ms</td>
 </tr>
@@ -328,8 +315,10 @@
 <td>双重检查锁式</td>
 <td>65ms</td>
 </tr>
-</tbody></table>
-<h4 id="典型的应用场景："><a href="#典型的应用场景：" class="headerlink" title="典型的应用场景："></a>典型的应用场景：</h4><ul>
+</tbody>
+</table>
+<h4 id="典型的应用场景"><a class="markdownIt-Anchor" href="#典型的应用场景"></a> 典型的应用场景：</h4>
+<ul>
 <li>windows的任务管理器</li>
 <li>window的回收站</li>
 <li>项目中读取配置文件的类</li>
@@ -431,7 +420,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-饿汉式（线程安全，调用效率高，不能延时加载）"><span class="nav-number">1.</span> <span class="nav-text">1 饿汉式（线程安全，调用效率高，不能延时加载）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-懒汉式（线程安全，调用效率不高，可以延时加载）"><span class="nav-number">2.</span> <span class="nav-text">2 懒汉式（线程安全，调用效率不高，可以延时加载）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）"><span class="nav-number">3.</span> <span class="nav-text">3 静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）"><span class="nav-number">4.</span> <span class="nav-text">4 枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-双重检测锁式（不建议使用）"><span class="nav-number">5.</span> <span class="nav-text">5 双重检测锁式（不建议使用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#五种单例模式在多线程环境下的效率"><span class="nav-number">6.</span> <span class="nav-text">五种单例模式在多线程环境下的效率</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#典型的应用场景："><span class="nav-number">7.</span> <span class="nav-text">典型的应用场景：</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-饿汉式线程安全调用效率高不能延时加载"><span class="nav-number">1.</span> <span class="nav-text"> 1 饿汉式（线程安全，调用效率高，不能延时加载）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-懒汉式线程安全调用效率不高可以延时加载"><span class="nav-number">2.</span> <span class="nav-text"> 2 懒汉式（线程安全，调用效率不高，可以延时加载）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-静态内部类式线程安全调用效率高可以延时加载推荐使用"><span class="nav-number">3.</span> <span class="nav-text"> 3 静态内部类式（线程安全，调用效率高，可以延时加载）（推荐使用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-枚举单例线程安全调用效率高不能延时加载建议使用"><span class="nav-number">4.</span> <span class="nav-text"> 4 枚举单例（线程安全，调用效率高，不能延时加载）（建议使用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-双重检测锁式不建议使用"><span class="nav-number">5.</span> <span class="nav-text"> 5 双重检测锁式（不建议使用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#五种单例模式在多线程环境下的效率"><span class="nav-number">6.</span> <span class="nav-text"> 五种单例模式在多线程环境下的效率</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#典型的应用场景"><span class="nav-number">7.</span> <span class="nav-text"> 典型的应用场景：</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -509,7 +498,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,36 +263,31 @@
       
         <p>创建并运行Java线程的两种方法。</p>
 <a id="more"></a>
-
-<hr>
-<h2 id="方法1-实现Runnable接口"><a href="#方法1-实现Runnable接口" class="headerlink" title="方法1: 实现Runnable接口"></a>方法1: 实现Runnable接口</h2><p>先来看一下Runnable接口，非常简单，里面只有一个run()方法：</p>
+<hr />
+<h2 id="方法1-实现runnable接口"><a class="markdownIt-Anchor" href="#方法1-实现runnable接口"></a> 方法1: 实现Runnable接口</h2>
+<p>先来看一下Runnable接口，非常简单，里面只有一个run()方法：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>实现了Runnble接口的类的对象是被用来创建线程的，start这个线程会导致对象的run方法在这个线程中被调用。</p>
 <p>最常使用的方法是在Thread的构造方法中传入一个实现了Runnable接口的匿名内部类，如下所示：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Thread myThread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"myThread is running"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    myThread.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>当新建的线程很多的时候，为了区分线程，需要给线程起个名字，可以在Thread构造方法中直接传入新建线程的名字，然后使用<code>Thread.currentThread().getName()</code>来得到这个线程的名字。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Thread myThread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="string">"myThread"</span>);</span><br><span class="line">    myThread.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>注意：在启动线程时要使用<code>Thread.start()</code>，不能直接调用<code>Thread.run()</code>。使用start()方法JVM会新建一个线程然后使用新建的线程执行run()方法，如果直接调用run()方法，JVM不会新建线程，相当于在当前线程中执行Thread对象中的run()方法。</p>
-<h2 id="方法2-创建Thread的子类"><a href="#方法2-创建Thread的子类" class="headerlink" title="方法2: 创建Thread的子类"></a>方法2: 创建Thread的子类</h2><p>Thread类实现了Runnable接口，我们可以创建Thread类的子类，然后重写run()方法，然后通过新建该类的对象来新建线程。</p>
+<h2 id="方法2-创建thread的子类"><a class="markdownIt-Anchor" href="#方法2-创建thread的子类"></a> 方法2: 创建Thread的子类</h2>
+<p>Thread类实现了Runnable接口，我们可以创建Thread类的子类，然后重写run()方法，然后通过新建该类的对象来新建线程。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"this is MyThread"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Thread thread = <span class="keyword">new</span> MyThread();</span><br><span class="line">    thread.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>也可以创建一个Thread的匿名子类对象来新建线程。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Thread thread = <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"this is myThread"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    thread.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="方法3-实现Callable接口"><a href="#方法3-实现Callable接口" class="headerlink" title="方法3: 实现Callable接口"></a>方法3: 实现Callable接口</h2><p><code>java.util.concurrent.Callable</code>接口里面只有一个方法，跟Runnable接口很类似，Callable接口源码如下：</p>
+<h2 id="方法3-实现callable接口"><a class="markdownIt-Anchor" href="#方法3-实现callable接口"></a> 方法3: 实现Callable接口</h2>
+<p><code>java.util.concurrent.Callable</code>接口里面只有一个方法，跟Runnable接口很类似，Callable接口源码如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>使用这种方法创建线程分以下几步：</p>
 <p>1.创建一个类实现Callable接口中的call()方法.</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyThread</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">" is running"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>2.新建Callable对象，使用Callabe对象作为传入参数新建FutureTask对象，FutureTask对Callable的call()方法的返回值进行了封装，然后使用FutureTask对象作为参数新建Thread对象，然后使用Thread.start()方法启动线程。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.FutureTask;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadExample02</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyThread</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">" is running"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Callable myThread = <span class="keyword">new</span> MyThread();</span><br><span class="line">        FutureTask&lt;Integer&gt; futureTask = <span class="keyword">new</span> FutureTask&lt;Integer&gt;(myThread);</span><br><span class="line">        Thread thread = <span class="keyword">new</span> Thread(futureTask, <span class="string">"myThread"</span>);</span><br><span class="line">        thread.start();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"子线程返回值 ："</span> + futureTask.get());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="三种方法对比"><a href="#三种方法对比" class="headerlink" title="三种方法对比"></a>三种方法对比</h2><p>使用时间Runnable，Callable接口的方法：</p>
+<h2 id="三种方法对比"><a class="markdownIt-Anchor" href="#三种方法对比"></a> 三种方法对比</h2>
+<p>使用时间Runnable，Callable接口的方法：</p>
 <ul>
 <li>优势：由于只实现了接口，所以还可以继承其他类。多个Thread可以共享同一个target对象，适合多个相同线程来处理同一份资源的情况，可以将CPU、代码和数据分开，形成清晰的模型。</li>
 <li>劣势：编程复杂，访问当前线程必须使用Thread.currentThread()方法。</li>
@@ -396,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法1-实现Runnable接口"><span class="nav-number">1.</span> <span class="nav-text">方法1: 实现Runnable接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法2-创建Thread的子类"><span class="nav-number">2.</span> <span class="nav-text">方法2: 创建Thread的子类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法3-实现Callable接口"><span class="nav-number">3.</span> <span class="nav-text">方法3: 实现Callable接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三种方法对比"><span class="nav-number">4.</span> <span class="nav-text">三种方法对比</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法1-实现runnable接口"><span class="nav-number">1.</span> <span class="nav-text"> 方法1: 实现Runnable接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法2-创建thread的子类"><span class="nav-number">2.</span> <span class="nav-text"> 方法2: 创建Thread的子类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法3-实现callable接口"><span class="nav-number">3.</span> <span class="nav-text"> 方法3: 实现Callable接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三种方法对比"><span class="nav-number">4.</span> <span class="nav-text"> 三种方法对比</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -474,7 +464,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

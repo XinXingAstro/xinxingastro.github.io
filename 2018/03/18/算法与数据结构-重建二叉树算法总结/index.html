@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -266,10 +261,8 @@
       
         <p>输入二叉树的前序遍历序列和中序遍历序列，重建二叉树。</p>
 <a id="more"></a>
-
 <p>下面代码假设输入序列是：前序遍历序列和中序遍历序列</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">reConstructBinaryTree</span><span class="params">(<span class="keyword">int</span> [] pre,<span class="keyword">int</span> [] in)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> reBuild(pre, in, <span class="number">0</span>, pre.length-<span class="number">1</span>, <span class="number">0</span>, in.length-<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * reBuid函数参数的定义很重要！！！节点在前序遍历序列和后序遍历序列中的开始和结束位置，一定要分开定义</span></span><br><span class="line"><span class="comment">     * 不然在算法中会产生歧义。</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">reBuild</span><span class="params">(<span class="keyword">int</span>[] pre, <span class="keyword">int</span>[] in, <span class="keyword">int</span> preStart, <span class="keyword">int</span> preEnd, <span class="keyword">int</span> inStart, <span class="keyword">int</span> inEnd)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (preStart &gt;= preEnd) &#123;</span><br><span class="line">            <span class="keyword">if</span> (preStart == preEnd) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> TreeNode(pre[preStart]);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> inRoot = find(inStart, inEnd, pre[preStart], in);</span><br><span class="line">        <span class="keyword">int</span> lengthOfLeft = inRoot - inStart;</span><br><span class="line">        TreeNode root = <span class="keyword">new</span> TreeNode(pre[preStart]);</span><br><span class="line">        root.left = reBuild(pre, in, preStart+<span class="number">1</span>, preStart+lengthOfLeft, inRoot-lengthOfLeft, inRoot-<span class="number">1</span>);</span><br><span class="line">        root.right = reBuild(pre, in, preStart+lengthOfLeft+<span class="number">1</span>, preEnd, inRoot+<span class="number">1</span>, inEnd);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> start, <span class="keyword">int</span> end, <span class="keyword">int</span> val, <span class="keyword">int</span>[] in)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt;= end; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (val == in[i]) &#123;</span><br><span class="line">                <span class="keyword">return</span> i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 
     </div>
 
@@ -446,7 +439,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

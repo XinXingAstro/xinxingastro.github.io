@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,9 +263,9 @@
       
         <p>Java反射机制的知识点总结。</p>
 <a id="more"></a>
-
-<hr>
-<h3 id="反射的概念"><a href="#反射的概念" class="headerlink" title="反射的概念"></a>反射的概念</h3><p>在Java运行时环境中，对于任意一个类我们可以利用反射机制知道这个类有哪些属性和方法，对于任意一个对象我们可以利用反射调用它的任意一个方法，这种动态获取类的信息以及动态调用对象的方法的功能来自于Java的反射(Reflection)机制。</p>
+<hr />
+<h3 id="反射的概念"><a class="markdownIt-Anchor" href="#反射的概念"></a> 反射的概念</h3>
+<p>在Java运行时环境中，对于任意一个类我们可以利用反射机制知道这个类有哪些属性和方法，对于任意一个对象我们可以利用反射调用它的任意一个方法，这种动态获取类的信息以及动态调用对象的方法的功能来自于Java的反射(Reflection)机制。</p>
 <p>Java反射机制主要提供了一下功能：</p>
 <ul>
 <li>在运行时判断任意一个对象所属的类。</li>
@@ -284,24 +279,24 @@
 <p>最常见的动态语言有：JavaScript、Python、Ruby等。</p>
 </blockquote>
 <p>虽然Java不是动态语言，但是Java的反射机制，让Java也具有了一定的动态性。</p>
-<h3 id="Class类"><a href="#Class类" class="headerlink" title="Class类"></a>Class类</h3><p>在Java程序运行期间，Java运行时系统始终为所有对象维护一个叫作<strong>运行时</strong>的类型标识，这个信息跟踪着每个对象所属的类，JVM利用运行时里的类型信息选择相应的方法执行。我们可以通过专门的Java类访问这些运行时信息，保存这些信息的类就是<strong>Class</strong>类。<strong>java.lang.Class</strong>是一个特殊的类，它用于封装被装入到JVM中的类或接口的信息。</p>
+<h3 id="class类"><a class="markdownIt-Anchor" href="#class类"></a> Class类</h3>
+<p>在Java程序运行期间，Java运行时系统始终为所有对象维护一个叫作<strong>运行时</strong>的类型标识，这个信息跟踪着每个对象所属的类，JVM利用运行时里的类型信息选择相应的方法执行。我们可以通过专门的Java类访问这些运行时信息，保存这些信息的类就是<strong>Class</strong>类。<strong>java.lang.Class</strong>是一个特殊的类，它用于封装被装入到JVM中的类或接口的信息。</p>
 <p>Class类没有构造方法，我们不能显示的构造一个Class对象，Class对象是在一个类或接口被加载时，JVM通过类加载器中的defineClass方法自动构造的，我们可以通过这个Class对象访问这个类的信息。JVM通过这个Class对象来构造对应类的普通对象。</p>
-<h4 id="获取Class对象"><a href="#获取Class对象" class="headerlink" title="获取Class对象"></a>获取Class对象</h4><h5 id="通过Object类的getClass-方法获取Class对象"><a href="#通过Object类的getClass-方法获取Class对象" class="headerlink" title="通过Object类的getClass()方法获取Class对象"></a>通过Object类的getClass()方法获取Class对象</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Date date1 = <span class="keyword">new</span> Date();</span><br><span class="line">Date date2 = <span class="keyword">new</span> Date();</span><br><span class="line">Class c1 = date1.getClass();</span><br><span class="line">Class c2 = date2.getClass();</span><br><span class="line">System.out.println(c1.getName()); <span class="comment">// java.util.Date</span></span><br><span class="line">System.out.println(c1 == c2); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
-
+<h4 id="获取class对象"><a class="markdownIt-Anchor" href="#获取class对象"></a> 获取Class对象</h4>
+<h5 id="通过object类的getclass方法获取class对象"><a class="markdownIt-Anchor" href="#通过object类的getclass方法获取class对象"></a> 通过Object类的getClass()方法获取Class对象</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Date date1 = <span class="keyword">new</span> Date();</span><br><span class="line">Date date2 = <span class="keyword">new</span> Date();</span><br><span class="line">Class c1 = date1.getClass();</span><br><span class="line">Class c2 = date2.getClass();</span><br><span class="line">System.out.println(c1.getName()); <span class="comment">// java.util.Date</span></span><br><span class="line">System.out.println(c1 == c2); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 <p>当一个对象被其父类的引用或其实现的接口的应用指向时，getClass()方法返回的是对象实际类型的Class对象。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List list = <span class="keyword">new</span> ArrayList();</span><br><span class="line">System.out.println(list.getClass().getName()); <span class="comment">// java.util.ArrayList</span></span><br></pre></td></tr></table></figure>
-
 <p>有时候可以用这个方法了解一个对象的实际类型，例如：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Set set = <span class="keyword">new</span> HashSet();</span><br><span class="line">Iterator it = set.iterator();</span><br><span class="line">System.out.println(it.getClass().getName()); <span class="comment">// java.util.HashMap$KeyIterator</span></span><br></pre></td></tr></table></figure>
-
 <p>从代码可以看出，HashSet的iterator方法返回的是实现了Iterator接口的HashMap内部类（KeyIterator）对象。 因为抽象类和接口不可能实例化对象，因此不能通过Object的getClass方法获得与抽象类和接口关联的Class对象。</p>
-<h5 id="使用-class方法获取Class对象"><a href="#使用-class方法获取Class对象" class="headerlink" title="使用.class方法获取Class对象"></a>使用.class方法获取Class对象</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = String<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">System.out.println(<span class="class"><span class="keyword">class</span>.<span class="title">getName</span>())</span>; <span class="comment">// java.lang.String</span></span><br></pre></td></tr></table></figure>
-
+<h5 id="使用class方法获取class对象"><a class="markdownIt-Anchor" href="#使用class方法获取class对象"></a> 使用.class方法获取Class对象</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = String<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">System.out.println(<span class="class"><span class="keyword">class</span>.<span class="title">getName</span>())</span>; <span class="comment">// java.lang.String</span></span><br></pre></td></tr></table></figure>
 <p>这个方法可以直接获得与指定类关联的Class对象，而并不需要有该类的对象存在。</p>
-<h5 id="使用Class-forName-String-className-方法获取Class对象"><a href="#使用Class-forName-String-className-方法获取Class对象" class="headerlink" title="使用Class.forName(String className)方法获取Class对象"></a>使用Class.forName(String className)方法获取Class对象</h5><p>该方法可以根据字符串参数所指定的类名获取与该类关联的Class对象。如果该类还没有被装入，该方法会将该类装入JVM。当该方法无法获取需要装入的类时（例如，在当前类路径中不存在这个类），会抛出ClassNotFoundException异常。</p>
+<h5 id="使用classfornamestring-classname方法获取class对象"><a class="markdownIt-Anchor" href="#使用classfornamestring-classname方法获取class对象"></a> 使用Class.forName(String className)方法获取Class对象</h5>
+<p>该方法可以根据字符串参数所指定的类名获取与该类关联的Class对象。如果该类还没有被装入，该方法会将该类装入JVM。当该方法无法获取需要装入的类时（例如，在当前类路径中不存在这个类），会抛出ClassNotFoundException异常。</p>
 <p>注意：className需要是类的全限定名。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class clazz = Class.forName(<span class="string">"com.xinxing.Test"</span>);</span><br></pre></td></tr></table></figure>
-
 <p>上面语句执行后，JVM首先会将Test类装入，然后返回对应的Class对象。该方法通常用于在程序运行时根据类名动态的载入类，并获取对应的Class对象。</p>
 
     </div>
@@ -392,7 +387,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#反射的概念"><span class="nav-number">1.</span> <span class="nav-text">反射的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Class类"><span class="nav-number">2.</span> <span class="nav-text">Class类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取Class对象"><span class="nav-number">2.1.</span> <span class="nav-text">获取Class对象</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#通过Object类的getClass-方法获取Class对象"><span class="nav-number">2.1.1.</span> <span class="nav-text">通过Object类的getClass()方法获取Class对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用-class方法获取Class对象"><span class="nav-number">2.1.2.</span> <span class="nav-text">使用.class方法获取Class对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用Class-forName-String-className-方法获取Class对象"><span class="nav-number">2.1.3.</span> <span class="nav-text">使用Class.forName(String className)方法获取Class对象</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#反射的概念"><span class="nav-number">1.</span> <span class="nav-text"> 反射的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#class类"><span class="nav-number">2.</span> <span class="nav-text"> Class类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取class对象"><span class="nav-number">2.1.</span> <span class="nav-text"> 获取Class对象</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#通过object类的getclass方法获取class对象"><span class="nav-number">2.1.1.</span> <span class="nav-text"> 通过Object类的getClass()方法获取Class对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用class方法获取class对象"><span class="nav-number">2.1.2.</span> <span class="nav-text"> 使用.class方法获取Class对象</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用classfornamestring-classname方法获取class对象"><span class="nav-number">2.1.3.</span> <span class="nav-text"> 使用Class.forName(String className)方法获取Class对象</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -470,7 +465,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

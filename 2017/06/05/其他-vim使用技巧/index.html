@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -266,12 +261,11 @@
       
         <p>vim常用技巧总结。</p>
 <a id="more"></a>
-
-<hr>
-<h4 id="批量替换"><a href="#批量替换" class="headerlink" title="批量替换"></a>批量替换</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">:s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br><span class="line">其中XXX是需要替换的字符串,YYY是替换后的字符串</span><br><span class="line">以上这句只对当前行进行替换,如果需要进行全局替换,则要:</span><br><span class="line">%s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br><span class="line"></span><br><span class="line">如果需要对指定部分进行替换,可以用V进入visual模式,再进行</span><br><span class="line">:s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br><span class="line">或者可以指定行数对指定范围进行替换:</span><br><span class="line">:100, 102s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br></pre></td></tr></table></figure>
-
-<h4 id="Visual模式"><a href="#Visual模式" class="headerlink" title="Visual模式"></a>Visual模式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">visual模式就是选择模式</span><br><span class="line">v:进入单个字符选择模式</span><br><span class="line">V:进入行选择模式</span><br></pre></td></tr></table></figure>
-
+<hr />
+<h4 id="批量替换"><a class="markdownIt-Anchor" href="#批量替换"></a> 批量替换</h4>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">:s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br><span class="line">其中XXX是需要替换的字符串,YYY是替换后的字符串</span><br><span class="line">以上这句只对当前行进行替换,如果需要进行全局替换,则要:</span><br><span class="line">%s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br><span class="line"></span><br><span class="line">如果需要对指定部分进行替换,可以用V进入visual模式,再进行</span><br><span class="line">:s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br><span class="line">或者可以指定行数对指定范围进行替换:</span><br><span class="line">:100, 102s&#x2F;XXX&#x2F;YYY&#x2F;g</span><br></pre></td></tr></table></figure>
+<h4 id="visual模式"><a class="markdownIt-Anchor" href="#visual模式"></a> Visual模式</h4>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">visual模式就是选择模式</span><br><span class="line">v:进入单个字符选择模式</span><br><span class="line">V:进入行选择模式</span><br></pre></td></tr></table></figure>
 
     </div>
 
@@ -365,7 +359,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#批量替换"><span class="nav-number">1.</span> <span class="nav-text">批量替换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Visual模式"><span class="nav-number">2.</span> <span class="nav-text">Visual模式</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#批量替换"><span class="nav-number">1.</span> <span class="nav-text"> 批量替换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#visual模式"><span class="nav-number">2.</span> <span class="nav-text"> Visual模式</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -443,7 +437,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

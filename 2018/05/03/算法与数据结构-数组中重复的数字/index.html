@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -267,47 +262,53 @@
         <p>找出数组中重复的数字。</p>
 <p>相关题目：剑指Offer面试题3: 数组中重复的数字。</p>
 <a id="more"></a>
-
-<hr>
+<hr />
 <p><font color=red><strong>问题1: 数组中元素的取值范围是多少？数组的长度？</strong><br /></font></p>
 <p><font color=red><strong>问题2: 数组是否可以修改？</strong><br/></font></p>
 <p><font color=red><strong>问题3: 数组中重复元素有多少？找出多少重复元素？</strong><br /></font></p>
 <p><font color=red><strong>问题4: 异常情况怎么处理，如数组为null，数组长度小于2，数组中不包含重复元素，如果数组元素取值范围是0～n-1但是数组中包含大于n-1的元素，这些情况应该怎么处理。</strong><br /></font></p>
-<hr>
-<h3 id="算法1-排序-遍历"><a href="#算法1-排序-遍历" class="headerlink" title="算法1: 排序+遍历"></a>算法1: 排序+遍历</h3><p>如果数组<strong>可以修改</strong>，并且元素的取值范围比较大，例如：从Integer.MIN_VALUE到Integer.MAX_VALUE。那最简单的算法就是将数组排序，重复的元素就会被放到一起，然后遍历数组找到重复元素。</p>
+<hr />
+<h3 id="算法1-排序遍历"><a class="markdownIt-Anchor" href="#算法1-排序遍历"></a> 算法1: 排序+遍历</h3>
+<p>如果数组<strong>可以修改</strong>，并且元素的取值范围比较大，例如：从Integer.MIN_VALUE到Integer.MAX_VALUE。那最简单的算法就是将数组排序，重复的元素就会被放到一起，然后遍历数组找到重复元素。</p>
 <p>时间复杂度：O(nlogn)</p>
 <p>空间复杂度：O(1)</p>
-<h3 id="算法2-每次将一个数字交换到相应位置"><a href="#算法2-每次将一个数字交换到相应位置" class="headerlink" title="算法2: 每次将一个数字交换到相应位置"></a>算法2: 每次将一个数字交换到相应位置</h3><p>如果题目中给出附加条件：<font color=red><strong>数组中元素的取值范围是0～n-1</strong></font>。那么我们可以利用这个条件对该算法做进一步优化。</p>
+<h3 id="算法2-每次将一个数字交换到相应位置"><a class="markdownIt-Anchor" href="#算法2-每次将一个数字交换到相应位置"></a> 算法2: 每次将一个数字交换到相应位置</h3>
+<p>如果题目中给出附加条件：<font color=red><strong>数组中元素的取值范围是0～n-1</strong></font>。那么我们可以利用这个条件对该算法做进一步优化。</p>
 <p>由于数组中元素取值范围是0～n-1，那么将数组排好序以后，每个元素的值应该和其下标相等。利用这个性质，我们在遍历数组的过程中，每次将一个数交换到正确位置，如果在交换过程中发现重复元素，则返回。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(1)</p>
-<h3 id="算法3-每次将一个位置标记为负数"><a href="#算法3-每次将一个位置标记为负数" class="headerlink" title="算法3: 每次将一个位置标记为负数"></a>算法3: 每次将一个位置标记为负数</h3><p>在算法2中我们每次将一个元素交换到指定位置，但是当前指针下就右会出现一个新的数字，我们需要继续将这个新的数字交换到指定位置，指针不能向前移动，这种情况下算法2的时间复杂度实际上比O(n)要大，我们可以对算法2做进一步优化，使其最坏情况下的时间复杂度降到O(n)。</p>
+<h3 id="算法3-每次将一个位置标记为负数"><a class="markdownIt-Anchor" href="#算法3-每次将一个位置标记为负数"></a> 算法3: 每次将一个位置标记为负数</h3>
+<p>在算法2中我们每次将一个元素交换到指定位置，但是当前指针下就右会出现一个新的数字，我们需要继续将这个新的数字交换到指定位置，指针不能向前移动，这种情况下算法2的时间复杂度实际上比O(n)要大，我们可以对算法2做进一步优化，使其最坏情况下的时间复杂度降到O(n)。</p>
 <p>对于每一个数字，我们知道它的最终位置在哪，我们并不将这个数字交换到指定的位置，而是在指定位置做一个标记，说明这个数字我们已经访问过了，我们做的标记，就是将指定位置的数字变为负数，下次如果我么右来到这个位置，看到该位置的数字为负数的时候，我们就找到了一个重复数字。这样对于每个元素，仅需要遍历一次我们就可以知道它是不是重复元素，相较于算法2，时间性能又大幅提升了。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(1)</p>
 <p>这个算法的例子见：Leetcode442. Find All Duplicates in an Array</p>
-<h3 id="算法4-Hash数组统计元素是否出现"><a href="#算法4-Hash数组统计元素是否出现" class="headerlink" title="算法4: Hash数组统计元素是否出现"></a>算法4: Hash数组统计元素是否出现</h3><p>如果数组<strong>不可以修改</strong>，我们可以使用HashMap统计元素是否出现，然后遍历HashMap找出重复数字。</p>
+<h3 id="算法4-hash数组统计元素是否出现"><a class="markdownIt-Anchor" href="#算法4-hash数组统计元素是否出现"></a> 算法4: Hash数组统计元素是否出现</h3>
+<p>如果数组<strong>不可以修改</strong>，我们可以使用HashMap统计元素是否出现，然后遍历HashMap找出重复数字。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(n)</p>
 <p>由于HashMap只是统计元素是否出现，我们完全可以使用一个<strong>boolean数组</strong>代替HashMap来降低一些空间复杂度。我们可以先找出数组中最大数max和最小数min来确定boolean数组的长度<strong>len = max - min + 1</strong>，然后每次从原数组中取出一个元素m，将<strong>boolean[m - min]置为true</strong>，如果发现该位置已经为true，那说明该元素就是重复元素。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(n)</p>
 <p>我们继续优化算法来避免O(n)的空间复杂度。</p>
-<h3 id="算法5-二分统计"><a href="#算法5-二分统计" class="headerlink" title="算法5: 二分统计"></a>算法5: 二分统计</h3><p>如果数组<strong>不可以修改</strong>，<strong>并且数组中元素的取值范围是0～n-1</strong>。</p>
+<h3 id="算法5-二分统计"><a class="markdownIt-Anchor" href="#算法5-二分统计"></a> 算法5: 二分统计</h3>
+<p>如果数组<strong>不可以修改</strong>，<strong>并且数组中元素的取值范围是0～n-1</strong>。</p>
 <p>和算法4类似，该算法也需要统计元素出现的次数，但不同的是，这次我们基于分治法的思想，统计一个区间内元素出现的次数，从而降低时间复杂度。</p>
 <p>由于已知数组中元素的取值范围在0～n-1之间，我们可以将这个区间分为0～n/2-1和n/2～n-1两个区间，分别统计数组中在这两个区间内的元素出现的次数，如果一个区间内元素出现的次数超过了区间的长度，那说明该区间内肯定存在重复元素，接下来，我们再将这个区间一分为二，统计元素出现的次数，直到找到重复元素为止。</p>
 <p>时间复杂度：O(nlogn)</p>
 <p>空间复杂度：O(1)</p>
 <p>和算法4相比该算法相当于用时间换空间。</p>
-<p>需要指出的是：<strong>该算法不一定每次都能找到重复数字！</strong>例如对于数组[2,2,3,4,5,6]，在1～3范围内元素出现的次数是3次，在4～6范围内元素出现的次数也是3次，算法找不到重复数字。</p>
-<h3 id="算法6-将数组映射为有环链表"><a href="#算法6-将数组映射为有环链表" class="headerlink" title="算法6: 将数组映射为有环链表"></a>算法6: 将数组映射为有环链表</h3><p><strong>如果数组中的元素取值范围是0～n-1。</strong></p>
+<p>需要指出的是：**该算法不一定每次都能找到重复数字！**例如对于数组[2,2,3,4,5,6]，在1～3范围内元素出现的次数是3次，在4～6范围内元素出现的次数也是3次，算法找不到重复数字。</p>
+<h3 id="算法6-将数组映射为有环链表"><a class="markdownIt-Anchor" href="#算法6-将数组映射为有环链表"></a> 算法6: 将数组映射为有环链表</h3>
+<p><strong>如果数组中的元素取值范围是0～n-1。</strong></p>
 <p>那么我们就可以将数组映射为一个有环链表，用链表中判断环入口节点的算法就可以找到重复元素。</p>
 <p><strong>映射规则：以元素下标作为node.val，以元素值作为node.next。当两个node.next值相同时链表中就会产生环。</strong></p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(1)</p>
 <p>这个算法有个很明显的问题：<strong>如果一个元素的值和其下标相同时，映射为节点时相当于节点的next指针指向该节点本身，链表就断了。</strong></p>
 <p>如果题目可以去掉数组不可修改(read-only)这个条件，这个问题就很容易解决，我们只需要遍历数组，将元素值和其下标相等的元素和相邻元素对换，直到数组中每个元素的值都不等于其下标为止。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<h3 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h3>
+<ul>
 <li>如果数组中元素的取值范围很大，那么我们只能使用排序+遍历和HashMap统计次数这两种算法。</li>
 <li>如果数组中元素的取值范围在数组长度范围内，我们就可以分别对排序+遍历算法和HashMap算法进行优化，优化过后的排序+遍历算法性能最好，达到O(n)的时间复杂度。并且还可以用二分统计和有环链表算法。</li>
 <li>如果题目中又给出read-only条件，那么排序+遍历算法就不能用了，可以使用的算法只有二分统计和HashMap统计，由于二分统计存在缺陷，所以最优的算法只有Hash数组统计了。</li>
@@ -420,7 +421,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法1-排序-遍历"><span class="nav-number">1.</span> <span class="nav-text">算法1: 排序+遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法2-每次将一个数字交换到相应位置"><span class="nav-number">2.</span> <span class="nav-text">算法2: 每次将一个数字交换到相应位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法3-每次将一个位置标记为负数"><span class="nav-number">3.</span> <span class="nav-text">算法3: 每次将一个位置标记为负数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法4-Hash数组统计元素是否出现"><span class="nav-number">4.</span> <span class="nav-text">算法4: Hash数组统计元素是否出现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法5-二分统计"><span class="nav-number">5.</span> <span class="nav-text">算法5: 二分统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法6-将数组映射为有环链表"><span class="nav-number">6.</span> <span class="nav-text">算法6: 将数组映射为有环链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法1-排序遍历"><span class="nav-number">1.</span> <span class="nav-text"> 算法1: 排序+遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法2-每次将一个数字交换到相应位置"><span class="nav-number">2.</span> <span class="nav-text"> 算法2: 每次将一个数字交换到相应位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法3-每次将一个位置标记为负数"><span class="nav-number">3.</span> <span class="nav-text"> 算法3: 每次将一个位置标记为负数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法4-hash数组统计元素是否出现"><span class="nav-number">4.</span> <span class="nav-text"> 算法4: Hash数组统计元素是否出现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法5-二分统计"><span class="nav-number">5.</span> <span class="nav-text"> 算法5: 二分统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法6-将数组映射为有环链表"><span class="nav-number">6.</span> <span class="nav-text"> 算法6: 将数组映射为有环链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text"> 总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -498,7 +499,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -266,26 +261,24 @@
       
         <p>最常用的有两种方法获取随机数。</p>
 <a id="more"></a>
-
-<h2 id="使用Math-random-方法"><a href="#使用Math-random-方法" class="headerlink" title="使用Math.random()方法"></a>使用Math.random()方法</h2><p><code>Math.random()</code>函数获取一个在<code>[0.0, 1.0)</code>之间的double类型的随机数。</p>
+<h2 id="使用mathrandom方法"><a class="markdownIt-Anchor" href="#使用mathrandom方法"></a> 使用Math.random()方法</h2>
+<p><code>Math.random()</code>函数获取一个在<code>[0.0, 1.0)</code>之间的double类型的随机数。</p>
 <p>例：获取在<code>[0.0, 10.0)</code>之间int类型的随机数：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> r = Math.random();</span><br><span class="line"><span class="keyword">int</span> ans = (<span class="keyword">int</span>)(r*<span class="number">10</span>);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="使用Random类获取随机数"><a href="#使用Random类获取随机数" class="headerlink" title="使用Random类获取随机数"></a>使用Random类获取随机数</h2><p>Random类中有很多获得随机数的方法，如：</p>
+<hr />
+<h2 id="使用random类获取随机数"><a class="markdownIt-Anchor" href="#使用random类获取随机数"></a> 使用Random类获取随机数</h2>
+<p>Random类中有很多获得随机数的方法，如：</p>
 <ul>
-<li><code>int nextInt()</code>方法返回在int类型的$[-2^{31}\sim2^{31}-1]$的随机数。</li>
+<li><code>int nextInt()</code>方法返回在int类型的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mo>−</mo><msup><mn>2</mn><mn>31</mn></msup><mo>∼</mo><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[-2^{31}\sim2^{31}-1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.897438em;vertical-align:-0.08333em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>的随机数。</li>
 <li><code>int nextInt(int bound)</code>方法返回int类型的[0, bound)之间的随机数。</li>
 </ul>
 <p>例：获取在<code>[0.0, 10.0)</code>之间int类型的随机数：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Random r = <span class="keyword">new</span> Random();</span><br><span class="line"><span class="keyword">int</span> ans = r.nextInt(<span class="number">10</span>);</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="使用UUID类获取UUID"><a href="#使用UUID类获取UUID" class="headerlink" title="使用UUID类获取UUID"></a>使用UUID类获取UUID</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UUID uuid = UUID.randomUUID();</span><br></pre></td></tr></table></figure>
-
+<hr />
+<h2 id="使用uuid类获取uuid"><a class="markdownIt-Anchor" href="#使用uuid类获取uuid"></a> 使用UUID类获取UUID</h2>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UUID uuid = UUID.randomUUID();</span><br></pre></td></tr></table></figure>
 <p>UUID得到的是一个随机字符串。</p>
-<blockquote>
-</blockquote>
+<blockquote></blockquote>
 
     </div>
 
@@ -391,7 +384,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Math-random-方法"><span class="nav-number">1.</span> <span class="nav-text">使用Math.random()方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Random类获取随机数"><span class="nav-number">2.</span> <span class="nav-text">使用Random类获取随机数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用UUID类获取UUID"><span class="nav-number">3.</span> <span class="nav-text">使用UUID类获取UUID</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用mathrandom方法"><span class="nav-number">1.</span> <span class="nav-text"> 使用Math.random()方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用random类获取随机数"><span class="nav-number">2.</span> <span class="nav-text"> 使用Random类获取随机数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用uuid类获取uuid"><span class="nav-number">3.</span> <span class="nav-text"> 使用UUID类获取UUID</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -469,7 +462,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

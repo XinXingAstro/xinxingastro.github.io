@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -266,31 +261,35 @@
       
         <p>找出数组中只出现1次的数字。</p>
 <a id="more"></a>
-
-<hr>
+<hr />
 <p><strong>问题1: 数组中其他元素出现几次？</strong></p>
 <p><strong>问题2: 数组中的元素是否有序？</strong></p>
 <p><strong>问题3: 数组是否可以修改？</strong></p>
-<hr>
+<hr />
 <p>如果要找出数组中只出现1次的数字，我们必须要知道数组中其他元素出现的次数，根据其他元素出现的次数我们可以使用不同的算法求解。</p>
-<h3 id="算法1-使用HashMap记录各元素出现次数"><a href="#算法1-使用HashMap记录各元素出现次数" class="headerlink" title="算法1: 使用HashMap记录各元素出现次数"></a>算法1: 使用HashMap记录各元素出现次数</h3><p>首先介绍一种最简单最通用的算法就是用一个HashMap记录数组中各个元素出现的次数，然后找出出现1次的元素。</p>
+<h3 id="算法1-使用hashmap记录各元素出现次数"><a class="markdownIt-Anchor" href="#算法1-使用hashmap记录各元素出现次数"></a> 算法1: 使用HashMap记录各元素出现次数</h3>
+<p>首先介绍一种最简单最通用的算法就是用一个HashMap记录数组中各个元素出现的次数，然后找出出现1次的元素。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(n)</p>
-<h3 id="算法2-逐个异或"><a href="#算法2-逐个异或" class="headerlink" title="算法2: 逐个异或"></a>算法2: 逐个异或</h3><p>如果题目中给出，数组中其他元素都出现2次，只有一个元素出现了1次，而且数组中的元素无序。那我们可以使用逐个异或的算法，只需遍历数组一遍，所有元素异或的结果就等于只出现1次的元素的值。</p>
+<h3 id="算法2-逐个异或"><a class="markdownIt-Anchor" href="#算法2-逐个异或"></a> 算法2: 逐个异或</h3>
+<p>如果题目中给出，数组中其他元素都出现2次，只有一个元素出现了1次，而且数组中的元素无序。那我们可以使用逐个异或的算法，只需遍历数组一遍，所有元素异或的结果就等于只出现1次的元素的值。</p>
 <p>这种方法能够奏效的原理是：两个相同元素异或的结果是0，和0异或的结果还是元素本身，并且异或操作满足交换性，既不管异或的顺序是怎样，最终得到的结果都是一样的。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(1)</p>
-<h3 id="算法3-二分查找"><a href="#算法3-二分查找" class="headerlink" title="算法3: 二分查找"></a>算法3: 二分查找</h3><p>如果我们将题设条件再一次加强，既数组中其他元素出现2次，只有一个元素出现1次，并且数组中的元素有序。那我们就可以使用更加高效的算法。</p>
+<h3 id="算法3-二分查找"><a class="markdownIt-Anchor" href="#算法3-二分查找"></a> 算法3: 二分查找</h3>
+<p>如果我们将题设条件再一次加强，既数组中其他元素出现2次，只有一个元素出现1次，并且数组中的元素有序。那我们就可以使用更加高效的算法。</p>
 <p><code>mid = (start + end) / 2</code>mid指向的是数组的中间元素，我们要<strong>保证mid前面正好有偶数个元素</strong>，既<code>if(mid % 2 == 1) mid--;</code></p>
 <p>1）如果重复1次的数字出现在前半部分或中间，则<code>nums[mid]</code>应该和后面一个数字<strong>不等</strong>，我们就在前半部分（包括总结元素）继续搜索。</p>
 <p>2）如果重复1次的数字出现在后半部分，则<code>nums[mid]</code>应该和后面一个数字<strong>相等</strong>，我们就在后半部分继续搜索。</p>
 <p>时间复杂度：O(logn)</p>
 <p>空间复杂度：O(1)</p>
-<h3 id="算法4-逐个异或-子数组划分"><a href="#算法4-逐个异或-子数组划分" class="headerlink" title="算法4: 逐个异或+子数组划分"></a>算法4: 逐个异或+子数组划分</h3><p>如果题目要求在一个乱序的数组中，有2个数字出现了1次，其他数字都出现了两次，要我们找到这两个数字。那么我们用算法2逐个异或数组中的元素，得到的就是这两个只出现一次的数字的异或结果。</p>
+<h3 id="算法4-逐个异或子数组划分"><a class="markdownIt-Anchor" href="#算法4-逐个异或子数组划分"></a> 算法4: 逐个异或+子数组划分</h3>
+<p>如果题目要求在一个乱序的数组中，有2个数字出现了1次，其他数字都出现了两次，要我们找到这两个数字。那么我们用算法2逐个异或数组中的元素，得到的就是这两个只出现一次的数字的异或结果。</p>
 <p>为了能分别得到这两个数字，我们需要将原数组分组，分组的方法是<strong>使用两个数字异或结果中第一个为1的位对原数组进行分组</strong>（异或结果为1说明这两个数的二进制码在这个位置上是不同的），使这两个只出现1次的数字分别分到两个不同的组里，这样再对这两个组分别使用算法2，就可以得到这两个数字。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(1)</p>
-<h3 id="算法5-位操作"><a href="#算法5-位操作" class="headerlink" title="算法5: 位操作"></a>算法5: 位操作</h3><p>如果题目中要求在一个乱序数组中，只有1个数字出现了1次，其他数组出现了3次，要我们找出这个只出现1次的数字target。那么我们除了使用算法1对数组元素出现的次数进行统计外，还可以使用位操作。</p>
+<h3 id="算法5-位操作"><a class="markdownIt-Anchor" href="#算法5-位操作"></a> 算法5: 位操作</h3>
+<p>如果题目中要求在一个乱序数组中，只有1个数字出现了1次，其他数组出现了3次，要我们找出这个只出现1次的数字target。那么我们除了使用算法1对数组元素出现的次数进行统计外，还可以使用位操作。</p>
 <p>由于数组中其他数字都出现了3次，那么我们累加每个元素的第i位（i：0～31），如果累加结果能被3整除，说明target在这一位上是0，如果累加结果不能被3整除，说明target在这一位上是1，对32位进行累加对3取余后，我们就可以得到target。</p>
 <p>时间复杂度：O(n)</p>
 <p>空间复杂度：O(1)</p>
@@ -402,7 +401,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法1-使用HashMap记录各元素出现次数"><span class="nav-number">1.</span> <span class="nav-text">算法1: 使用HashMap记录各元素出现次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法2-逐个异或"><span class="nav-number">2.</span> <span class="nav-text">算法2: 逐个异或</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法3-二分查找"><span class="nav-number">3.</span> <span class="nav-text">算法3: 二分查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法4-逐个异或-子数组划分"><span class="nav-number">4.</span> <span class="nav-text">算法4: 逐个异或+子数组划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法5-位操作"><span class="nav-number">5.</span> <span class="nav-text">算法5: 位操作</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法1-使用hashmap记录各元素出现次数"><span class="nav-number">1.</span> <span class="nav-text"> 算法1: 使用HashMap记录各元素出现次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法2-逐个异或"><span class="nav-number">2.</span> <span class="nav-text"> 算法2: 逐个异或</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法3-二分查找"><span class="nav-number">3.</span> <span class="nav-text"> 算法3: 二分查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法4-逐个异或子数组划分"><span class="nav-number">4.</span> <span class="nav-text"> 算法4: 逐个异或+子数组划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法5-位操作"><span class="nav-number">5.</span> <span class="nav-text"> 算法5: 位操作</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -480,7 +479,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

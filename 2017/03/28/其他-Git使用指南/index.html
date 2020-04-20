@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,25 +263,80 @@
       
         <p>Git是现在最流行的分布式版本控制系统，Git可以在离线状态下工作而且它的分支管理操作特别好用。本文是最精简的Git使用指南</p>
 <a id="more"></a>
-
 <p>在GitHub上新建一个库以后</p>
 <p>当我们要在本地新建一个库，并且关联远程仓库时，执行一下命令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">echo "# Blog" &gt;&gt; README.md</span><br><span class="line">git init</span><br><span class="line">git add README.md</span><br><span class="line">git commit -m "first commit"</span><br><span class="line">git remote add origin git@github.com:XinXingAstro/Blog.git</span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
-
 <p>当我们要为现有库添加与远程仓库，并且提交现有代码到远程仓库时，执行一下命令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@github.com:XinXingAstro/Blog.git</span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
-
 <p>操作git的更详细内容如下：</p>
-<h4 id="安装Git"><a href="#安装Git" class="headerlink" title="安装Git"></a>安装Git</h4><p><a href="https://git-for-windows.github.io/">Windows版官网下载地址</a> 使用默认选项安装；<br>Mac上面直接安装xcode；<br>安装完成后配置全局用户名和邮件：<br><code>git config --global user.name &quot;Your Name&quot;  //--global是设置全局的username和useremail</code><br><code>git config --global user.email &quot;email@example.com&quot;</code><br>如果不进行全局设置，可以在每个库中单独设置:<br><code>git config --local --list  //查看本地库的属性，里面有username和useremail</code></p>
-<h4 id="Git库的基本操作"><a href="#Git库的基本操作" class="headerlink" title="Git库的基本操作"></a>Git库的基本操作</h4><p>Git追踪<strong>文件修改</strong>而不是文件本身；<br>通过 <code>git --help</code> 来查看所有命令的说明；<br><code>.gitignore</code>文件会让git忽略一些文件<a href="https://github.com/github/gitignore">这里是官网的模版</a></p>
-<p><code>ssh-keygen -t rsa -C &quot;youremail@address.com&quot;  //创建SSH密钥</code><br><code>git clone &lt;SSH Key/HTTPS&gt;  //克隆远程库，git支持https协议但是通过SSH克隆速度最快；从远程克隆的时候，git自动把本地的master分支和远程的master分支对应起来了，远程仓库的默认名称是origin</code><br><code>git init  //将项目文件夹初始化为git仓库</code><br><code>git pull  //将远程库的更改合并到当前分支，相当与git fetch origin dev +  git merge FETCH_HEAD</code><br><code>git remote  //管理正在追踪的远程仓库，-v 查看仓库名 地址 和fetch pull权限</code><br><code>git remote add origin &lt;SSH KEY/HTTPS&gt;  //关联远程仓库</code><br><code>git branch --set-upstream &lt;localbranch&gt; origin/&lt;branch&gt;  //建立本地分支和远程分支的关联</code><br><code>git push -u origin master  //将本地master分支推送到远程origin库； -u 参数会关联本地分支和远程分支</code><br><code>git checkout -b dev origin/dev  //本地创建和远程分支对应的分支</code><br><code>git status  //查看仓库当前的状态</code></p>
-<p><img src="git.png" alt="git结构图">在我们编辑文件时，Git会将其视为已修改，我们分阶段修改的文件，可以一次性提交所有更改，循环重复。<br><code>git add &lt;filename&gt;  //将文件修改提交到暂存区</code><br><code>git commit -m &quot;本次提交的说明&quot;  //将暂存去的全部文件修改提交到当前分支</code><br><code>git diff &lt;filename&gt;  //查看具体的变更内容</code><br><code>diff</code>的输出格式可参考<a href="http://www.ruanyifeng.com/blog/2012/08/how_to_read_diff.html">这个网站</a><br><code>git log  //显示从最近到最远的提交日志，加上 --pretty=oneline 参数每条日志仅占一行</code><br><code>git reflog  //查看引用日志</code></p>
-<h4 id="撤销更改"><a href="#撤销更改" class="headerlink" title="撤销更改"></a>撤销更改</h4><p><code>git reset --hard HEAD~1  //将版本库回退到上一个版本，git用HEAD指针指向当前分支的当前版本，HEAD~n表示上n个版本</code><br><code>git reset --hard &lt;commit id&gt;  //将版本库设置成任意一个版本</code><br><code>git checkout -- &lt;filename&gt;  //丢弃工作区修改</code><br>如果修改提交到暂存区，想丢弃修改分两步：</p>
-<p>1) <code>git reset HEAD &lt;filename&gt;  //将修改撤回到工作区</code><br>2) <code>git checkout -- &lt;filename&gt;  //丢弃工作区修改</code><br>如果修改提交到当前分支时，就要用版本回退撤销修改<br><code>git rm &lt;filename&gt;  //将文件从版本库中删除，如果文件没从版本库中删除，而是被误删，可以用 git checkout -- &lt;filename&gt; 将文件恢复到之前提交的最新版本</code></p>
-<p><code>git config --global color.ui true  //让git显示颜色</code></p>
-<h4 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h4><p><code>git branch  //查看分支</code><br><code>git branch &lt;branchname&gt;  //创建分支</code><br><code>git checkout -b &lt;branchname&gt;  //创建+切换分支</code><br><code>git checkout &lt;branchname&gt;  //切换分支</code><br><code>git merge &lt;branchname&gt;  // 默认使用Fast forward模式合并某分支到当前分支，删除被合并分支后会丢掉分支信息。当</code>git<code>无法自动合并时，必须手动解决冲突，然后再提交合并</code><br><code>git merge --no-ff -m &quot;your commit mesage&quot; &lt;branchname&gt;  //使用普通模式合并分支，合并完成后可以看到合并历史</code><br><code>git branch -d &lt;branchname&gt;  //删除分支</code><br><code>git branch -D &lt;branchname&gt;  //强行删除没有被合并过的分支</code><br><code>git log --graph  //查看分支合并图，可以加</code>–pretty=oneline –abbrev-commit<code>参数</code><br>开发一个功能，修改一个bug，最好在原分支上新建一个分支进行操作，完成后再合并回原来分支</p>
-<h4 id="tag操作"><a href="#tag操作" class="headerlink" title="tag操作"></a>tag操作</h4><p><code>git tag  //查看所有标签</code><br><code>git show &lt;tagname&gt;  //查看标签信息</code><br><code>git tag &lt;name&gt;  //name一般是版本号，就会在当前分支上的当前commit上打一个tag，tag就是指向某个commit的指针，tag不能移动</code><br><code>git tag &lt;commit id&gt;  //为指定commit打标签，可以用git log --pretty=oneline --abbrev-commit 查看历史commit id</code><br><code>git push origin &lt;tagname&gt;  //推送一个标签到远程库</code><br><code>git push origin --tags  //推送全部标签到远程库</code><br><code>git tag -a &lt;tagname&gt; -m &lt;tagmessage&gt; &lt;commit id&gt;  //-a指定标签名，-m指定说明文字</code><br><code>git tag -d &lt;tagname&gt;  //删除标签</code><br><code>git push origin :refs/tags/&lt;tagname&gt;  //删除一个远程标签，首先要删除本地标签，然后再用本命令删除远程标签</code></p>
-<h4 id="保存工作现场操作"><a href="#保存工作现场操作" class="headerlink" title="保存工作现场操作"></a>保存工作现场操作</h4><p><code>git stash  //保存工作现场</code><br><code>git stash list  //查看工作现场列表</code><br><code>git stash apply stash@{n} //恢复第n个工作现场，恢复后stash内容不删除</code><br><code>git stash drop stash@{n}  //删除第n个工作现场</code><br><code>git stash pop //恢复工作现场并删除stash内容</code></p>
+<h4 id="安装git"><a class="markdownIt-Anchor" href="#安装git"></a> 安装Git</h4>
+<p><a href="https://git-for-windows.github.io/">Windows版官网下载地址</a> 使用默认选项安装；<br />
+Mac上面直接安装xcode；<br />
+安装完成后配置全局用户名和邮件：<br />
+<code>git config --global user.name &quot;Your Name&quot; //--global是设置全局的username和useremail</code><br />
+<code>git config --global user.email &quot;email@example.com&quot;</code><br />
+如果不进行全局设置，可以在每个库中单独设置:<br />
+<code>git config --local --list //查看本地库的属性，里面有username和useremail</code></p>
+<h4 id="git库的基本操作"><a class="markdownIt-Anchor" href="#git库的基本操作"></a> Git库的基本操作</h4>
+<p>Git追踪<strong>文件修改</strong>而不是文件本身；<br />
+通过 <code>git --help</code> 来查看所有命令的说明；<br />
+<code>.gitignore</code>文件会让git忽略一些文件<a href="https://github.com/github/gitignore">这里是官网的模版</a></p>
+<p><code>ssh-keygen -t rsa -C &quot;youremail@address.com&quot; //创建SSH密钥</code><br />
+<code>git clone &lt;SSH Key/HTTPS&gt; //克隆远程库，git支持https协议但是通过SSH克隆速度最快；从远程克隆的时候，git自动把本地的master分支和远程的master分支对应起来了，远程仓库的默认名称是origin</code><br />
+<code>git init //将项目文件夹初始化为git仓库</code><br />
+<code>git pull //将远程库的更改合并到当前分支，相当与git fetch origin dev + git merge FETCH_HEAD</code><br />
+<code>git remote //管理正在追踪的远程仓库，-v 查看仓库名 地址 和fetch pull权限</code><br />
+<code>git remote add origin &lt;SSH KEY/HTTPS&gt; //关联远程仓库</code><br />
+<code>git branch --set-upstream &lt;localbranch&gt; origin/&lt;branch&gt; //建立本地分支和远程分支的关联</code><br />
+<code>git push -u origin master //将本地master分支推送到远程origin库； -u 参数会关联本地分支和远程分支</code><br />
+<code>git checkout -b dev origin/dev //本地创建和远程分支对应的分支</code><br />
+<code>git status //查看仓库当前的状态</code></p>
+<p><img src="git.png" alt="git结构图" />在我们编辑文件时，Git会将其视为已修改，我们分阶段修改的文件，可以一次性提交所有更改，循环重复。<br />
+<code>git add &lt;filename&gt; //将文件修改提交到暂存区</code><br />
+<code>git commit -m &quot;本次提交的说明&quot; //将暂存去的全部文件修改提交到当前分支</code><br />
+<code>git diff &lt;filename&gt; //查看具体的变更内容</code><br />
+<code>diff</code>的输出格式可参考<a href="http://www.ruanyifeng.com/blog/2012/08/how_to_read_diff.html">这个网站</a><br />
+<code>git log //显示从最近到最远的提交日志，加上 --pretty=oneline 参数每条日志仅占一行</code><br />
+<code>git reflog //查看引用日志</code></p>
+<h4 id="撤销更改"><a class="markdownIt-Anchor" href="#撤销更改"></a> 撤销更改</h4>
+<p><code>git reset --hard HEAD~1 //将版本库回退到上一个版本，git用HEAD指针指向当前分支的当前版本，HEAD~n表示上n个版本</code><br />
+<code>git reset --hard &lt;commit id&gt; //将版本库设置成任意一个版本</code><br />
+<code>git checkout -- &lt;filename&gt; //丢弃工作区修改</code><br />
+如果修改提交到暂存区，想丢弃修改分两步：</p>
+<ol>
+<li><code>git reset HEAD &lt;filename&gt; //将修改撤回到工作区</code></li>
+<li><code>git checkout -- &lt;filename&gt; //丢弃工作区修改</code><br />
+如果修改提交到当前分支时，就要用版本回退撤销修改<br />
+<code>git rm &lt;filename&gt; //将文件从版本库中删除，如果文件没从版本库中删除，而是被误删，可以用 git checkout -- &lt;filename&gt; 将文件恢复到之前提交的最新版本</code></li>
+</ol>
+<p><code>git config --global color.ui true //让git显示颜色</code></p>
+<h4 id="分支管理"><a class="markdownIt-Anchor" href="#分支管理"></a> 分支管理</h4>
+<p><code>git branch //查看分支</code><br />
+<code>git branch &lt;branchname&gt; //创建分支</code><br />
+<code>git checkout -b &lt;branchname&gt; //创建+切换分支</code><br />
+<code>git checkout &lt;branchname&gt; //切换分支</code><br />
+<code>git merge &lt;branchname&gt; // 默认使用Fast forward模式合并某分支到当前分支，删除被合并分支后会丢掉分支信息。当</code>git<code>无法自动合并时，必须手动解决冲突，然后再提交合并</code><br />
+<code>git merge --no-ff -m &quot;your commit mesage&quot; &lt;branchname&gt; //使用普通模式合并分支，合并完成后可以看到合并历史</code><br />
+<code>git branch -d &lt;branchname&gt; //删除分支</code><br />
+<code>git branch -D &lt;branchname&gt; //强行删除没有被合并过的分支</code><br />
+<code>git log --graph //查看分支合并图，可以加</code>–pretty=oneline --abbrev-commit<code>参数</code><br />
+开发一个功能，修改一个bug，最好在原分支上新建一个分支进行操作，完成后再合并回原来分支</p>
+<h4 id="tag操作"><a class="markdownIt-Anchor" href="#tag操作"></a> tag操作</h4>
+<p><code>git tag //查看所有标签</code><br />
+<code>git show &lt;tagname&gt; //查看标签信息</code><br />
+<code>git tag &lt;name&gt; //name一般是版本号，就会在当前分支上的当前commit上打一个tag，tag就是指向某个commit的指针，tag不能移动</code><br />
+<code>git tag &lt;commit id&gt; //为指定commit打标签，可以用git log --pretty=oneline --abbrev-commit 查看历史commit id</code><br />
+<code>git push origin &lt;tagname&gt; //推送一个标签到远程库</code><br />
+<code>git push origin --tags //推送全部标签到远程库</code><br />
+<code>git tag -a &lt;tagname&gt; -m &lt;tagmessage&gt; &lt;commit id&gt; //-a指定标签名，-m指定说明文字</code><br />
+<code>git tag -d &lt;tagname&gt; //删除标签</code><br />
+<code>git push origin :refs/tags/&lt;tagname&gt; //删除一个远程标签，首先要删除本地标签，然后再用本命令删除远程标签</code></p>
+<h4 id="保存工作现场操作"><a class="markdownIt-Anchor" href="#保存工作现场操作"></a> 保存工作现场操作</h4>
+<p><code>git stash //保存工作现场</code><br />
+<code>git stash list //查看工作现场列表</code><br />
+<code>git stash apply stash@{n} //恢复第n个工作现场，恢复后stash内容不删除</code><br />
+<code>git stash drop stash@{n} //删除第n个工作现场</code><br />
+<code>git stash pop //恢复工作现场并删除stash内容</code></p>
 
     </div>
 
@@ -380,7 +430,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装Git"><span class="nav-number">1.</span> <span class="nav-text">安装Git</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Git库的基本操作"><span class="nav-number">2.</span> <span class="nav-text">Git库的基本操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#撤销更改"><span class="nav-number">3.</span> <span class="nav-text">撤销更改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分支管理"><span class="nav-number">4.</span> <span class="nav-text">分支管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tag操作"><span class="nav-number">5.</span> <span class="nav-text">tag操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#保存工作现场操作"><span class="nav-number">6.</span> <span class="nav-text">保存工作现场操作</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装git"><span class="nav-number">1.</span> <span class="nav-text"> 安装Git</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#git库的基本操作"><span class="nav-number">2.</span> <span class="nav-text"> Git库的基本操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#撤销更改"><span class="nav-number">3.</span> <span class="nav-text"> 撤销更改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分支管理"><span class="nav-number">4.</span> <span class="nav-text"> 分支管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tag操作"><span class="nav-number">5.</span> <span class="nav-text"> tag操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#保存工作现场操作"><span class="nav-number">6.</span> <span class="nav-text"> 保存工作现场操作</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -458,7 +508,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -124,24 +124,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -268,15 +263,14 @@
       
         <p>求数组或字符串的全排列算法。</p>
 <a id="more"></a>
-
-<hr>
-<h3 id="不包含重复元素的序列求全排列"><a href="#不包含重复元素的序列求全排列" class="headerlink" title="不包含重复元素的序列求全排列"></a>不包含重复元素的序列求全排列</h3><p>我们将第一个元素看作一部分A，其余元素看作一部分B，让第一个元素和后面的某一个元素交换，然后求B的全排列，递归执行上面语句，知道第二部分的开始指针到达数组末尾，我就得到一个排列。</p>
+<hr />
+<h3 id="不包含重复元素的序列求全排列"><a class="markdownIt-Anchor" href="#不包含重复元素的序列求全排列"></a> 不包含重复元素的序列求全排列</h3>
+<p>我们将第一个元素看作一部分A，其余元素看作一部分B，让第一个元素和后面的某一个元素交换，然后求B的全排列，递归执行上面语句，知道第二部分的开始指针到达数组末尾，我就得到一个排列。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">permutation</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> start)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (start == nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : nums) &#123;</span><br><span class="line">            <span class="comment">//得到一个排列</span></span><br><span class="line">            System.out.print(nums);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; nums.length; i++) &#123;</span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">        permutation(nums, start + <span class="number">1</span>);</span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = nums[a];</span><br><span class="line">    nums[a] = nums[b];</span><br><span class="line">    nums[b] = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="包含重复元素的序列求全排列"><a href="#包含重复元素的序列求全排列" class="headerlink" title="包含重复元素的序列求全排列"></a>包含重复元素的序列求全排列</h3><p>推荐使用Set这种数据结构存储排列结果，可以完美解决排列重复的问题。</p>
+<h3 id="包含重复元素的序列求全排列"><a class="markdownIt-Anchor" href="#包含重复元素的序列求全排列"></a> 包含重复元素的序列求全排列</h3>
+<p>推荐使用Set这种数据结构存储排列结果，可以完美解决排列重复的问题。</p>
 <p>还有一种方案是：添加if语句判断该元素是否重复，如果重复则不交换，这种方法不保证能完全解决重复元素的问题。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//放在Set中的数据类型必须实现Comparable接口的compareTo方法</span></span><br><span class="line">Set&lt;String&gt; res = <span class="keyword">new</span> TreeSet&lt;&gt;();</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">permutation2</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> start)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (start == nums.length - <span class="number">1</span>) &#123;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i : nums) &#123;</span><br><span class="line">            sb.append(i);</span><br><span class="line">        &#125;</span><br><span class="line">        res.add(sb.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt; nums.length; i++) &#123;</span><br><span class="line">        <span class="comment">//swap nums[i] nums[start]</span></span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">        permutation2(nums, start + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">//swap nums[i] nums[start]</span></span><br><span class="line">        swap(nums, i, start);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = nums[a];</span><br><span class="line">    nums[a] = nums[b];</span><br><span class="line">    nums[b] = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 
     </div>
 
@@ -366,7 +360,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#不包含重复元素的序列求全排列"><span class="nav-number">1.</span> <span class="nav-text">不包含重复元素的序列求全排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#包含重复元素的序列求全排列"><span class="nav-number">2.</span> <span class="nav-text">包含重复元素的序列求全排列</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#不包含重复元素的序列求全排列"><span class="nav-number">1.</span> <span class="nav-text"> 不包含重复元素的序列求全排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#包含重复元素的序列求全排列"><span class="nav-number">2.</span> <span class="nav-text"> 包含重复元素的序列求全排列</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -444,7 +438,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         

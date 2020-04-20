@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Helvetica:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
@@ -122,24 +122,19 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
-
-  </li>
         <li class="menu-item menu-item-categories">
 
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">6</span></a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">54</span></a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -269,20 +264,22 @@
 <p><strong>/etc/profile</strong> -&gt; <strong>/etc/paths</strong> -&gt; <strong>~/.bash_porfile</strong> -&gt; <strong>~/.bash_login</strong> -&gt; <strong>~/.profile</strong> -&gt; <strong>~/.bashrc</strong></p>
 </blockquote>
 <a id="more"></a>
-
-<h4 id="OS-X系统环境变量加载顺序"><a href="#OS-X系统环境变量加载顺序" class="headerlink" title="OS X系统环境变量加载顺序"></a>OS X系统环境变量加载顺序</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/etc/profile</span><br><span class="line"></span><br><span class="line">/etc/paths</span><br><span class="line"></span><br><span class="line">~/.bash_porfile</span><br><span class="line"></span><br><span class="line">~/.bash_login</span><br><span class="line"></span><br><span class="line">~/.profile</span><br><span class="line"></span><br><span class="line">~/.bashrc</span><br></pre></td></tr></table></figure>
-
-
+<h4 id="os-x系统环境变量加载顺序"><a class="markdownIt-Anchor" href="#os-x系统环境变量加载顺序"></a> OS X系统环境变量加载顺序</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/etc/profile</span><br><span class="line"></span><br><span class="line">/etc/paths</span><br><span class="line"></span><br><span class="line">~/.bash_porfile</span><br><span class="line"></span><br><span class="line">~/.bash_login</span><br><span class="line"></span><br><span class="line">~/.profile</span><br><span class="line"></span><br><span class="line">~/.bashrc</span><br></pre></td></tr></table></figure>
 <p>/etc/profile 和 /etc/paths 系统启动时自动加载。</p>
-<p><del>/.bash_profile，</del>/.bash_login，<del>/.profile按照从前往后的顺序读取，如果</del>/.bash_profile文件存在，则后面的几个文件就会被忽略不读了，如果~/.bash_profile文件不存在，才会以此类推读取后面的文件。</p>
+<p><sub>/.bash_profile，</sub>/.bash_login，<sub>/.profile按照从前往后的顺序读取，如果</sub>/.bash_profile文件存在，则后面的几个文件就会被忽略不读了，如果~/.bash_profile文件不存在，才会以此类推读取后面的文件。</p>
 <p>mac上面重启终端后 ~/.bashrc 不会自动加载。</p>
-<h4 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h4><p><code>echo $PATH</code> 查看当前环境变量</p>
+<h4 id="配置环境变量"><a class="markdownIt-Anchor" href="#配置环境变量"></a> 配置环境变量</h4>
+<p><code>echo $PATH</code> 查看当前环境变量</p>
 <p><code>export VALUE_HOME = /.../.../...</code> 定义新环境变量是一个目录地址</p>
 <p><code>export PATH=$VALUE_HOME/bin:$PATH</code> 将/bin目录加入环境变量的头部</p>
 <p><code>source .bashrc</code> 执行修改过的配置文件，使环境变量生效</p>
-<h4 id="自定义命令"><a href="#自定义命令" class="headerlink" title="自定义命令"></a>自定义命令</h4><h5 id="方法一：利用alias在配置文件中自定义命令"><a href="#方法一：利用alias在配置文件中自定义命令" class="headerlink" title="方法一：利用alias在配置文件中自定义命令"></a>方法一：利用alias在配置文件中自定义命令</h5><p><code>alias ll=&quot;ls -la&quot;</code> </p>
+<h4 id="自定义命令"><a class="markdownIt-Anchor" href="#自定义命令"></a> 自定义命令</h4>
+<h5 id="方法一利用alias在配置文件中自定义命令"><a class="markdownIt-Anchor" href="#方法一利用alias在配置文件中自定义命令"></a> 方法一：利用alias在配置文件中自定义命令</h5>
+<p><code>alias ll=&quot;ls -la&quot;</code></p>
 <p><code>alias nb=&quot;cd /Users/xinxing/myProjects/Blog;hexo new $1&quot;</code></p>
-<h5 id="方法二：将存放自定义脚本的目录加入PATH变量中"><a href="#方法二：将存放自定义脚本的目录加入PATH变量中" class="headerlink" title="方法二：将存放自定义脚本的目录加入PATH变量中"></a>方法二：将存放自定义脚本的目录加入PATH变量中</h5><p><code>export PATH=$PATH:/Users/xinxing/.my_cmd</code></p>
+<h5 id="方法二将存放自定义脚本的目录加入path变量中"><a class="markdownIt-Anchor" href="#方法二将存放自定义脚本的目录加入path变量中"></a> 方法二：将存放自定义脚本的目录加入PATH变量中</h5>
+<p><code>export PATH=$PATH:/Users/xinxing/.my_cmd</code></p>
 
     </div>
 
@@ -382,7 +379,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#OS-X系统环境变量加载顺序"><span class="nav-number">1.</span> <span class="nav-text">OS X系统环境变量加载顺序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置环境变量"><span class="nav-number">2.</span> <span class="nav-text">配置环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义命令"><span class="nav-number">3.</span> <span class="nav-text">自定义命令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#方法一：利用alias在配置文件中自定义命令"><span class="nav-number">3.1.</span> <span class="nav-text">方法一：利用alias在配置文件中自定义命令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方法二：将存放自定义脚本的目录加入PATH变量中"><span class="nav-number">3.2.</span> <span class="nav-text">方法二：将存放自定义脚本的目录加入PATH变量中</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#os-x系统环境变量加载顺序"><span class="nav-number">1.</span> <span class="nav-text"> OS X系统环境变量加载顺序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置环境变量"><span class="nav-number">2.</span> <span class="nav-text"> 配置环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义命令"><span class="nav-number">3.</span> <span class="nav-text"> 自定义命令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#方法一利用alias在配置文件中自定义命令"><span class="nav-number">3.1.</span> <span class="nav-text"> 方法一：利用alias在配置文件中自定义命令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方法二将存放自定义脚本的目录加入path变量中"><span class="nav-number">3.2.</span> <span class="nav-text"> 方法二：将存放自定义脚本的目录加入PATH变量中</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -460,7 +457,7 @@
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">219k</span>
+    <span title="站点总字数">220k</span>
 </div>
 
         
