@@ -117,10 +117,10 @@ darkmode: true
 # External url should start with http:// or https://
 menu:
   home: / || fa fa-home
-  tags: /tags/ || fa fa-tags
   categories: /categories/ || fa fa-th
+  tags: /tags/ || fa fa-tags
   archives: /archives/ || fa fa-archive
-  about: /about/ || fa fa-user
+  #about: /about/ || fa fa-user
   #schedule: /schedule/ || fa fa-calendar
   #sitemap: /sitemap.xml || fa fa-sitemap
   #commonweal: /404/ || fa fa-heartbeat
@@ -408,10 +408,10 @@ github_banner:
 # ---------------------------------------------------------------
 
 font:
-  enable: false
+  enable: true
 
   # Uri of fonts host, e.g. https://fonts.googleapis.com (Default).
-  host:
+  host: https://fonts.googleapis.com
 
   # Font options:
   # `external: true` will load this font family from `host` above.
@@ -421,13 +421,14 @@ font:
   # Global font settings used for all elements inside <body>.
   global:
     external: true
-    family: Lato
+    #family: Lato
+    family: Helvetica
     size:
 
   # Font settings for site title (.site-title).
   title:
     external: true
-    family:
+    family: Pacifico
     size:
 
   # Font settings for headlines (<h1> to <h6>).
