@@ -1,7 +1,9 @@
 ---
 title: {{ title }}
 date: {{ date }}
-updated:
+updated: {{ updated }}
+comments: true
 categories:
 tags:
+mathjax: false
 ---
