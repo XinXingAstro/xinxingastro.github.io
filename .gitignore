@@ -2,3 +2,4 @@
 node_modules/
 public/
 .deploy_git/
+# 这里面如果加上db.json会引起页面字体显示异常
