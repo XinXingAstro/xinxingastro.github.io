@@ -422,7 +422,9 @@ font:
   global:
     external: true
     #family: Lato
-    family: Helvetica
+    #family: Helvetica
+    #family: Ubuntu
+    family: Comic Sans MS
     size:
 
   # Font settings for site title (.site-title).
