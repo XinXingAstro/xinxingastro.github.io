@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Xing's Blog
+title: Xing's Techlog
 subtitle: 
 description: Xing's Tech Blog
 keywords: Tech, Algorithm, Data Structure
 author: Xing Xin
-language: zh-CN
+language: en
 timezone: Asia/Shanghai
 
 # URL
