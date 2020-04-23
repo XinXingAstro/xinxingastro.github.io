@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comic Sans MS:300,300italic,400,400italic,700,700italic|Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xinxingastro.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"manual"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":{"disqus":{"text":"Load Disqus","order":-1}},"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="找出数组中重复的数字。 相关题目：剑指Offer面试题3: 数组中重复的数字。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数组中重复的数字">
+<meta property="og:url" content="https://xinxingastro.github.io/2018/05/03/Algorithms-Data-Structures-%E6%95%B0%E7%BB%84%E4%B8%AD%E9%87%8D%E5%A4%8D%E7%9A%84%E6%95%B0%E5%AD%97/index.html">
+<meta property="og:site_name" content="Xing&#39;s Techlog">
+<meta property="og:description" content="找出数组中重复的数字。 相关题目：剑指Offer面试题3: 数组中重复的数字。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-05-03T08:00:19.000Z">
+<meta property="article:modified_time" content="2020-04-23T02:40:48.732Z">
+<meta property="article:author" content="Xing Xin">
+<meta property="article:tag" content="数组">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://xinxingastro.github.io/2018/05/03/Algorithms-Data-Structures-%E6%95%B0%E7%BB%84%E4%B8%AD%E9%87%8D%E5%A4%8D%E7%9A%84%E6%95%B0%E5%AD%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>数组中重复的数字 | Xing's Techlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xing's Techlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/XinXingAstro" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2018/05/03/Algorithms-Data-Structures-%E6%95%B0%E7%BB%84%E4%B8%AD%E9%87%8D%E5%A4%8D%E7%9A%84%E6%95%B0%E5%AD%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+      <meta itemprop="name" content="Xing Xin">
+      <meta itemprop="description" content="Xing's Tech Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xing's Techlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数组中重复的数字<a href="https://github.com/XinXingAstro/xinxingastro.github.io/edit/source/source/_posts/Algorithms%20&%20Data%20Structures/%E6%95%B0%E7%BB%84%E4%B8%AD%E9%87%8D%E5%A4%8D%E7%9A%84%E6%95%B0%E5%AD%97.md" class="post-edit-link" title="Edit this post" rel="noopener" target="_blank"><i class="fa fa-pencil-alt"></i></a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-05-03 16:00:19" itemprop="dateCreated datePublished" datetime="2018-05-03T16:00:19+08:00">2018-05-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-04-23 10:40:48" itemprop="dateModified" datetime="2020-04-23T10:40:48+08:00">2020-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithms-Data-Structures/" itemprop="url" rel="index"><span itemprop="name">Algorithms & Data Structures</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/2018/05/03/Algorithms-Data-Structures-%E6%95%B0%E7%BB%84%E4%B8%AD%E9%87%8D%E5%A4%8D%E7%9A%84%E6%95%B0%E5%AD%97/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/05/03/Algorithms-Data-Structures-数组中重复的数字/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>找出数组中重复的数字。</p>
+<p>相关题目：剑指Offer面试题3: 数组中重复的数字。</p>
+<a id="more"></a>
+<hr />
+<p><font color=red><strong>问题1: 数组中元素的取值范围是多少？数组的长度？</strong><br /></font></p>
+<p><font color=red><strong>问题2: 数组是否可以修改？</strong><br/></font></p>
+<p><font color=red><strong>问题3: 数组中重复元素有多少？找出多少重复元素？</strong><br /></font></p>
+<p><font color=red><strong>问题4: 异常情况怎么处理，如数组为null，数组长度小于2，数组中不包含重复元素，如果数组元素取值范围是0～n-1但是数组中包含大于n-1的元素，这些情况应该怎么处理。</strong><br /></font></p>
+<hr />
+<h3 id="算法1-排序遍历"><a class="markdownIt-Anchor" href="#算法1-排序遍历"></a> 算法1: 排序+遍历</h3>
+<p>如果数组<strong>可以修改</strong>，并且元素的取值范围比较大，例如：从Integer.MIN_VALUE到Integer.MAX_VALUE。那最简单的算法就是将数组排序，重复的元素就会被放到一起，然后遍历数组找到重复元素。</p>
+<p>时间复杂度：O(nlogn)</p>
+<p>空间复杂度：O(1)</p>
+<h3 id="算法2-每次将一个数字交换到相应位置"><a class="markdownIt-Anchor" href="#算法2-每次将一个数字交换到相应位置"></a> 算法2: 每次将一个数字交换到相应位置</h3>
+<p>如果题目中给出附加条件：<font color=red><strong>数组中元素的取值范围是0～n-1</strong></font>。那么我们可以利用这个条件对该算法做进一步优化。</p>
+<p>由于数组中元素取值范围是0～n-1，那么将数组排好序以后，每个元素的值应该和其下标相等。利用这个性质，我们在遍历数组的过程中，每次将一个数交换到正确位置，如果在交换过程中发现重复元素，则返回。</p>
+<p>时间复杂度：O(n)</p>
+<p>空间复杂度：O(1)</p>
+<h3 id="算法3-每次将一个位置标记为负数"><a class="markdownIt-Anchor" href="#算法3-每次将一个位置标记为负数"></a> 算法3: 每次将一个位置标记为负数</h3>
+<p>在算法2中我们每次将一个元素交换到指定位置，但是当前指针下就右会出现一个新的数字，我们需要继续将这个新的数字交换到指定位置，指针不能向前移动，这种情况下算法2的时间复杂度实际上比O(n)要大，我们可以对算法2做进一步优化，使其最坏情况下的时间复杂度降到O(n)。</p>
+<p>对于每一个数字，我们知道它的最终位置在哪，我们并不将这个数字交换到指定的位置，而是在指定位置做一个标记，说明这个数字我们已经访问过了，我们做的标记，就是将指定位置的数字变为负数，下次如果我么右来到这个位置，看到该位置的数字为负数的时候，我们就找到了一个重复数字。这样对于每个元素，仅需要遍历一次我们就可以知道它是不是重复元素，相较于算法2，时间性能又大幅提升了。</p>
+<p>时间复杂度：O(n)</p>
+<p>空间复杂度：O(1)</p>
+<p>这个算法的例子见：Leetcode442. Find All Duplicates in an Array</p>
+<h3 id="算法4-hash数组统计元素是否出现"><a class="markdownIt-Anchor" href="#算法4-hash数组统计元素是否出现"></a> 算法4: Hash数组统计元素是否出现</h3>
+<p>如果数组<strong>不可以修改</strong>，我们可以使用HashMap统计元素是否出现，然后遍历HashMap找出重复数字。</p>
+<p>时间复杂度：O(n)</p>
+<p>空间复杂度：O(n)</p>
+<p>由于HashMap只是统计元素是否出现，我们完全可以使用一个<strong>boolean数组</strong>代替HashMap来降低一些空间复杂度。我们可以先找出数组中最大数max和最小数min来确定boolean数组的长度<strong>len = max - min + 1</strong>，然后每次从原数组中取出一个元素m，将<strong>boolean[m - min]置为true</strong>，如果发现该位置已经为true，那说明该元素就是重复元素。</p>
+<p>时间复杂度：O(n)</p>
+<p>空间复杂度：O(n)</p>
+<p>我们继续优化算法来避免O(n)的空间复杂度。</p>
+<h3 id="算法5-二分统计"><a class="markdownIt-Anchor" href="#算法5-二分统计"></a> 算法5: 二分统计</h3>
+<p>如果数组<strong>不可以修改</strong>，<strong>并且数组中元素的取值范围是0～n-1</strong>。</p>
+<p>和算法4类似，该算法也需要统计元素出现的次数，但不同的是，这次我们基于分治法的思想，统计一个区间内元素出现的次数，从而降低时间复杂度。</p>
+<p>由于已知数组中元素的取值范围在0～n-1之间，我们可以将这个区间分为0～n/2-1和n/2～n-1两个区间，分别统计数组中在这两个区间内的元素出现的次数，如果一个区间内元素出现的次数超过了区间的长度，那说明该区间内肯定存在重复元素，接下来，我们再将这个区间一分为二，统计元素出现的次数，直到找到重复元素为止。</p>
+<p>时间复杂度：O(nlogn)</p>
+<p>空间复杂度：O(1)</p>
+<p>和算法4相比该算法相当于用时间换空间。</p>
+<p>需要指出的是：**该算法不一定每次都能找到重复数字！**例如对于数组[2,2,3,4,5,6]，在1～3范围内元素出现的次数是3次，在4～6范围内元素出现的次数也是3次，算法找不到重复数字。</p>
+<h3 id="算法6-将数组映射为有环链表"><a class="markdownIt-Anchor" href="#算法6-将数组映射为有环链表"></a> 算法6: 将数组映射为有环链表</h3>
+<p><strong>如果数组中的元素取值范围是0～n-1。</strong></p>
+<p>那么我们就可以将数组映射为一个有环链表，用链表中判断环入口节点的算法就可以找到重复元素。</p>
+<p><strong>映射规则：以元素下标作为node.val，以元素值作为node.next。当两个node.next值相同时链表中就会产生环。</strong></p>
+<p>时间复杂度：O(n)</p>
+<p>空间复杂度：O(1)</p>
+<p>这个算法有个很明显的问题：<strong>如果一个元素的值和其下标相同时，映射为节点时相当于节点的next指针指向该节点本身，链表就断了。</strong></p>
+<p>如果题目可以去掉数组不可修改(read-only)这个条件，这个问题就很容易解决，我们只需要遍历数组，将元素值和其下标相等的元素和相邻元素对换，直到数组中每个元素的值都不等于其下标为止。</p>
+<h3 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h3>
+<ul>
+<li>如果数组中元素的取值范围很大，那么我们只能使用排序+遍历和HashMap统计次数这两种算法。</li>
+<li>如果数组中元素的取值范围在数组长度范围内，我们就可以分别对排序+遍历算法和HashMap算法进行优化，优化过后的排序+遍历算法性能最好，达到O(n)的时间复杂度。并且还可以用二分统计和有环链表算法。</li>
+<li>如果题目中又给出read-only条件，那么排序+遍历算法就不能用了，可以使用的算法只有二分统计和HashMap统计，由于二分统计存在缺陷，所以最优的算法只有Hash数组统计了。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">Related Posts</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2017/06/30/Algorithms-Data-Structures-2017网易-合唱团/" rel="bookmark">2017网易 合唱团</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2018/05/09/Algorithms-Data-Structures-二维数组中的查找/" rel="bookmark">二维数组中的查找</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2018/06/20/Algorithms-Data-Structures-数组中只出现1次的数字/" rel="bookmark">数组中只出现1次的数字</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="/2017/06/30/Algorithms-Data-Structures-连续子数组最大累乘积/" rel="bookmark">连续子数组最大累乘积</a></div>
+    </li>
+  </ul>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E7%BB%84/" rel="tag"><i class="fa fa-tag"></i> 数组</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/04/30/Others-%E8%BD%AC-markdown%E8%AE%BE%E7%BD%AE%E5%AD%97%E4%BD%93%E5%AD%97%E5%8F%B7%E9%A2%9C%E8%89%B2/" rel="prev" title="Markdown设置字体、字号和颜色">
+      <i class="fa fa-chevron-left"></i> Markdown设置字体、字号和颜色
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/03/Java-Java%E4%B8%AD%E9%81%8D%E5%8E%86Map%E7%9A%84%E6%96%B9%E6%B3%95/" rel="next" title="Java中遍历Map的方法">
+      Java中遍历Map的方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法1-排序遍历"><span class="nav-number">1.</span> <span class="nav-text"> 算法1: 排序+遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法2-每次将一个数字交换到相应位置"><span class="nav-number">2.</span> <span class="nav-text"> 算法2: 每次将一个数字交换到相应位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法3-每次将一个位置标记为负数"><span class="nav-number">3.</span> <span class="nav-text"> 算法3: 每次将一个位置标记为负数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法4-hash数组统计元素是否出现"><span class="nav-number">4.</span> <span class="nav-text"> 算法4: Hash数组统计元素是否出现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法5-二分统计"><span class="nav-number">5.</span> <span class="nav-text"> 算法5: 二分统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法6-将数组映射为有环链表"><span class="nav-number">6.</span> <span class="nav-text"> 算法6: 将数组映射为有环链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text"> 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xing Xin"
+      src="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+  <p class="site-author-name" itemprop="name">Xing Xin</p>
+  <div class="site-description" itemprop="description">Xing's Tech Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XinXingAstro" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XinXingAstro" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xinxingastro@gmail.com" title="E-Mail → mailto:xinxingastro@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xing Xin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">220k</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+  <script>
+    (function(d, w, c) {
+      w.ChatraID = 'u5Jxaqvnnd33Bhyk3';
+      var s = d.createElement('script');
+      w[c] = w[c] || function() {
+        (w[c].q = w[c].q || []).push(arguments);
+      };
+      s.async = true;
+      s.src = 'https://call.chatra.io/chatra.js';
+      if (d.head) d.head.appendChild(s);
+    })(document, window, 'Chatra');
+  </script>
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://xings-blog.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://xinxingastro.github.io/2018/05/03/Algorithms-Data-Structures-%E6%95%B0%E7%BB%84%E4%B8%AD%E9%87%8D%E5%A4%8D%E7%9A%84%E6%95%B0%E5%AD%97/";
+    this.page.identifier = "2018/05/03/Algorithms-Data-Structures-数组中重复的数字/";
+    this.page.title = "数组中重复的数字";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://xings-blog.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
