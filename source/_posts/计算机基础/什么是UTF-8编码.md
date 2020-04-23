@@ -5,8 +5,7 @@ tags:
   - null
 comments: true
 mathjax: false
-typora-copy-images-to: ../../images
-typora-root-url: ../../../source
+updated:
 date: 2018-08-04 10:56:59
 categories: 计算机基础
 ---

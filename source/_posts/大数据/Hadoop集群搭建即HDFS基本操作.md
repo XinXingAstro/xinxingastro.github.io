@@ -6,6 +6,7 @@ tags:
   - Hadoop集群
   - HDFS
 comments: true
+updated:
 ---
 HDFS就是一个基于分布式、自动冗余、可以动态扩展的大硬盘，Hadoop目前不支持Java9最好装Java7或者Java8。
 
