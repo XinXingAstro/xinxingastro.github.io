@@ -26,9 +26,9 @@ LRU近期最少使用缓存替换策略的原理及实现。
 >
 > 顺序局部性（Order Locality）：在典型程序中，除转移类指令外，大部分指令是顺序进行的。顺序执行和非顺序执行的比例大致是5:1。此外，对大型数组访问也是顺序的。指令的顺序执行、数组的连续存放等是产生顺序局部性的原因。
 
->LRU(Least Recently Used)近期最少使用算法，是内存管理的一种页面置换算法，通常用与缓存的淘汰策略实现，由于缓存的内存非常宝贵，所以需要根据某种规则来剔除数据，保证内存不被撑满。
+>LRU(Least Recently Used)近期最少使用算法，是内存管理的一种页面置换算法，通常用于缓存淘汰策略的实现，由于缓存的空间非常宝贵，所以需要根据某种规则来剔除数据，保证缓存不被撑满。
 
-常用的缓存Redis中可以设置内存的最大使用量，当内存的使用量超过这个最大值时，Redis就会实施淘汰策略，Redis中有6种常用的数据淘汰策略：
+Redis中设置内存最大使用量，当内存的使用量超过这个最大值时，Redis就会实施淘汰策略，Redis中有6种常用的数据淘汰策略：
 
 |                 |                                                          |
 | --------------- | -------------------------------------------------------- |
@@ -39,7 +39,7 @@ LRU近期最少使用缓存替换策略的原理及实现。
 | allkeys-random  | 从全部数据集中**随机挑选**数据淘汰                       |
 | no-enviction    | 禁止驱逐数据                                             |
 
-在Mybatis中也实现了使用LRU策略的缓存，我们通过Mybatis中的[LruCache.java](https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/cache/decorators/LruCache.java)看一下LRU Cache的实现原理。
+Mybatis中也实现了使用LRU策略的缓存，我们通过Mybatis中的[LruCache.java](https://github.com/mybatis/mybatis-3/blob/master/src/main/java/org/apache/ibatis/cache/decorators/LruCache.java)看一下LRU Cache的实现原理。
 
 ```java
 package org.apache.ibatis.cache.decorators;
