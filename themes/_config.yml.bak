@@ -48,7 +48,7 @@ favicon:
   #ms_browserconfig: /images/browserconfig.xml
 
 # Show multilingual switcher in footer.
-language_switcher: false
+language_switcher: true
 
 footer:
   # Specify the date when the site was setup. If not defined, current year will be used.
@@ -59,7 +59,7 @@ footer:
     # Icon name in Font Awesome. See: https://fontawesome.com/icons
     name: fa fa-heart
     # If you want to animate the icon, set it to true.
-    animated: false
+    animated: true
     # Change the color of icon, using Hex Code.
     color: "#ff0000"
 
@@ -69,7 +69,7 @@ footer:
   # Powered by Hexo & NexT
   powered: true
 
-  # Beian ICP and gongan information for Chinese users. See: https://beian.miit.gov.cn, http://www.beian.gov.cn
+  # Beian ICP and gongan information for Chinese users. See: http://www.beian.miit.gov.cn, http://www.beian.gov.cn
   beian:
     enable: false
     icp:
@@ -103,7 +103,6 @@ scheme: Mist
 #scheme: Gemini
 
 # Dark Mode
-#darkmode: false
 darkmode: true
 
 
@@ -202,7 +201,7 @@ links_settings:
   layout: block
 
 links:
-  #Title: http://yoursite.com
+  #Title: http://xinxingastro.github.io
 
 # Table of Contents in the Sidebar
 # Front-matter variable (unsupport wrap expand_all).
@@ -251,9 +250,9 @@ post_meta:
 # Post wordcount display settings
 # Dependencies: https://github.com/theme-next/hexo-symbols-count-time
 symbols_count_time:
-  separated_meta: true
-  item_text_post: true
-  item_text_total: false
+  separated_meta: false
+  item_text_post: false
+  item_text_total: true
 
 # Use icon instead of the symbol # to indicate the tag at the bottom of the post
 tag_icon: true
@@ -297,7 +296,7 @@ related_posts:
 # Dependencies: https://github.com/hexojs/hexo-deployer-git
 post_edit:
   enable: true
-  #url: https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name # Link for view source
+  #url: https://github.com/XinXingAstro/xinxingastro.github.io/tree/source/source/ # Link for view source
   url: https://github.com/XinXingAstro/xinxingastro.github.io/edit/source/source/ # Link for fork & edit
 
 # Show previous post and next post in post footer if exists
@@ -386,7 +385,7 @@ bookmark:
   color: "#222"
   # If auto, save the reading progress when closing the page or clicking the bookmark-icon.
   # If manual, only save it by clicking the bookmark-icon.
-  save: auto
+  save: manual
 
 # `Follow me on GitHub` banner in the top-right corner.
 github_banner:
@@ -422,13 +421,16 @@ font:
   # Global font settings used for all elements inside <body>.
   global:
     external: true
-    family: Noto Sans SC
+    #family: Lato
+    #family: Helvetica
+    #family: Ubuntu
+    family: Comic Sans MS
     size:
 
   # Font settings for site title (.site-title).
   title:
     external: true
-    family:
+    family: Pacifico
     size:
 
   # Font settings for headlines (<h1> to <h6>).
@@ -790,7 +792,7 @@ note:
   #  - flat      flat callout style with background, like on Mozilla or StackOverflow.
   #  - disabled  disable all CSS styles import of note tag.
   style: simple
-  icons: false
+  icons: true
   # Offset lighter of background in % for modern and flat styles (modern: -12 | 12; flat: -18 | 6).
   # Offset also applied to label tag variables. This option can work with disabled note tag.
   light_bg_offset: 0
