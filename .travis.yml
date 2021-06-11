@@ -10,8 +10,7 @@ script:
   - hexo generate # generate static files
 deploy:
   provider: pages
-  #skip-cleanup: true
-  skip-cleanup: false
+  skip-cleanup: true #构建完成后不清除
   github-token: $GH_TOKEN
   keep-history: true
   target_branch: master # deploy static files to master
