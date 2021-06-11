@@ -17,4 +17,3 @@ deploy:
   on:
     branch: source
   local-dir: public
-  target_branch: master #存放生成文件的branch
