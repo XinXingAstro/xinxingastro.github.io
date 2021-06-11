@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Pacifico:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"xinxingastro.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="基于AMD Ryzen系列CPU的装机方案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AMD平台装机方案">
+<meta property="og:url" content="https://xinxingastro.github.io/2018/03/24/Others/AMD%E5%B9%B3%E5%8F%B0%E8%A3%85%E6%9C%BA%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="Xing&#39;s Techlog">
+<meta property="og:description" content="基于AMD Ryzen系列CPU的装机方案。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-03-24T17:24:04.000Z">
+<meta property="article:modified_time" content="2021-06-11T05:52:15.997Z">
+<meta property="article:author" content="Xing Xin">
+<meta property="article:tag" content="Tech">
+<meta property="article:tag" content=" Algorithm">
+<meta property="article:tag" content=" Data Structure">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://xinxingastro.github.io/2018/03/24/Others/AMD%E5%B9%B3%E5%8F%B0%E8%A3%85%E6%9C%BA%E6%96%B9%E6%A1%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>AMD平台装机方案 | Xing's Techlog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Xing's Techlog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/XinXingAstro" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://xinxingastro.github.io/2018/03/24/Others/AMD%E5%B9%B3%E5%8F%B0%E8%A3%85%E6%9C%BA%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+      <meta itemprop="name" content="Xing Xin">
+      <meta itemprop="description" content="Xing's Tech Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xing's Techlog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AMD平台装机方案<a href="https://github.com/XinXingAstro/xinxingastro.github.io/edit/source/source/_posts/Others/AMD%E5%B9%B3%E5%8F%B0%E8%A3%85%E6%9C%BA%E6%96%B9%E6%A1%88.md" class="post-edit-link" title="Edit this post" rel="noopener" target="_blank"><i class="fa fa-pencil-alt"></i></a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-25 01:24:04" itemprop="dateCreated datePublished" datetime="2018-03-25T01:24:04+08:00">2018-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-06-11 13:52:15" itemprop="dateModified" datetime="2021-06-11T13:52:15+08:00">2021-06-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Others/" itemprop="url" rel="index"><span itemprop="name">Others</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>基于AMD Ryzen系列CPU的装机方案。</p>
+<a id="more"></a>
+<hr />
+<h3 id="amd-ryzen-7-2700x-装机方案"><a class="markdownIt-Anchor" href="#amd-ryzen-7-2700x-装机方案"></a> AMD Ryzen 7 2700X 装机方案</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>具体型号</th>
+<th>京东 ¥</th>
+<th>Amazon$</th>
+<th>差价¥</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU</td>
+<td>AMD 锐龙 7 2700X 处理器 8核16线程 AM4 接口 3.7GHz 盒装（自带CPU散热器）</td>
+<td><a href="https://item.jd.com/6902456.html">2699</a></td>
+<td><a href="https://www.amazon.com/AMD-Ryzen-Processor-Wraith-Cooler/dp/B07B428M7F/ref=sr_1_3?s=electronics&amp;ie=UTF8&amp;qid=1523660263&amp;sr=1-3&amp;keywords=amd+ryzen+7+2700x">329.00</a></td>
+<td>633.54</td>
+</tr>
+<tr>
+<td>内存</td>
+<td>金士顿(Kingston)骇客神条 Predator系列 DDR4 3600 16G(8Gx2)套装</td>
+<td><a href="http://item.jd.com/4533077.html#crumb-wrap">1899</a></td>
+<td><a href="https://www.amazon.com/Kingston-Technology-HyperX-HX432C16PB3K2-16/dp/B01GCWQBQQ/ref=sr_1_3?s=electronics&amp;ie=UTF8&amp;qid=1523659856&amp;sr=1-3&amp;keywords=Predator%2BDDR4&amp;th=1">290</a></td>
+<td>79</td>
+</tr>
+<tr>
+<td></td>
+<td>金士顿(Kingston)骇客神条 Predator系列 DDR4 3600 32G(8Gx4)套装</td>
+<td><a href="http://item.jd.com/4523079.html#crumb-wrap">3599</a></td>
+<td><a href="https://www.amazon.com/Kingston-Technology-HyperX-HX432C16PB3K2-16/dp/B072JTLSYV/ref=sr_1_3?s=electronics&amp;ie=UTF8&amp;qid=1523659856&amp;sr=1-3&amp;keywords=Predator%2BDDR4&amp;th=1">530.99</a></td>
+<td>265.44</td>
+</tr>
+<tr>
+<td>主板</td>
+<td>玩家国度（REPUBLIC OF GAMERS ）ROG STRIX X470-F GAMING 声波雷达 游戏主板（AMD X470/socket AM4）</td>
+<td><a href="https://item.jd.com/7252367.html">1999</a></td>
+<td><a href="https://www.amazon.com/dp/B07C4PH429/ref=sr_1_1?s=electronics&amp;ie=UTF8&amp;qid=1523659761&amp;sr=1-1&amp;keywords=ROG+STRIX+X470-F+GAMING">214.99</a></td>
+<td>649.29</td>
+</tr>
+<tr>
+<td></td>
+<td>华硕 （ASUS） PRIME X470-PRO主板“吃鸡”游戏主板（AMD X470/socket AM4)</td>
+<td><a href="https://item.jd.com/7038904.html">1499</a></td>
+<td><a href="https://www.amazon.com/dp/B07C57Q1XH/ref=sr_1_2?rps=1&amp;ie=UTF8&amp;qid=1523659655&amp;sr=8-2&amp;keywords=PRIME+X470-PRO">184.99</a></td>
+<td>337.63</td>
+</tr>
+<tr>
+<td>SSD</td>
+<td>三星(SAMSUNG) 960 EVO 250G M.2 NVMe 固态硬盘</td>
+<td><a href="http://item.jd.com/3739097.html#crumb-wrap">729</a></td>
+<td><a href="https://www.amazon.com/Samsung-960-EVO-Internal-MZ-V6E250BW/dp/B01LYFKX41/ref=sr_1_fkmr0_1?s=electronics&amp;ie=UTF8&amp;qid=1523660332&amp;sr=1-1-fkmr0&amp;keywords=960+EVO+250G+M.2+NVMe">119.99</a></td>
+<td>-24.3</td>
+</tr>
+<tr>
+<td>电源</td>
+<td>美商海盗船（USCorsair）额定650W RM650x 电源</td>
+<td><a href="http://item.jd.com/1905013.html#crumb-wrap">869</a></td>
+<td><a href="https://www.amazon.com/Corsair-RM650x-Modular-Supply-Certified/dp/B015YEIBJ8/ref=sr_1_3?s=electronics&amp;ie=UTF8&amp;qid=1523660482&amp;sr=1-3&amp;keywords=RM650x">119.99</a></td>
+<td>115.7</td>
+</tr>
+<tr>
+<td></td>
+<td>安钛克（Antec）额定650W EAG650 PRO 模组电源</td>
+<td><a href="http://item.jd.com/1331794.html#crumb-wrap">649</a></td>
+<td><a href="https://www.amazon.com/Antec-VP-450-Power-Supply/dp/B0716GK7Z6/ref=sr_1_1?s=electronics&amp;ie=UTF8&amp;qid=1523660680&amp;sr=1-1&amp;keywords=antec%2Bpsu&amp;th=1">55.54</a></td>
+<td>300.2</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>电源应该选择海盗船650W电源</li>
+<li>三星的SSD应该在国内买</li>
+</ul>
+<h3 id="amd-ryzen-7-1800x-装机方案"><a class="markdownIt-Anchor" href="#amd-ryzen-7-1800x-装机方案"></a> AMD Ryzen 7 1800X 装机方案</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>具体型号</th>
+<th>京东 ¥</th>
+<th>Amazon$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU</td>
+<td><a href="http://item.jd.com/3885175.html#crumb-wrap">锐龙 AMD Ryzen 7 1800X 处理器8核AM4接口 3.6GHz 盒装</a></td>
+<td>2699</td>
+<td><a href="https://www.amazon.com/AMD-Ryzen-1800X-Processor-YD180XBCAEWOF/dp/B06W9JXK4G/ref=sr_1_1?s=electronics&amp;ie=UTF8&amp;qid=1521996810&amp;sr=1-1&amp;keywords=amd+ryzen+7+1800x">329</a></td>
+</tr>
+<tr>
+<td>CPU散热器</td>
+<td><a href="http://item.jd.com/2329757.html">猫头鹰（NOCTUA）NH-D9L CPU散热器</a></td>
+<td>439</td>
+<td><a href="https://www.amazon.com/Noctua-Cooler-2011-0-2011-3-NH-D9L/dp/B00QCEWTAW/ref=sr_1_1?s=electronics&amp;ie=UTF8&amp;qid=1521997050&amp;sr=1-1&amp;keywords=nh-d9l">54.59</a></td>
+</tr>
+<tr>
+<td>内存条</td>
+<td><a href="http://item.jd.com/4533077.html#crumb-wrap">金士顿(Kingston)骇客神条 Predator系列 DDR4 3600 16G(8Gx2)套装</a></td>
+<td>1899</td>
+<td><a href="https://www.amazon.com/Kingston-Technology-HyperX-HX430C15PB3K2-32/dp/B071G19NY3/ref=sr_1_16?s=electronics&amp;ie=UTF8&amp;qid=1521997187&amp;sr=1-16&amp;keywords=kingston%2Bhyperx%2Bddr4&amp;th=1">264.99</a></td>
+</tr>
+<tr>
+<td>主板</td>
+<td><a href="http://item.jd.com/3887247.html">华硕（ASUS）PRIME X370-PRO 主板（AMD X370/socket AM4）</a></td>
+<td>999</td>
+<td><a href="https://www.amazon.com/Prime-X370-Pro-Ryzen-Motherboard-Lighting/dp/B06WD4N297/ref=sr_1_2?s=electronics&amp;ie=UTF8&amp;qid=1521997360&amp;sr=1-2&amp;keywords=asus+x370">150.58</a></td>
+</tr>
+<tr>
+<td>SSD</td>
+<td><a href="http://item.jd.com/3739097.html#crumb-wrap">三星(SAMSUNG) 960 EVO 250G M.2 NVMe 固态硬盘</a></td>
+<td>769</td>
+<td><a href="https://www.amazon.com/Samsung-960-EVO-Internal-MZ-V6E500BW/dp/B01LYFKX41/ref=sr_1_1?s=electronics&amp;ie=UTF8&amp;qid=1521998647&amp;sr=1-1&amp;keywords=samsung%2B960%2Bevo&amp;th=1">119.99</a></td>
+</tr>
+<tr>
+<td>电源</td>
+<td><a href="http://item.jd.com/1331794.html#crumb-wrap">安钛克（Antec）额定650W EAG650 PRO 模组电源</a></td>
+<td>649</td>
+<td><a href="https://www.amazon.com/Antec-VP-450-Power-Supply/dp/B0716GK7Z6/ref=sr_1_1?s=electronics&amp;ie=UTF8&amp;qid=1521997592&amp;sr=1-1&amp;keywords=antec%2Bpower%2Bsupply&amp;th=1">53.09</a></td>
+</tr>
+<tr>
+<td>机箱</td>
+<td><a href="http://item.jd.com/2285652.html#crumb-wrap">追风者(PHANTEKS) 416PSC主动静音版 ATX全金属RGB水冷机箱</a></td>
+<td>349</td>
+<td><a href="https://www.amazon.com/dp/B01BLYB5HK/ref=psdc_572238_t2_B01NALAFU9?th=1">78.40</a></td>
+</tr>
+<tr>
+<td>显卡</td>
+<td>自己之前的GTX950</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>显示器</td>
+<td><a href="http://item.jd.com/3446665.html?dist=jd">LG 27UD58-B 27英寸4K IPS硬屏 低闪屏滤蓝光LED背光液晶显示器</a></td>
+<td>2499</td>
+<td><a href="https://www.amazon.com/LG-Splitscreen-Accessories-Universal-Transformer/dp/B06XGHR38R/ref=sr_1_2_sspa?s=electronics&amp;ie=UTF8&amp;qid=1521998203&amp;sr=1-2-spons&amp;keywords=lg+27ud58-b&amp;psc=1">342.99</a></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>10302</td>
+<td>1393.27</td>
+</tr>
+</tbody>
+</table>
+<p>亚马逊上的价格比国内的价格总体便宜1500块左右。</p>
+<h3 id="amd-threadripper-1950x-装机方案"><a class="markdownIt-Anchor" href="#amd-threadripper-1950x-装机方案"></a> AMD Threadripper 1950X 装机方案</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>具体型号</th>
+<th>京东¥</th>
+<th>Amazon$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU</td>
+<td><a href="http://item.jd.com/4620609.html">锐龙 AMD Threadripper （线程撕裂者）1950X 处理器16核32线程</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CPU散热器</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>内存条</td>
+<td><a href="http://item.jd.com/4533077.html#crumb-wrap">金士顿(Kingston)骇客神条 Predator系列 DDR4 3600 16G(8Gx2)套装</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>主板</td>
+<td><a href="http://item.jd.com/4620627.html#none">华硕（ASUS）PRIME X399-A 主板（AMD X399/Socket TR4）</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SSD</td>
+<td><a href="http://item.jd.com/3739097.html#crumb-wrap">三星(SAMSUNG) 960 EVO 250G M.2 NVMe 固态硬盘</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>电源</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>机箱</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>显卡</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>显示器</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="比较好的机箱"><a class="markdownIt-Anchor" href="#比较好的机箱"></a> 比较好的机箱</h3>
+<table>
+<thead>
+<tr>
+<th>机箱</th>
+<th>价格¥</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="http://item.jd.com/3783597.html#crumb-wrap">Tt（Thermaltake）Core G3 黑色 薄型机箱（支持ATX主板/支持长显卡/垂直或平躺摆放/侧透/双U3 140*370*454mm</a></td>
+<td>359</td>
+</tr>
+<tr>
+<td><a href="http://item.jd.com/3595525.html#crumb-wrap">FD（Fractal Design）Node 202 Slim机箱 立卧两用/ITX主板/SFX电源/智能风道/支持310mm显卡 82*330*377mm</a></td>
+<td>699</td>
+</tr>
+<tr>
+<td><a href="http://item.jd.com/2285666.html">追风者(PHANTEKS) 416P黑色 中塔ATX侧透RGB水冷机箱(RGB呼吸灯控/配2把风扇/280水冷/防尘/背线/SSD)</a></td>
+<td>299</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+
+    
+    
+    
+      
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/20/Java/Java%E6%8A%BD%E8%B1%A1%E7%B1%BB%E5%92%8C%E6%8E%A5%E5%8F%A3%E5%8C%BA%E5%88%AB/" rel="prev" title="Java抽象类和接口的区别">
+      <i class="fa fa-chevron-left"></i> Java抽象类和接口的区别
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/25/Algorithms%20&%20Data%20Structures/%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/" rel="next" title="二叉树遍历算法总结">
+      二叉树遍历算法总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#amd-ryzen-7-2700x-装机方案"><span class="nav-number">1.</span> <span class="nav-text"> AMD Ryzen 7 2700X 装机方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#amd-ryzen-7-1800x-装机方案"><span class="nav-number">2.</span> <span class="nav-text"> AMD Ryzen 7 1800X 装机方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#amd-threadripper-1950x-装机方案"><span class="nav-number">3.</span> <span class="nav-text"> AMD Threadripper 1950X 装机方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#比较好的机箱"><span class="nav-number">4.</span> <span class="nav-text"> 比较好的机箱</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xing Xin"
+      src="https://avatars0.githubusercontent.com/u/16800212?s=460&v=4">
+  <p class="site-author-name" itemprop="name">Xing Xin</p>
+  <div class="site-description" itemprop="description">Xing's Tech Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XinXingAstro" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;XinXingAstro" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:xinxingastro@gmail.com" title="E-Mail → mailto:xinxingastro@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xing Xin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">Symbols count total: </span>
+    <span title="Symbols count total">220k</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'bec5d4e7bb3f9151ddc7',
+      clientSecret: '048aa3f6ef481cfbd842e3034e8a11c4d4ffd894',
+      repo        : 'xinxingastro.github.io',
+      owner       : 'XinXingAstro',
+      admin       : ['XinXingAstro'],
+      id          : 'e088615304bc484b6166873e99381db0',
+        language: '',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
